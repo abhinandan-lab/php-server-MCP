@@ -1,0 +1,473 @@
+-- |--------------------------------------------------------------------------------------------------------
+-- Creators Table (users who sign up/login via Google Auth)
+-- |--------------------------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS youtube_creators;
+CREATE TABLE youtube_creators (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    channel_id VARCHAR(100),
+    channel_handle VARCHAR(100),
+    channel_name VARCHAR(255),
+    submission_cities TEXT DEFAULT NULL,
+    user_name VARCHAR(150),
+    user_email VARCHAR(255),
+    login_jwt_token TEXT,
+    firebase_token TEXT,
+    profile_avatar TEXT,
+    login_password TEXT, -- hashed password (if used)
+    email_verified TINYINT(1) DEFAULT 0, -- 0 = not verified, 1 = verified
+    creator_status TINYINT(1) DEFAULT 1, -- 0 = blocked creator, 1 = active creator
+    google_access_token TEXT,
+    google_refresh_token TEXT,
+    event_uploads TEXT DEFAULT NULL,
+    submission_states TEXT DEFAULT NULL,
+    region VARCHAR(100) DEFAULT NULL,
+    total_submissions INT DEFAULT NULL,
+    google_token_expires_at DATETIME,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO `youtube_creators` (`id`, `channel_id`, `channel_handle`, `channel_name`, `submission_cities`, `user_name`, `user_email`, `login_jwt_token`, `firebase_token`, `profile_avatar`, `login_password`, `email_verified`, `creator_status`, `google_access_token`, `google_refresh_token`, `event_uploads`, `submission_states`, `region`, `total_submissions`, `google_token_expires_at`, `created_at`) VALUES
+(1, 'UCKDCMAcIAy8smamC5FdHJ6w', '@abhinandanindrajitrajbhar', 'Abhinandan Indrajit Rajbhar', NULL, 'Abhinandan Indrajit Rajbhar', 'abhinandan@boomlive.in', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0IiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdCIsImlhdCI6MTc1ODcwMDUzMSwiZXhwIjoxNzU5MzA1MzMxLCJ1c2VyIjp7ImVtYWlsIjoiYWJoaW5hbmRhbkBib29tbGl2ZS5pbiIsIm5hbWUiOiJBYmhpbmFuZGFuIEluZHJhaml0IFJhamJoYXIifX0.qs7Yx7YAnfieLLxQyYpJpOcg2jS9TOFOwhhjx30-xiA', NULL, 'https://yt3.ggpht.com/ytc/AIdro_lqULl_zl4kd2Kqu-NGfQAeRgktPwzB-Z0A1Snc5T96-MRs7PMnyyGHCmsAyOOuHNpt5Q=s88-c-k-c0x00ffffff-no-rj', NULL, 1, 1, 'ya29.a0AQQ_BDRTRV5b7tPNeqr0eNzhpZmUqo3i7TBTV81HJPKpTGNF-QMBiIEwVW_2z33dYCgpW-NboLqYU3nxZyVvq0RAnP7K1kEzqOJIPI0mbvJLBesb5N0yayGFPlQvbGtL64J-WcxA8Hcc3GlXq_HizhPf0TsJcbE7NWMV5NpjeP9cgoFKeKVqqQC36eTmBUqlWxZy5qIaCgYKAa0SARUSFQHGX2MitE5YJoqi0Y2p-ODKG79jIA0206', NULL, NULL, NULL, NULL, NULL, '2025-09-24 08:55:27', '2025-09-24 07:55:31');
+
+
+
+-- |--------------------------------------------------------------------------------------------------------
+-- Admin Table
+-- |--------------------------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS admin_user;
+CREATE TABLE admin_user (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(40),
+    email VARCHAR(150) NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO admin_user (username, email, password) 
+VALUES ('admin', 'admin@example.com', '$2y$10$bkPD8BaqPY9gsbL15YLytOTuBy1G//VFscMtktpUCjo3KcH5BFrqG');
+
+
+-- |--------------------------------------------------------------------------------------------------------
+-- Challenges
+-- |--------------------------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS challenges;
+CREATE TABLE challenges (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    challenge_title VARCHAR(512) NOT NULL,
+    target_city VARCHAR(160),
+    description TEXT,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    reward_points INT(8) DEFAULT 0,
+    reward_coins INT(8) DEFAULT 0, -- reserved for later usage
+    difficulty_level ENUM('easy', 'medium', 'hard') NOT NULL,
+    hashtags TEXT,
+    location TEXT,
+    category VARCHAR(1024),
+    feature_challenge TINYINT(1) DEFAULT 0, -- 0 = false, 1 = true
+    push_notifications_to_creators TINYINT(1) DEFAULT 1, -- 0 = false, 1 = true
+    created_by INT DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Insert dummy rows into challenges
+
+INSERT INTO `challenges` (`id`, `challenge_title`, `target_city`, `description`, `start_date`, `end_date`, `reward_points`, `reward_coins`, `difficulty_level`, `hashtags`, `location`, `category`, `feature_challenge`, `push_notifications_to_creators`, `created_by`, `created_at`, `updated_at`) VALUES
+(1, 'Clean City Campaign', 'Mumbai', 'Encourage local citizens to participate in cleanliness drives.', '2025-09-10', '2025-09-20', 200, 50, 'easy', '#clean #city #campaign', 'Mumbai Central Park', 'Environment', 1, 1, 1, '2025-09-22 06:05:18', '2025-09-22 06:05:18'),
+(2, 'AI Hackathon 2025', 'Bangalore', 'Build innovative AI solutions to solve real-world problems.', '2025-10-01', '2025-10-05', 220, 100, 'hard', '#AI #hackathon #innovation', 'Tech Park, Bangalore', 'Technology', 0, 1, 2, '2025-09-22 06:05:18', '2025-09-22 06:05:18'),
+(3, '30 Shorts in 30 Days', 'Mumbai', 'Upload 1 YouTube Short every day for 30 days on any topic you love.', '2025-09-01', '2025-09-30', 1000, 500, 'medium', '#YouTubeShorts #DailyChallenge', NULL, 'content_growth', 1, 1, 1, '2025-09-22 00:50:55', '2025-09-22 00:50:55'),
+(4, 'Trending Topic Upload', 'Delhi', 'Create a video around the top trending hashtag this week on YouTube.', '2025-09-22', '2025-10-05', 700, 500, 'medium', '#YouTubeShorts #DailyChallenge', NULL, 'trending', 1, 1, 1, '2025-09-22 00:52:12', '2025-09-22 00:52:12'),
+(5, 'Collab Challenge', 'Bangalore', 'Collaborate with at least one creator and upload a joint video.', '2025-09-22', '2025-10-20', 800, 400, 'medium', '#Collab #DailyChallenge', NULL, 'collaboration', 1, 1, 1, '2025-09-22 00:53:01', '2025-09-22 00:53:01'),
+(6, 'First 1,000 Views', 'Mumbai', 'Upload a video that hits 1,000 views within 7 days of publishing.', '2025-09-28', '2025-10-20', 1200, 400, 'hard', '#ViralChallenge #DailyChallenge', NULL, 'growth', 1, 1, 1, '2025-09-22 00:54:01', '2025-09-22 00:54:01'),
+(7, 'Storytelling Challenge', 'Hyderabad', 'Upload a short video that tells a complete story in under 60 seconds.', '2025-09-22', '2025-10-07', 600, 400, 'easy', '#StoryIn60 #YTShorts', NULL, 'creativity', 0, 1, 1, '2025-09-22 00:54:54', '2025-09-22 00:54:54');
+
+
+
+-- |--------------------------------------------------------------------------------------------------------
+-- Badges
+-- |--------------------------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS badges;
+CREATE TABLE badges (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(512) NOT NULL,
+    label VARCHAR(160),
+    icon VARCHAR(512),
+    description TEXT,
+    reward_point_required INT NOT NULL DEFAULT 0,
+    reward_condition_required TEXT DEFAULT NULL,
+    reward_condition_required_SQL TEXT DEFAULT NULL,
+    created_by BIGINT UNSIGNED,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO badges (
+  title, label, icon, description, reward_point_required,
+  reward_condition_required, reward_condition_required_SQL, created_by
+)
+VALUES
+('First Module Started',        'Module Starter',   'https://raw.githubusercontent.com/Schweinepriester/github-profile-achievements/main/images/quickdraw-default.png', 'You started your very first module!', 0,
+ 'Awarded when a creator starts their first module',
+ 'SELECT CASE WHEN COUNT(*) >= 1 THEN ''condition_true'' ELSE ''condition_false'' END AS result FROM creator_module_progress WHERE creator_id = ?', 
+ 1),
+
+('First Challenge Started',     'Challenge Starter','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwfZWTPKuRhNeZneyFYgg9Bbx0BL-u9DU_Kw&s', 'You kicked off your very first challenge!', 0,
+ 'Awarded when a creator starts their first challenge',
+ 'SELECT CASE WHEN COUNT(*) >= 1 THEN ''condition_true'' ELSE ''condition_false'' END AS result FROM creator_challenge_progress WHERE creator_id = ?', 
+ 1),
+
+('First Challenge Submitted',   'Challenge Achiever','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRc8P7EdDBTgWgwdadTp7klaD7nt357NuCaVA&s','You successfully submitted your first challenge!', 0,
+ 'Awarded when a creator submits their first challenge',
+ 'SELECT CASE WHEN COUNT(*) >= 1 THEN ''condition_true'' ELSE ''condition_false'' END AS result FROM challenge_submissions WHERE creator_id = ?', 
+ 1),
+
+('First Module Submitted',      'Module Completer', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZ_G4DyodTM50rBpvX8UlWJlsqNBoJB3K-Cw&s','You completed and submitted your first module!', 0,
+ 'Awarded when a creator submits their first module',
+ 'SELECT CASE WHEN COUNT(*) >= 1 THEN ''condition_true'' ELSE ''condition_false'' END AS result FROM module_submissions WHERE creator_id = ?', 
+ 1),
+
+('Leaderboard Rank #1',         'Top Performer',    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTrmDldXmLMmalU-UtFLLuauTWweSQhI33zog&s','You secured the #1 spot on the leaderboard!', 0,
+ 'Awarded when a creator secures the #1 position on the leaderboard',
+ 'SELECT CASE WHEN cs.creator_id = ? THEN ''condition_true'' ELSE ''condition_false'' END AS result FROM creator_stats cs ORDER BY cs.total_points DESC, cs.total_coins DESC, cs.total_badges DESC, cs.last_updated ASC LIMIT 1',
+ 1);
+
+
+
+-- |--------------------------------------------------------------------------------------------------------
+-- Learning Modules
+-- |--------------------------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS modules;
+CREATE TABLE modules (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(512) NOT NULL,
+    video_url TEXT,
+    video_file VARCHAR(512),
+    documentation TEXT,
+    description TEXT,
+    activity TEXT,
+    status ENUM('draft', 'published') DEFAULT 'draft' NOT NULL,
+    reward_points_can_achieve INT DEFAULT 0,
+    created_by BIGINT UNSIGNED,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Insert dummy rows into modules
+
+INSERT INTO `modules` (`id`, `title`, `video_url`, `video_file`, `documentation`, `description`, `activity`, `status`, `reward_points_can_achieve`, `created_by`, `created_at`, `updated_at`) VALUES
+(1, 'Introduction to Data Structures', 'https://youtube.com/watch?v=abcd1234', 'datastructures.mp4', 'test descript', 'Covers arrays, linked lists, stacks, and queues.', 'Complete a small coding assignment on arrays.', 'published', 100, 1, '2025-09-22 06:05:18', '2025-09-22 06:05:18'),
+(2, 'Advanced Algorithms', 'https://youtube.com/watch?v=wxyz5678', 'algorithms.mp4', 'test descript2', 'Focus on dynamic programming and graph algorithms.', 'Submit a project implementing shortest path algorithm.', 'draft', 200, 2, '2025-09-22 06:05:18', '2025-09-22 06:05:18'),
+(3, 'Mastering YouTube Shorts', 'https://www.youtube.com/watch?v=gEQ0BLyVJhY', 'Module video file path/name (optional)', 'Learn the fundamentals of creating engaging YouTube Shorts, including pacing, captions, and trending sounds.', 'This module helps creators understand how Shorts work and how to leverage them for rapid growth.', 'Upload a 30-second Short using a trending sound and caption.', 'published', 300, 1, '2025-09-22 01:01:28', '2025-09-22 01:01:28'),
+(4, 'Storytelling in 60 Seconds', 'https://www.youtube.com/watch?v=fqFXbDQAWrw', NULL, 'Tips and tricks for telling compelling stories in short-form content.', 'This module focuses on structure, pacing, and editing for storytelling.', 'Create a Short with a beginning, middle, and end under 60 seconds.', 'published', 250, 1, '2025-09-22 01:02:34', '2025-09-22 01:02:34'),
+(5, 'Analytics Deep Dive', 'https://www.youtube.com/watch?v=MF-nduEPygw', NULL, 'Learn to read YouTube Analytics to understand your audience and optimize future uploads.', 'Creators will explore key metrics like watch time, retention, CTR, and impressions.', 'Review your last 3 videos’ analytics and submit insights.', 'published', 250, 1, '2025-09-22 01:04:44', '2025-09-22 01:04:44');
+
+-- |--------------------------------------------------------------------------------------------------------
+-- Creator Badges
+-- |--------------------------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS creator_badges;
+CREATE TABLE creator_badges (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    creator_id BIGINT UNSIGNED NOT NULL,
+    badge_id BIGINT UNSIGNED NOT NULL,
+    awarded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    reason VARCHAR(255),
+    awarded_by BIGINT UNSIGNED DEFAULT NULL,
+    UNIQUE KEY (creator_id, badge_id),
+    FOREIGN KEY (creator_id) REFERENCES youtube_creators(id) ON DELETE CASCADE,
+    FOREIGN KEY (badge_id) REFERENCES badges(id) ON DELETE CASCADE
+);
+
+
+-- |--------------------------------------------------------------------------------------------------------
+-- Track Creator Progress on Modules
+-- |--------------------------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS creator_module_progress;
+CREATE TABLE creator_module_progress (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    creator_id BIGINT UNSIGNED NOT NULL,
+    module_id BIGINT UNSIGNED NOT NULL,
+    status ENUM('not_started','in_progress','completed') DEFAULT 'not_started',
+    submission TEXT,
+    points_earned INT DEFAULT 0,
+    started_at DATETIME DEFAULT NULL,
+    completed_at DATETIME DEFAULT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY (creator_id, module_id),
+    FOREIGN KEY (creator_id) REFERENCES youtube_creators(id) ON DELETE CASCADE,
+    FOREIGN KEY (module_id) REFERENCES modules(id) ON DELETE CASCADE
+);
+
+-- |--------------------------------------------------------------------------------------------------------
+-- Track Creator Progress on Challenges (NEW)
+-- |--------------------------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS creator_challenge_progress;
+CREATE TABLE creator_challenge_progress (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    creator_id BIGINT UNSIGNED NOT NULL,
+    challenge_id BIGINT UNSIGNED NOT NULL,
+    status ENUM('not_started','in_progress','completed') DEFAULT 'not_started',
+    started_at DATETIME DEFAULT NULL,
+    completed_at DATETIME DEFAULT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY (creator_id, challenge_id),
+    FOREIGN KEY (creator_id) REFERENCES youtube_creators(id) ON DELETE CASCADE,
+    FOREIGN KEY (challenge_id) REFERENCES challenges(id) ON DELETE CASCADE
+);
+
+-- |--------------------------------------------------------------------------------------------------------
+-- Module Submissions (Multiple Allowed) + Admin Review Support
+-- |--------------------------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS module_submissions;
+CREATE TABLE module_submissions (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    creator_id BIGINT UNSIGNED NOT NULL,
+    module_id BIGINT UNSIGNED NOT NULL,
+    submission TEXT NOT NULL,
+    points_awarded INT DEFAULT 0,
+    coins_awarded INT DEFAULT 0,
+    status ENUM('submitted','accepted','rejected','resubmit_requested') DEFAULT 'submitted',
+    rejected_reason TEXT,
+    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    reviewed_at TIMESTAMP NULL,
+    reviewed_by INT NULL,
+
+    -- Additional columns similar to challenge_submissions
+    title VARCHAR(1024),
+    thumbnail TEXT,
+    description TEXT,
+    channel_title VARCHAR(255),
+    published_at DATETIME NULL,
+    tags TEXT, -- Store tags as JSON array
+    location TEXT NULL, -- store lat/long if available
+    location_desc VARCHAR(512),
+    hashtags TEXT,
+    city VARCHAR(255),
+    country VARCHAR(150),
+    state VARCHAR(150),
+
+    -- Relations
+    FOREIGN KEY (creator_id) REFERENCES youtube_creators(id) ON DELETE CASCADE,
+    FOREIGN KEY (module_id) REFERENCES modules(id) ON DELETE CASCADE
+);
+
+
+
+-- |--------------------------------------------------------------------------------------------------------
+-- Challenge Submissions (Multiple Allowed) + Admin Review Support + YouTube Video Metadata
+-- |--------------------------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS challenge_submissions;
+CREATE TABLE challenge_submissions (
+id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+creator_id BIGINT UNSIGNED NOT NULL,
+challenge_id BIGINT UNSIGNED NOT NULL,
+-- Submission details
+submission_url VARCHAR(1024),
+video_id VARCHAR(40), -- YouTube videoId
+title VARCHAR(1024),
+thumbnail TEXT,
+description TEXT,
+channel_title VARCHAR(255),
+published_at DATETIME NULL,
+tags TEXT, -- Store tags as JSON array
+view_count BIGINT UNSIGNED DEFAULT 0,
+like_count BIGINT UNSIGNED DEFAULT 0,
+comment_count BIGINT UNSIGNED DEFAULT 0,
+location TEXT NULL, -- store lat/long if available
+location_desc VARCHAR(512),
+-- Extra from your original schema
+hashtags TEXT,
+city VARCHAR(255),
+country VARCHAR(150),
+state VARCHAR(150),
+points_awarded INT DEFAULT 0,
+coins_awarded INT DEFAULT 0,
+status ENUM('submitted','accepted','rejected','resubmit_requested') DEFAULT 'submitted',
+rejected_reason TEXT,
+submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+reviewed_at TIMESTAMP NULL,
+reviewed_by INT NULL,
+-- Relations
+FOREIGN KEY (creator_id) REFERENCES youtube_creators(id) ON DELETE CASCADE,
+FOREIGN KEY (challenge_id) REFERENCES challenges(id) ON DELETE CASCADE
+);
+
+-- |--------------------------------------------------------------------------------------------------------
+-- Creator Stats (Cache for Leaderboards / Faster Queries) (NEW)
+-- |--------------------------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS creator_stats;
+CREATE TABLE creator_stats (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    creator_id BIGINT UNSIGNED NOT NULL UNIQUE,
+    total_points INT DEFAULT 0,
+    total_coins INT DEFAULT 0,
+    total_badges INT DEFAULT 0,
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (creator_id) REFERENCES youtube_creators(id) ON DELETE CASCADE
+);
+
+
+-- |--------------------------------------------------------------------------------------------------------
+-- rewards
+-- |--------------------------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS rewards;
+CREATE TABLE rewards (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,           -- Name of the reward
+    description TEXT,                      -- Optional description
+    coin_cost INT UNSIGNED NOT NULL,       -- Coins required to redeem
+    voucher_link VARCHAR(1024) DEFAULT NULL, -- Reward voucher URL/code
+    logo VARCHAR(512) DEFAULT NULL,        -- Reward logo/image
+    total_available INT UNSIGNED DEFAULT NULL, -- Optional limit on reward quantity
+    created_by INT DEFAULT 1,             -- Admin who created the reward
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (created_by) REFERENCES admin_user(id) ON DELETE SET NULL
+);
+
+-- Dummy rewards
+INSERT INTO rewards (title, description, coin_cost, voucher_link, logo, total_available, created_by) VALUES
+('Amazon Gift Card', 'Redeemable on Amazon for shopping.', 15, 'https://example.com/voucher/amazon123', '🛒', 100, 1),
+('Netflix Subscription', '1-month Netflix subscription voucher.', 300, 'https://example.com/voucher/netflix456', '🎬', 50, 1),
+('Spotify Premium', '1-month Spotify Premium membership.', 200, 'https://example.com/voucher/spotify789', '🎵', 50, 1),
+('Google Play Gift', 'Gift card for Google Play store.', 400, 'https://example.com/voucher/googleplay101', '📱', 100, 1),
+('Starbucks Coffee', 'Free coffee voucher for Starbucks.', 150, 'https://example.com/voucher/starbucks202', '☕', 200, 1),
+('Gaming Headset', 'High-quality gaming headset.', 1000, 'https://example.com/voucher/headset303', '🎧', 20, 1),
+('BOOM Exclusive Badge', 'Special badge for loyal creators.', 6, 'https://example.com/voucher/boombadge404', '🏅', 500, 1);
+
+
+-- |--------------------------------------------------------------------------------------------------------
+-- reward_redemptions
+-- |--------------------------------------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS reward_redemptions;
+CREATE TABLE reward_redemptions (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    creator_id BIGINT UNSIGNED NOT NULL,
+    reward_id BIGINT UNSIGNED NOT NULL,
+    coins_used INT UNSIGNED NOT NULL,
+    redeemed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('pending','approved','rejected') DEFAULT 'approved',
+    FOREIGN KEY (creator_id) REFERENCES youtube_creators(id) ON DELETE CASCADE,
+    FOREIGN KEY (reward_id) REFERENCES rewards(id) ON DELETE CASCADE
+);
+
+-- |--------------------------------------------------------------------------------------------------------
+-- creator_activities
+-- |--------------------------------------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS creator_activities;
+CREATE TABLE creator_activities (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    creator_id BIGINT UNSIGNED NOT NULL,
+    activity_type VARCHAR(100) NOT NULL,       -- e.g., 'module_started', 'challenge_submitted', 'reward_redeemed'
+    activity_ref_id BIGINT UNSIGNED DEFAULT NULL, -- Optional reference (module_id, challenge_id, reward_id)
+    points_earned INT DEFAULT 0,               -- Points earned for this activity
+    coins_earned INT DEFAULT 0,                -- Coins earned for this activity
+    description TEXT,                          -- Optional details of the activity
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (creator_id) REFERENCES youtube_creators(id) ON DELETE CASCADE
+);
+
+
+-- |--------------------------------------------------------------------------------------------------------
+-- admin_events | event created by admin to fetch data of youtubers
+-- |--------------------------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS admin_events;
+CREATE TABLE admin_events (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    start_date DATETIME NOT NULL,
+    end_date DATETIME NOT NULL,
+    hashtags TEXT,
+    description TEXT,
+    status TINYINT(1) NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- |--------------------------------------------------------------------------------------------------------
+-- event_uploads | events data fetch asynchronously from youtube api 3
+-- |--------------------------------------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS event_uploads;
+CREATE TABLE event_uploads (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    creator_id BIGINT UNSIGNED NOT NULL,  -- Changed from INT to BIGINT UNSIGNED
+    event_id INT UNSIGNED NOT NULL,       -- Changed from INT to INT UNSIGNED
+    submission_url VARCHAR(500) NOT NULL,
+    video_id VARCHAR(50) NOT NULL UNIQUE,
+    title VARCHAR(255),
+    thumbnail VARCHAR(500),
+    description TEXT,
+    channel_title VARCHAR(255),
+    published_at DATETIME,
+    tags TEXT,
+    view_count INT DEFAULT 0,
+    like_count INT DEFAULT 0,
+    comment_count INT DEFAULT 0,
+    location VARCHAR(255),
+    location_desc VARCHAR(500),
+    hashtags TEXT,
+    city VARCHAR(100),
+    state VARCHAR(100),
+    country VARCHAR(100),
+    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (creator_id) REFERENCES youtube_creators(id),
+    FOREIGN KEY (event_id) REFERENCES admin_events(id)
+);
+
+
+-- |--------------------------------------------------------------------------------------------------------
+-- indian_states | states grouped in regions
+-- |--------------------------------------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS indian_states;
+CREATE TABLE indian_states (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    state_name VARCHAR(100) NOT NULL,
+    region ENUM('North', 'East', 'South', 'West') NOT NULL
+);
+
+INSERT INTO indian_states (state_name, region) VALUES
+-- North
+('Jammu & Kashmir', 'North'),
+('Himachal Pradesh', 'North'),
+('Punjab', 'North'),
+('Haryana', 'North'),
+('Uttarakhand', 'North'),
+('Uttar Pradesh', 'North'),
+('Delhi', 'North'),
+
+-- East
+('Bihar', 'East'),
+('Jharkhand', 'East'),
+('Odisha', 'East'),
+('West Bengal', 'East'),
+
+-- South
+('Andhra Pradesh', 'South'),
+('Telangana', 'South'),
+('Karnataka', 'South'),
+('Tamil Nadu', 'South'),
+('Kerala', 'South'),
+
+-- West
+('Rajasthan', 'West'),
+('Gujarat', 'West'),
+('Maharashtra', 'West'),
+('Goa', 'West');
+
+-- |--------------------------------------------------------------------------------------------------------
+-- state_submissions_count | to keep track of state submissions count per creator
+-- |--------------------------------------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS state_submissions_count;
+CREATE TABLE state_submissions_count (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    creator_id BIGINT UNSIGNED NOT NULL,
+    state_name VARCHAR(255) NOT NULL,
+    total_submissions INT NOT NULL DEFAULT 0,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (creator_id) REFERENCES youtube_creators(id),
+    UNIQUE KEY unique_creator_state (creator_id, state_name)
+);
