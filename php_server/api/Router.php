@@ -2,19 +2,18 @@
 
 namespace App;
 
+use App\Exceptions\NotFoundException;
+
 class Router
 {
     private $routes = [];
     public function __construct(private $basePath = '') {}
 
-
-    // Add this method to your Router class
     public function getBasePath(): string
     {
         return $this->basePath;
     }
 
-    // Router.php - Add this method
     public function add($method, $pattern, $handler, $description = '', $visible = true, $inputs = [], $showHeaders = false, $tags = [])
     {
         $route = [
@@ -23,9 +22,9 @@ class Router
             'handler' => $handler,
             'description' => $description,
             'visible' => $visible,
-            'inputs' => $inputs, // form = $_POST, get = $_GET
+            'inputs' => $inputs,
             'showHeaders' => $showHeaders,
-            'tags' => is_array($tags) ? $tags : [$tags], // NEW: Support for tags/groups
+            'tags' => is_array($tags) ? $tags : [$tags],
             'regex' => $this->patternToRegex($pattern),
             'specificity' => $this->calculateSpecificity($pattern)
         ];
@@ -33,7 +32,6 @@ class Router
         usort($this->routes, fn($a, $b) => $b['specificity'] <=> $a['specificity']);
     }
 
-    // NEW: Method to get routes grouped by tags
     public function getGroupedRoutes(): array
     {
         $grouped = [];
@@ -55,17 +53,14 @@ class Router
             }
         }
 
-        // Sort groups alphabetically
         ksort($grouped);
 
-        // Add ungrouped routes at the end if they exist
         if (!empty($ungrouped)) {
             $grouped['Other'] = $ungrouped;
         }
 
         return $grouped;
     }
-
 
     public function getRoutes(): array
     {
@@ -74,26 +69,78 @@ class Router
 
     public function dispatch()
     {
-        $method = $_SERVER['REQUEST_METHOD'];
-        $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        $uri = '/' . trim(str_replace($this->basePath, '', $uri), '/');
+        try {
+            $method = $_SERVER['REQUEST_METHOD'];
+            $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+            $uri = '/' . trim(str_replace($this->basePath, '', $uri), '/');
 
+            foreach ($this->routes as $route) {
+                if ($method !== $route['method'])
+                    continue;
+
+                if (preg_match($route['regex'], $uri, $matches)) {
+                    array_shift($matches); // remove full match
+                    [$controller, $action] = explode('@', $route['handler']);
+                    
+                    // Use Controllers namespace
+                    $controllerClass = "App\\Controllers\\$controller";
+                    
+                    // Check if class exists
+                    if (!class_exists($controllerClass)) {
+                        throw new \Exception("Controller not found: $controllerClass");
+                    }
+                    
+                    // Create controller instance
+                    $controllerInstance = new $controllerClass();
+                    
+                    // Check if method exists
+                    if (!method_exists($controllerInstance, $action)) {
+                        throw new \Exception("Method '$action' not found in controller '$controllerClass'");
+                    }
+                    
+                    // Call the controller method
+                    call_user_func_array([$controllerInstance, $action], $matches);
+                    return;
+                }
+            }
+
+            // If nothing matched, throw NotFoundException
+            throw new NotFoundException("Route not found: $method $uri");
+            
+        } catch (\Throwable $e) {
+            // Let the global exception handler deal with it
+            throw $e;
+        }
+    }
+
+    /**
+     * Get route information for a specific URI and method
+     */
+    public function getRouteInfo(string $method, string $uri): ?array
+    {
+        $uri = '/' . trim(str_replace($this->basePath, '', $uri), '/');
+        
         foreach ($this->routes as $route) {
             if ($method !== $route['method'])
                 continue;
 
             if (preg_match($route['regex'], $uri, $matches)) {
-                array_shift($matches); // remove full match
-                [$controller, $action] = explode('@', $route['handler']);
-                require_once "controllers/$controller.php";
-                call_user_func_array([new $controller, $action], $matches);
-                return;
+                return [
+                    'route' => $route,
+                    'matches' => array_slice($matches, 1) // Remove full match
+                ];
             }
         }
+        
+        return null;
+    }
 
-        // If nothing matched
-        http_response_code(404);
-        echo json_encode(['error' => 'Route not found']);
+    /**
+     * Check if a route exists
+     */
+    public function routeExists(string $method, string $uri): bool
+    {
+        return $this->getRouteInfo($method, $uri) !== null;
     }
 
     private function patternToRegex($pattern)

@@ -1,6 +1,6 @@
 <?php
 
-
+namespace App\Controllers;
 
 class InitController
 {
@@ -9,7 +9,6 @@ class InitController
     public function __construct()
     {
         require_once __DIR__ . '/../connection.php';
-        require_once __DIR__ . '/../helpers/helperFunctions.php';
         $this->conn = $connpdo; // from connection.php
     }
 

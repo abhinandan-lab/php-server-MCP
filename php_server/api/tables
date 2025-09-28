@@ -1,0 +1,15 @@
+-- |--------------------------------------------------------------------------------------------------------
+-- Admin Table
+-- |--------------------------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS admin_user;
+CREATE TABLE admin_user (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(40),
+    email VARCHAR(150) NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO admin_user (username, email, password) 
+VALUES ('admin', 'admin@example.com', '$2y$10$bkPD8BaqPY9gsbL15YLytOTuBy1G//VFscMtktpUCjo3KcH5BFrqG');
+

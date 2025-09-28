@@ -1,8 +1,5 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-ini_set('log_errors', '1');
+namespace App\Controllers;
 
 use Dotenv\Dotenv;
 
@@ -14,8 +11,8 @@ class DocsController
     public function __construct()
     {
         require_once __DIR__ . '/../connection.php';
-        require_once __DIR__ . '/../helpers/helperFunctions.php';
-        require_once __DIR__ . '/../helpers/DBhelperFunctions.php';
+        // require_once __DIR__ . '/../helpers/helperFunctions.php';
+        // require_once __DIR__ . '/../helpers/DBhelperFunctions.php';
         $this->conn = $connpdo;
         $this->dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
         $this->dotenv->load();
