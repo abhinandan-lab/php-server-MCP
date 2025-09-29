@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Routing System - PHP Light Framework</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h3>PHP Light Framework</h3>
+            <span class="version">v1.0.0</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">🏠 Home</a></li>
+            <li><a href="installation.html">📦 Installation</a></li>
+            <li><a href="routing.html" class="active">🛣️ Routing</a></li>
+            <li><a href="controllers.html">🎛️ Controllers</a></li>
+            <li><a href="validation.html">🔒 Validation & Security</a></li>
+            <li><a href="database.html">💾 Database</a></li>
+            <li><a href="debugging.html">🐛 Debugging</a></li>
+            <li><a href="exceptions.html">⚠️ Error Handling</a></li>
+            <li><a href="examples.html">📚 Examples</a></li>
+            <li><a href="reference.html">📖 API Reference</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="/api/docs" target="_blank" class="demo-link">🚀 Live Demo</a>
+        </div>
+    </nav>
+
+    <main class="content">
+        <div class="container">
+            <header class="page-header">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> > Routing
+                </nav>
+                <h1>🛣️ Routing System</h1>
+                <p>Learn the flexible array-based routing system</p>
+            </header>
+
+            <section class="array-syntax">
+                <h2>📝 Array-Based Route Definition</h2>
+                <p>The framework uses a clean array syntax for defining routes:</p>
+                
+                <pre><code class="language-php">$router->add([
+    'method' => 'GET|POST|PUT|DELETE',
+    'url' => '/your/endpoint/{id}',
+    'controller' => 'ControllerName@methodName',
+    'desc' => 'Route description for documentation',
+    'visible' => true,  // Show in interactive docs
+    'params' => [
+        'url' => ['id' => 'integer (required) - Resource ID'],
+        'get' => ['status' => 'string (optional) - Filter status'],
+        'form' => ['name' => 'string (required) - User name'],
+        'json' => ['data' => 'object (required) - JSON payload']
+    ],
+    'group' => ['API Group Name']
+]);</code></pre>
+            </section>
+
+            <section class="parameter-types">
+                <h2>🔧 Parameter Types</h2>
+                
+                <div class="param-section">
+                    <h3>🔗 URL Parameters</h3>
+                    <p>Captured from the route path itself:</p>
+                    <pre><code class="language-php">$router->add([
+    'method' => 'GET',
+    'url' => '/user/{id}/posts/{postId}',
+    'controller' => 'UserController@getUserPost',
+    'params' => [
+        'url' => [
+            'id' => 'integer (required) - User ID',
+            'postId' => 'integer (required) - Post ID'
+        ]
+    ]
+]);</code></pre>
+                </div>
+
+                <div class="param-section">
+                    <h3>❓ GET Parameters</h3>
+                    <p>Query string parameters (?key=value):</p>
+                    <pre><code class="language-php">$router->add([
+    'method' => 'GET',
+    'url' => '/posts',
+    'controller' => 'PostController@getPosts',
+    'params' => [
+        'get' => [
+            'page' => 'integer (optional) - Page number (default: 1)',
+            'limit' => 'integer (optional) - Results per page (default: 10)',
+            'status' => 'string (optional) - published|draft|archived'
+        ]
+    ]
+]);</code></pre>
+                </div>
+
+                <div class="param-section">
+                    <h3>📝 Form Parameters</h3>
+                    <p>POST form data (application/x-www-form-urlencoded):</p>
+                    <pre><code class="language-php">$router->add([
+    'method' => 'POST',
+    'url' => '/user/login',
+    'controller' => 'AuthController@login',
+    'params' => [
+        'form' => [
+            'email' => 'string (required) - Valid email address',
+            'password' => 'string (required) - Password (min 8 chars)',
+            'remember' => 'boolean (optional) - Remember login'
+        ]
+    ]
+]);</code></pre>
+                </div>
+
+                <div class="param-section">
+                    <h3>🔧 JSON Body</h3>
+                    <p>JSON payload (application/json):</p>
+                    <pre><code class="language-php">$router->add([
+    'method' => 'POST',
+    'url' => '/user/create',
+    'controller' => 'UserController@createUser',
+    'params' => [
+        'json' => [
+            'name' => 'string (required) - Full name (2-50 chars)',
+            'email' => 'string (required) - Valid email address',
+            'profile' => 'object (optional) - {age: number, bio: string}'
+        ]
+    ]
+]);</code></pre>
+                </div>
+            </section>
+
+            <section class="complete-example">
+                <h2>📚 Complete Route Example</h2>
+                <pre><code class="language-php">// Complex route with multiple parameter types
+$router->add([
+    'method' => 'PUT',
+    'url' => '/user/{id}/update',
+    'controller' => 'UserController@updateUser',
+    'desc' => 'Update user information with profile data',
+    'visible' => true,
+    'params' => [
+        'url' => [
+            'id' => 'integer (required) - User ID to update'
+        ],
+        'get' => [
+            'notify' => 'boolean (optional) - Send notification email'
+        ],
+        'json' => [
+            'name' => 'string (optional) - Updated full name',
+            'email' => 'string (optional) - Updated email address',
+            'profile' => 'object (optional) - Profile data to update',
+            'settings' => 'array (optional) - User preference settings'
+        ]
+    ],
+    'group' => ['User Management']
+]);
+
+// Simple GET route
+$router->add([
+    'method' => 'GET',
+    'url' => '/health',
+    'controller' => 'SystemController@healthCheck',
+    'desc' => 'API health check endpoint',
+    'visible' => true,
+    'group' => ['System']
+]);</code></pre>
+            </section>
+
+            <section class="route-grouping">
+                <h2>📂 Route Grouping</h2>
+                <p>Organize routes into logical groups for better documentation:</p>
+                
+                <pre><code class="language-php">// User management routes
+$router->add(['group' => ['User Management'], /*...*/]);
+$router->add(['group' => ['User Management'], /*...*/]);
+
+// Authentication routes  
+$router->add(['group' => ['Authentication'], /*...*/]);
+
+// Blog management
+$router->add(['group' => ['Blog Posts'], /*...*/]);
+$router->add(['group' => ['Blog Posts'], /*...*/]);</code></pre>
+            </section>
+
+            <section class="best-practices">
+                <h2>✅ Best Practices</h2>
+                
+                <div class="practice">
+                    <h3>🎯 Consistent URL Structure</h3>
+                    <pre><code class="language-php">// Good - RESTful structure
+GET    /users          // List users
+POST   /users          // Create user  
+GET    /users/{id}     // Get specific user
+PUT    /users/{id}     // Update user
+DELETE /users/{id}     // Delete user</code></pre>
+                </div>
+
+                <div class="practice">
+                    <h3>📝 Descriptive Parameter Documentation</h3>
+                    <pre><code class="language-php">'params' => [
+    'url' => [
+        'id' => 'integer (required) - User ID (1-999999)'
+    ],
+    'get' => [
+        'include' => 'string (optional) - profile,posts,settings'
+    ]
+]</code></pre>
+                </div>
+
+                <div class="practice">
+                    <h3>🏷️ Logical Grouping</h3>
+                    <pre><code class="language-php">// Group related functionality
+'group' => ['User Management']    // ✅ Good
+'group' => ['Users']             // ✅ Good  
+'group' => ['Misc']              // ❌ Avoid generic names</code></pre>
+                </div>
+            </section>
+
+            <section class="next-steps">
+                <h2>🎯 Next Steps</h2>
+                <div class="next-links">
+                    <a href="controllers.html" class="next-link">
+                        <strong>🎛️ Learn Controllers</strong>
+                        <span>Handle requests and build responses</span>
+                    </a>
+                    <a href="validation.html" class="next-link">
+                        <strong>🔒 Add Validation</strong>
+                        <span>Validate and secure your endpoints</span>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="assets/script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</body>
+</html>

@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validation & Security - PHP Light Framework</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h3>PHP Light Framework</h3>
+            <span class="version">v1.0.0</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">🏠 Home</a></li>
+            <li><a href="installation.html">📦 Installation</a></li>
+            <li><a href="routing.html">🛣️ Routing</a></li>
+            <li><a href="controllers.html">🎛️ Controllers</a></li>
+            <li><a href="validation.html" class="active">🔒 Validation & Security</a></li>
+            <li><a href="database.html">💾 Database</a></li>
+            <li><a href="debugging.html">🐛 Debugging</a></li>
+            <li><a href="exceptions.html">⚠️ Error Handling</a></li>
+            <li><a href="examples.html">📚 Examples</a></li>
+            <li><a href="reference.html">📖 API Reference</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="/api/docs" target="_blank" class="demo-link">🚀 Live Demo</a>
+        </div>
+    </nav>
+
+    <main class="content">
+        <div class="container">
+            <header class="page-header">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> > Validation & Security
+                </nav>
+                <h1>🔒 Validation & Security</h1>
+                <p>Input validation, sanitization, and security features</p>
+            </header>
+
+            <section class="validation-usage">
+                <h2>✅ Using Validation</h2>
+                <p>The framework provides built-in request validation with automatic sanitization:</p>
+                
+                <pre><code class="language-php">public function createUser() 
+{
+    try {
+        // Validate and sanitize input automatically
+        $data = $this->validateRequest([
+            'name' => 'required|min:2|max:50',
+            'email' => 'required|email',
+            'password' => 'required|min:8|max:100',
+            'age' => 'integer|min:18|max:120',
+            'website' => 'url'
+        ]);
+        
+        // $data is now validated and sanitized
+        $this->processUser($data);
+        
+    } catch (ValidationException $e) {
+        // Handle validation errors
+        $this->sendValidationError($e->getMessage(), $e->getValidationErrors());
+    }
+}</code></pre>
+            </section>
+
+            <section class="validation-rules">
+                <h2>📋 Available Validation Rules</h2>
+                
+                <div class="rule-grid">
+                    <div class="rule">
+                        <h3>required</h3>
+                        <p>Field must be present and not empty</p>
+                        <pre><code class="language-php">'name' => 'required'</code></pre>
+                    </div>
+                    
+                    <div class="rule">
+                        <h3>email</h3>
+                        <p>Must be valid email format</p>
+                        <pre><code class="language-php">'email' => 'required|email'</code></pre>
+                    </div>
+                    
+                    <div class="rule">
+                        <h3>min:X</h3>
+                        <p>Minimum length/value</p>
+                        <pre><code class="language-php">'password' => 'min:8'
+'age' => 'integer|min:18'</code></pre>
+                    </div>
+                    
+                    <div class="rule">
+                        <h3>max:X</h3>
+                        <p>Maximum length/value</p>
+                        <pre><code class="language-php">'name' => 'max:50'
+'age' => 'integer|max:120'</code></pre>
+                    </div>
+                    
+                    <div class="rule">
+                        <h3>numeric</h3>
+                        <p>Must be numeric (int or float)</p>
+                        <pre><code class="language-php">'price' => 'numeric'</code></pre>
+                    </div>
+                    
+                    <div class="rule">
+                        <h3>integer</h3>
+                        <p>Must be integer value</p>
+                        <pre><code class="language-php">'quantity' => 'integer'</code></pre>
+                    </div>
+                    
+                    <div class="rule">
+                        <h3>url</h3>
+                        <p>Must be valid URL</p>
+                        <pre><code class="language-php">'website' => 'url'</code></pre>
+                    </div>
+                    
+                    <div class="rule">
+                        <h3>alpha</h3>
+                        <p>Only letters allowed</p>
+                        <pre><code class="language-php">'status' => 'alpha'</code></pre>
+                    </div>
+                    
+                    <div class="rule">
+                        <h3>alphanumeric</h3>
+                        <p>Only letters and numbers</p>
+                        <pre><code class="language-php">'username' => 'alphanumeric'</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="validation-examples">
+                <h2>📚 Validation Examples</h2>
+                
+                <div class="example">
+                    <h3>User Registration</h3>
+                    <pre><code class="language-php">$data = $this->validateRequest([
+    'name' => 'required|min:2|max:50',
+    'email' => 'required|email',
+    'password' => 'required|min:8|max:100',
+    'age' => 'integer|min:13',
+    'website' => 'url'  // Optional if not provided
+]);</code></pre>
+                </div>
+
+                <div class="example">
+                    <h3>Post Creation</h3>
+                    <pre><code class="language-php">$data = $this->validateRequest([
+    'title' => 'required|min:5|max:200',
+    'content' => 'required|min:50',
+    'category' => 'required|alpha',
+    'tags' => 'required',  // Will be validated as string
+    'featured' => 'integer' // 0 or 1
+]);</code></pre>
+                </div>
+                
+                <div class="example">
+                    <h3>API Settings Update</h3>
+                    <pre><code class="language-php">$data = $this->validateRequest([
+    'api_key' => 'required|alphanumeric|min:32|max:32',
+    'rate_limit' => 'integer|min:1|max:1000',
+    'callback_url' => 'url',
+    'enabled' => 'integer'  // 0 or 1
+]);</code></pre>
+                </div>
+            </section>
+
+            <section class="input-sanitization">
+                <h2>🧽 Automatic Input Sanitization</h2>
+                <p>All input is automatically sanitized before validation:</p>
+                
+                <div class="sanitization-feature">
+                    <h3>XSS Protection</h3>
+                    <pre><code class="language-php">// Input: "&lt;script&gt;alert('xss')&lt;/script&gt;John"
+// Sanitized: "&amp;lt;script&amp;gt;alert('xss')&amp;lt;/script&amp;gt;John"</code></pre>
+                </div>
+                
+                <div class="sanitization-feature">
+                    <h3>Null Byte Removal</h3>
+                    <pre><code class="language-php">// Input: "malicious\0content"
+// Sanitized: "maliciouscontent"</code></pre>
+                </div>
+                
+                <div class="sanitization-feature">
+                    <h3>Whitespace Trimming</h3>
+                    <pre><code class="language-php">// Input: "  john@example.com  "
+// Sanitized: "john@example.com"</code></pre>
+                </div>
+            </section>
+
+            <section class="security-headers">
+                <h2>🛡️ Security Headers</h2>
+                <p>The framework automatically applies security headers to all responses:</p>
+                
+                <pre><code class="language-http">X-XSS-Protection: 1; mode=block
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'...
+Referrer-Policy: strict-origin-when-cross-origin</code></pre>
+                
+                <div class="security-explanation">
+                    <h3>Header Explanations</h3>
+                    <ul>
+                        <li><strong>X-XSS-Protection:</strong> Browser XSS filtering enabled</li>
+                        <li><strong>X-Content-Type-Options:</strong> Prevent MIME type sniffing</li>
+                        <li><strong>X-Frame-Options:</strong> Prevent clickjacking attacks</li>
+                        <li><strong>Strict-Transport-Security:</strong> Force HTTPS connections</li>
+                        <li><strong>Content-Security-Policy:</strong> Control resource loading</li>
+                        <li><strong>Referrer-Policy:</strong> Control referrer information</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="cors-configuration">
+                <h2>🌐 CORS Configuration</h2>
+                <p>Configure Cross-Origin Resource Sharing in your <code>.env</code> file:</p>
+                
+                <pre><code class="language-env"># Allow specific origins
+ALLOWED_ORIGINS=http://localhost:3000,https://yourdomain.com
+
+# Allow all origins (not recommended for production)
+ALLOWED_ORIGINS=
+
+# The framework automatically handles:
+# - Preflight OPTIONS requests
+# - CORS headers
+# - Credential support</code></pre>
+            </section>
+
+            <section class="rate-limiting">
+                <h2>⏱️ Rate Limiting</h2>
+                <p>Built-in rate limiting protects your API from abuse:</p>
+                
+                <pre><code class="language-env"># Rate limiting configuration
+RATE_LIMIT_REQUESTS=100  # Requests per time window
+RATE_LIMIT_WINDOW=3600   # Time window in seconds (1 hour)</code></pre>
+                
+                <div class="rate-limit-response">
+                    <h3>Rate Limit Response</h3>
+                    <p>When rate limit is exceeded, clients receive:</p>
+                    <pre><code class="language-json">{
+    "status": "error",
+    "message": "Rate limit exceeded. Too many requests.",
+    "data": {
+        "max_requests": 100,
+        "time_window": 3600,
+        "retry_after": 3600
+    }
+}</code></pre>
+                </div>
+            </section>
+
+            <section class="security-best-practices">
+                <h2>🔐 Security Best Practices</h2>
+                
+                <div class="practice">
+                    <h3>🛡️ Always Validate Input</h3>
+                    <pre><code class="language-php">// ✅ Good - Validate everything
+$data = $this->validateRequest([
+    'email' => 'required|email',
+    'id' => 'required|integer'
+]);
+
+// ❌ Bad - Using raw input
+$email = $_POST['email'];
+$id = $_GET['id'];</code></pre>
+                </div>
+                
+                <div class="practice">
+                    <h3>🚫 Never Trust User Input</h3>
+                    <pre><code class="language-php">// ✅ Good - Parameterized queries
+RunQuery([
+    'query' => 'SELECT * FROM users WHERE id = :id',
+    'params' => [':id' => $userId]
+]);
+
+// ❌ Bad - String concatenation
+RunQuery([
+    'query' => "SELECT * FROM users WHERE id = $userId"
+]);</code></pre>
+                </div>
+                
+                <div class="practice">
+                    <h3>📊 Don't Expose Sensitive Data</h3>
+                    <pre><code class="language-php">// ✅ Good - Return safe data only
+$this->sendSuccess('User retrieved', [
+    'id' => $user['id'],
+    'name' => $user['name'],
+    'email' => $user['email']
+    // Don't include password hash
+]);
+
+// ❌ Bad - Returning everything
+$this->sendSuccess('User retrieved', $user);</code></pre>
+                </div>
+                
+                <div class="practice">
+                    <h3>🔍 Log Security Events</h3>
+                    <pre><code class="language-php">// Log failed authentication attempts
+if (!$validCredentials) {
+    error_log("Failed login attempt for: {$email} from IP: {$clientIP}");
+    $this->sendError('Invalid credentials', 401);
+}</code></pre>
+                </div>
+            </section>
+
+            <section class="validation-errors">
+                <h2>⚠️ Handling Validation Errors</h2>
+                <p>The framework provides structured validation error responses:</p>
+                
+                <pre><code class="language-php">// This validation will fail
+$data = $this->validateRequest([
+    'name' => 'required|min:10',     // "John" is too short
+    'email' => 'required|email',     // "invalid-email" is not valid
+    'age' => 'integer|min:18'        // "15" is too young
+]);
+
+// Returns HTTP 422 with:
+{
+    "status": "error",
+    "message": "Validation failed",
+    "data": {
+        "validation_errors": {
+            "name": ["name must be at least 10 characters"],
+            "email": ["email must be a valid email address"],
+            "age": ["age must be at least 18"]
+        }
+    }
+}</code></pre>
+            </section>
+
+            <section class="custom-validation">
+                <h2>🔧 Custom Validation Logic</h2>
+                <p>Implement custom validation logic in your controllers:</p>
+                
+                <pre><code class="language-php">public function updateUser($id) 
+{
+    try {
+        // Basic validation
+        $data = $this->validateRequest([
+            'email' => 'required|email',
+            'name' => 'required|min:2|max:50'
+        ]);
+        
+        // Custom business logic validation
+        if ($data['email'] !== $currentUser['email']) {
+            // Check if new email already exists
+            $existingUser = RunQuery([
+                'conn' => $this->conn,
+                'query' => 'SELECT id FROM users WHERE email = :email AND id != :id',
+                'params' => [':email' => $data['email'], ':id' => $id]
+            ]);
+            
+            if (!empty($existingUser)) {
+                throw new ValidationException('Email validation failed', [
+                    'email' => 'This email address is already registered'
+                ]);
+            }
+        }
+        
+        // Additional custom validation
+        if (isset($data['role']) && !$this->canAssignRole($data['role'])) {
+            throw new ValidationException('Permission denied', [
+                'role' => 'You do not have permission to assign this role'
+            ]);
+        }
+        
+        // Proceed with update
+        $this->updateUserData($id, $data);
+        
+    } catch (ValidationException $e) {
+        $this->sendValidationError($e->getMessage(), $e->getValidationErrors());
+    }
+}</code></pre>
+            </section>
+
+            <section class="validation-middleware">
+                <h2>🔄 Validation Middleware Pattern</h2>
+                <p>Create reusable validation patterns for common scenarios:</p>
+                
+                <pre><code class="language-php">class UserController extends BaseController 
+{
+    /**
+     * Common user validation rules
+     */
+    private function getUserValidationRules($isUpdate = false) 
+    {
+        $rules = [
+            'name' => 'required|min:2|max:50',
+            'email' => 'required|email'
+        ];
+        
+        if (!$isUpdate) {
+            // Password required for creation
+            $rules['password'] = 'required|min:8|max:100';
+        } else {
+            // Password optional for updates
+            $rules['password'] = 'min:8|max:100';
+        }
+        
+        return $rules;
+    }
+    
+    public function createUser() 
+    {
+        $data = $this->validateRequest($this->getUserValidationRules());
+        // Create user logic
+    }
+    
+    public function updateUser($id) 
+    {
+        $data = $this->validateRequest($this->getUserValidationRules(true));
+        // Update user logic
+    }
+    
+    /**
+     * Validate and sanitize file uploads
+     */
+    private function validateFileUpload($file, $allowedTypes = ['jpg', 'png', 'gif']) 
+    {
+        if (!$file || $file['error'] !== UPLOAD_ERR_OK) {
+            throw new ValidationException('File upload failed', [
+                'file' => 'Please select a valid file to upload'
+            ]);
+        }
+        
+        $fileInfo = pathinfo($file['name']);
+        $extension = strtolower($fileInfo['extension'] ?? '');
+        
+        if (!in_array($extension, $allowedTypes)) {
+            throw new ValidationException('Invalid file type', [
+                'file' => 'Only ' . implode(', ', $allowedTypes) . ' files are allowed'
+            ]);
+        }
+        
+        if ($file['size'] > 5 * 1024 * 1024) { // 5MB
+            throw new ValidationException('File too large', [
+                'file' => 'File size must be less than 5MB'
+            ]);
+        }
+        
+        return $file;
+    }
+}</code></pre>
+            </section>
+
+            <section class="production-security">
+                <h2>🚀 Production Security Checklist</h2>
+                
+                <div class="security-checklist">
+                    <h3>Environment Configuration</h3>
+                    <ul>
+                        <li>✅ Set <code>DEBUG_MODE=false</code> in production</li>
+                        <li>✅ Set <code>SHOW_ERRORS=false</code> in production</li>
+                        <li>✅ Enable <code>LOG_ERRORS=true</code> for monitoring</li>
+                        <li>✅ Use strong database credentials</li>
+                        <li>✅ Configure specific CORS origins (not *)</li>
+                        <li>✅ Set appropriate rate limits</li>
+                    </ul>
+                    
+                    <h3>Server Configuration</h3>
+                    <ul>
+                        <li>✅ Use HTTPS in production</li>
+                        <li>✅ Hide server information headers</li>
+                        <li>✅ Configure proper file permissions</li>
+                        <li>✅ Disable directory browsing</li>
+                        <li>✅ Keep PHP and dependencies updated</li>
+                    </ul>
+                    
+                    <h3>Application Security</h3>
+                    <ul>
+                        <li>✅ Validate all user input</li>
+                        <li>✅ Use parameterized database queries</li>
+                        <li>✅ Implement proper authentication</li>
+                        <li>✅ Log security-related events</li>
+                        <li>✅ Regular security audits</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="next-steps">
+                <h2>🎯 Next Steps</h2>
+                <div class="next-links">
+                    <a href="database.html" class="next-link">
+                        <strong>💾 Database Operations</strong>
+                        <span>Learn database queries and migrations</span>
+                    </a>
+                    <a href="debugging.html" class="next-link">
+                        <strong>🐛 Debugging Tools</strong>
+                        <span>Debug your application effectively</span>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="assets/script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</body>
+</html>

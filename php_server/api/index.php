@@ -1,48 +1,40 @@
 <?php
 
-// Enable error reporting first (before autoloader)
+// START OUTPUT BUFFERING FIRST - before any other code
+ob_start();
+
+// Enable error reporting first
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
-$allowedOrigins = [];
-
-// CORS Logic (keep your existing CORS code)
-if (isset($_SERVER['HTTP_ORIGIN'])) {
-    if (empty($allowedOrigins)) {
-        header("Access-Control-Allow-Origin: " . $_SERVER['HTTP_ORIGIN']);
-        header("Access-Control-Allow-Credentials: true");
-    } else {
-        if (in_array($_SERVER['HTTP_ORIGIN'], $allowedOrigins)) {
-            header("Access-Control-Allow-Origin: " . $_SERVER['HTTP_ORIGIN']);
-            header("Access-Control-Allow-Credentials: true");
-        }
-    }
-}
-
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-header("Access-Control-Allow-Headers: Authorization, Content-Type, X-Requested-With, client_request_url");
-
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
-
-// Load autoloader and environment
+// Load autoloader first
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // Load environment variables
 use Dotenv\Dotenv;
 use App\Router;
 use App\Core\ExceptionHandler;
+use App\Core\Security;
+use App\Middleware\SecurityMiddleware;
 
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->safeLoad();
 
+// Initialize security first
+Security::initialize();
+
+// Apply security headers and CORS BEFORE any other output
+SecurityMiddleware::applySecurityHeaders();
+SecurityMiddleware::handleCORS();
+
+// Basic rate limiting (100 requests per hour) - BEFORE router creation
+SecurityMiddleware::rateLimiting(100, 3600);
+
 // Register global exception handler
 ExceptionHandler::register();
 
-// Now check debug mode from properly loaded env
+// Configure error reporting based on environment
 if (!empty($_ENV['SHOW_ERRORS']) && ($_ENV['SHOW_ERRORS'] === 'true' || $_ENV['SHOW_ERRORS'] === '1')) {
     error_reporting(E_ALL);
     ini_set('display_errors', 1);
@@ -55,37 +47,201 @@ if (!empty($_ENV['SHOW_ERRORS']) && ($_ENV['SHOW_ERRORS'] === 'true' || $_ENV['S
     ini_set('display_startup_errors', 0);
 }
 
-
-
-// Add this after loading environment variables and before creating router
-use App\Core\Security;
-
-// Initialize security first
-Security::initialize();
-
-
-
-// Create router with namespace
+// **CREATE ROUTER AFTER MIDDLEWARE**
 $router = new Router('/api');
 
+
+
+
 // SYSTEM ROUTES
-$router->add('POST', '/run_migration', 'InitController@migrateFromFile', 'Runs DB migration', visible: true);
+$router->add([
+    'method' => 'POST',
+    'url' => '/run_migration',
+    'controller' => 'InitController@migrateFromFile',
+    'desc' => 'Runs DB migration from uploaded SQL file',
+    'visible' => true,
+    'params' => [
+        'form' => ['sql_file' => 'file (required) – SQL file to execute']
+    ],
+    'group' => ['System']
+]);
 
 // Environment routes
-$router->add('GET', '/env/get', 'DocsController@getEnvironment', 'Get environment variables', false);
-$router->add('POST', '/env/update', 'DocsController@updateEnvironment', 'Update environment variable', false);
-$router->add('POST', '/env/add', 'DocsController@addEnvironment', 'Add environment variable', false);
+$router->add([
+    'method' => 'GET',
+    'url' => '/env/get',
+    'controller' => 'DocsController@getEnvironment',
+    'desc' => 'Get environment variables',
+    'visible' => false,
+    'group' => ['Environment']
+]);
 
-// GET ROUTES
-$router->add('GET', '/', 'AuthController@welcome', 'API welcome', visible: true, inputs: [], showHeaders: false, tags: ['Testing']);
-$router->add('GET', '/test', 'AuthController@test2', 'testing api', visible: true, inputs: [], showHeaders: false, tags: ['Testing']);
+$router->add([
+    'method' => 'POST',
+    'url' => '/env/update',
+    'controller' => 'DocsController@updateEnvironment',
+    'desc' => 'Update environment variable',
+    'visible' => false,
+    'params' => [
+        'form' => [
+            'key' => 'string (required) – Environment variable key',
+            'value' => 'string (required) – Environment variable value'
+        ]
+    ],
+    'group' => ['Environment']
+]);
 
-// Add these new test routes after your existing routes
-$router->add('GET', '/test-exception', 'AuthController@testException', 'Test exception handling', true, [], false, ['Testing']);
-$router->add('POST', '/test-validation', 'AuthController@testValidation', 'Test validation', true, ['email', 'password', 'name'], false, ['Testing']);
+$router->add([
+    'method' => 'POST',
+    'url' => '/env/add',
+    'controller' => 'DocsController@addEnvironment',
+    'desc' => 'Add new environment variable',
+    'visible' => false,
+    'params' => [
+        'form' => [
+            'key' => 'string (required) – Environment variable key',
+            'value' => 'string (required) – Environment variable value'
+        ]
+    ],
+    'group' => ['Environment']
+]);
 
-$router->add('GET', '/docs', 'DocsController@index', 'Interactive API documentation', false);
+// Main API Routes
+$router->add([
+    'method' => 'GET',
+    'url' => '/',
+    'controller' => 'AuthController@welcome',
+    'desc' => 'API welcome message with framework info',
+    'visible' => true,
+    'group' => ['Testing']
+]);
 
-// Run the router
-// header('Content-Type: application/json');
+$router->add([
+    'method' => 'GET',
+    'url' => '/test',
+    'controller' => 'AuthController@test',
+    'desc' => 'Testing endpoint with debug information',
+    'visible' => true,
+    'group' => ['Testing']
+]);
+
+// Documentation route
+$router->add([
+    'method' => 'GET',
+    'url' => '/docs',
+    'controller' => 'DocsController@index',
+    'desc' => 'Interactive API documentation with testing interface',
+    'visible' => true,
+    'group' => ['Documentation']
+]);
+
+// Test routes with different parameter types
+$router->add([
+    'method' => 'GET',
+    'url' => '/test-exception',
+    'controller' => 'AuthController@testException',
+    'desc' => 'Test exception handling with different error types',
+    'visible' => true,
+    'params' => [
+        'get' => ['type' => 'string (optional) – validation|database|notfound|generic|fatal']
+    ],
+    'group' => ['Testing']
+]);
+
+$router->add([
+    'method' => 'POST',
+    'url' => '/test-validation',
+    'controller' => 'AuthController@testValidation',
+    'desc' => 'Test validation with required fields',
+    'visible' => true,
+    'params' => [
+        'form' => [
+            'email' => 'string (required) – Valid email address',
+            'password' => 'string (required) – Password (min 8 characters)',
+            'name' => 'string (required) – Full name'
+        ]
+    ],
+    'group' => ['Testing']
+]);
+
+// Example with URL parameters
+$router->add([
+    'method' => 'GET',
+    'url' => '/user/{id}',
+    'controller' => 'AuthController@getUserById',
+    'desc' => 'Get user by ID with optional status filter',
+    'visible' => true,
+    'params' => [
+        'url' => ['id' => 'integer (required) – User ID'],
+        'get' => [
+            'status' => 'string (optional) – active|inactive|pending',
+            'include_profile' => 'boolean (optional) – Include profile data'
+        ]
+    ],
+    'group' => ['Testing']
+]);
+
+// Example with JSON body
+$router->add([
+    'method' => 'POST',
+    'url' => '/user/create',
+    'controller' => 'AuthController@createUser',
+    'desc' => 'Create new user with JSON payload',
+    'visible' => true,
+    'params' => [
+        'json' => [
+            'name' => 'string (required) – Full name',
+            'email' => 'string (required) – Valid email',
+            'password' => 'string (required) – Min 8 characters',
+            'profile' => 'object (optional) – {age: number, bio: string}'
+        ]
+    ],
+    'group' => ['Testing']
+]);
+
+
+// **VALIDATION TEST ROUTE**
+$router->add([
+    'method' => 'POST',
+    'url' => '/test-validation',
+    'controller' => 'AuthController@testValidation',
+    'desc' => 'Test validation with required fields and sanitization',
+    'visible' => true,
+    'params' => [
+        'form' => [
+            'email' => 'string (required) – Valid email address',
+            'password' => 'string (required) – Password (min 8 characters)',
+            'name' => 'string (required) – Full name (min 2 characters, max 50)'
+        ]
+    ],
+    'group' => ['Testing']
+]);
+
+
+
+
+
+
+
+
+
+// Set JSON content type for API responses (except docs)
+if ($_SERVER['REQUEST_URI'] !== '/api/docs') {
+    header('Content-Type: application/json');
+}
 $router->dispatch();
+
+
+// Check if this is the docs route (HTML response)
+$requestUri = $_SERVER['REQUEST_URI'] ?? '';
+$isDocsRoute = (strpos($requestUri, '/docs') !== false);
+
+if ($isDocsRoute) {
+    // For docs page - flush output (show HTML)
+    ob_end_flush();
+} else {
+    // For API routes - clean output (discard debug text)
+    if (!headers_sent()) {
+        ob_end_clean();
+    }
+}

@@ -32,6 +32,11 @@ try {
     die();
 }
 
+
+
+
+
+
 // Enhanced interpolateQuery function
 function interpolateQuery(PDO $conn, string $query, array $params = []): string
 {
@@ -52,6 +57,9 @@ function interpolateQuery(PDO $conn, string $query, array $params = []): string
         return str_replace($key, $value, $interpolatedQuery);
     }, $query);
 }
+
+
+
 
 /**
  * Enhanced RunQuery function with named parameters support and LOG_ERRORS control

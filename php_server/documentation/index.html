@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHP Light Framework - Documentation</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h3>PHP Light Framework</h3>
+            <span class="version">v1.0.0</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html" class="active">🏠 Home</a></li>
+            <li><a href="installation.html">📦 Installation</a></li>
+            <li><a href="routing.html">🛣️ Routing</a></li>
+            <li><a href="controllers.html">🎛️ Controllers</a></li>
+            <li><a href="validation.html">🔒 Validation & Security</a></li>
+            <li><a href="database.html">💾 Database</a></li>
+            <li><a href="debugging.html">🐛 Debugging</a></li>
+            <li><a href="exceptions.html">⚠️ Error Handling</a></li>
+            <li><a href="examples.html">📚 Examples</a></li>
+            <li><a href="reference.html">📖 API Reference</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="/api/docs" target="_blank" class="demo-link">🚀 Live Demo</a>
+        </div>
+    </nav>
+
+    <main class="content">
+        <div class="container">
+            <header class="page-header">
+                <h1>🚀 PHP Light Framework</h1>
+                <p class="lead">A modern, lightweight PHP framework for building robust REST APIs with built-in security, validation, and interactive documentation.</p>
+            </header>
+
+            <section class="features">
+                <h2>✨ Key Features</h2>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>🛣️ Flexible Router</h3>
+                        <p>Array-based route definitions with URL, GET, POST, and JSON parameter support</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🔒 Security First</h3>
+                        <p>XSS protection, CORS handling, rate limiting, and comprehensive security headers</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🎛️ Request Validation</h3>
+                        <p>Built-in input sanitization and validation middleware with custom rules</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>📚 Interactive Docs</h3>
+                        <p>Beautiful API documentation with live testing interface and environment management</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>💾 Database Integration</h3>
+                        <p>Enhanced database operations with named parameters and migration system</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🐛 Smart Debugging</h3>
+                        <p>Context-aware debug functions with environment controls and error logging</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="quick-start">
+                <h2>⚡ Quick Start</h2>
+                <ol class="start-steps">
+                    <li><strong>Install:</strong> <code>composer install</code></li>
+                    <li><strong>Configure:</strong> Copy <code>.env.example</code> to <code>.env</code></li>
+                    <li><strong>Setup Database:</strong> Configure database credentials in <code>.env</code></li>
+                    <li><strong>Run Migration:</strong> POST to <code>/api/run_migration</code> with your schema</li>
+                    <li><strong>Start Building:</strong> Create routes and controllers</li>
+                </ol>
+                <div class="quick-links">
+                    <a href="installation.html" class="btn btn-primary">📦 Full Installation Guide</a>
+                    <a href="/api/docs" target="_blank" class="btn btn-secondary">🚀 Try Live Demo</a>
+                </div>
+            </section>
+
+            <section class="requirements">
+                <h2>📋 Requirements</h2>
+                <ul>
+                    <li>PHP 8.0 or higher</li>
+                    <li>Composer for dependency management</li>
+                    <li>MySQL/PDO support</li>
+                    <li>Apache/Nginx with URL rewriting</li>
+                </ul>
+            </section>
+
+            <section class="navigation">
+                <h2>📖 Documentation Sections</h2>
+                <div class="doc-links">
+                    <a href="installation.html" class="doc-link">
+                        <strong>📦 Installation</strong>
+                        <span>Setup guide and configuration</span>
+                    </a>
+                    <a href="routing.html" class="doc-link">
+                        <strong>🛣️ Routing System</strong>
+                        <span>Array-based route definitions and parameters</span>
+                    </a>
+                    <a href="controllers.html" class="doc-link">
+                        <strong>🎛️ Controllers</strong>
+                        <span>Request handling and response methods</span>
+                    </a>
+                    <a href="validation.html" class="doc-link">
+                        <strong>🔒 Validation & Security</strong>
+                        <span>Input validation, sanitization, and security features</span>
+                    </a>
+                    <a href="database.html" class="doc-link">
+                        <strong>💾 Database Operations</strong>
+                        <span>Database queries, migrations, and schema management</span>
+                    </a>
+                    <a href="debugging.html" class="doc-link">
+                        <strong>🐛 Debugging</strong>
+                        <span>Debug functions and environment management</span>
+                    </a>
+                    <a href="exceptions.html" class="doc-link">
+                        <strong>⚠️ Error Handling</strong>
+                        <span>Exception handling and custom error types</span>
+                    </a>
+                    <a href="examples.html" class="doc-link">
+                        <strong>📚 Examples</strong>
+                        <span>Complete tutorials and real-world examples</span>
+                    </a>
+                    <a href="reference.html" class="doc-link">
+                        <strong>📖 API Reference</strong>
+                        <span>Complete method reference and specifications</span>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="assets/script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</body>
+</html>

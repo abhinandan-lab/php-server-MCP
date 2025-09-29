@@ -4,6 +4,7 @@ namespace App\Core;
 
 use App\Exceptions\BaseException;
 use Throwable;
+use Dotenv\Dotenv;
 
 /**
  * Global exception handler for the framework
@@ -25,11 +26,13 @@ class ExceptionHandler
      */
     public static function handle(Throwable $exception): void
     {
-        // Log the exception
-        self::logException($exception);
+        // Log the exception only if LOG_ERRORS is enabled
+        if (self::shouldLogErrors()) {
+            self::logException($exception);
+        }
 
         // Check if we should show detailed errors
-        $showErrors = !empty($_ENV['SHOW_ERRORS']) && ($_ENV['SHOW_ERRORS'] === 'true' || $_ENV['SHOW_ERRORS'] === '1');
+        $showErrors = self::shouldShowErrors();
 
         // If it's our custom exception, use its data
         if ($exception instanceof BaseException) {
@@ -129,7 +132,49 @@ class ExceptionHandler
     }
 
     /**
-     * Log exception to file with detailed information
+     * Check if errors should be logged
+     */
+    private static function shouldLogErrors(): bool
+    {
+        // Try to get from $_ENV first
+        if (isset($_ENV['LOG_ERRORS'])) {
+            return ($_ENV['LOG_ERRORS'] === 'true' || $_ENV['LOG_ERRORS'] === '1');
+        }
+        
+        // Fallback: try to load environment if not loaded
+        try {
+            $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
+            $dotenv->safeLoad();
+            return !empty($_ENV['LOG_ERRORS']) && ($_ENV['LOG_ERRORS'] === 'true' || $_ENV['LOG_ERRORS'] === '1');
+        } catch (\Exception $e) {
+            // If environment loading fails, default to not logging
+            return false;
+        }
+    }
+
+    /**
+     * Check if detailed errors should be shown
+     */
+    private static function shouldShowErrors(): bool
+    {
+        // Try to get from $_ENV first
+        if (isset($_ENV['SHOW_ERRORS'])) {
+            return ($_ENV['SHOW_ERRORS'] === 'true' || $_ENV['SHOW_ERRORS'] === '1');
+        }
+        
+        // Fallback: try to load environment if not loaded
+        try {
+            $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
+            $dotenv->safeLoad();
+            return !empty($_ENV['SHOW_ERRORS']) && ($_ENV['SHOW_ERRORS'] === 'true' || $_ENV['SHOW_ERRORS'] === '1');
+        } catch (\Exception $e) {
+            // If environment loading fails, default to not showing errors
+            return false;
+        }
+    }
+
+    /**
+     * Log exception to file - only if LOG_ERRORS is enabled
      */
     private static function logException(Throwable $exception): void
     {
@@ -158,8 +203,14 @@ class ExceptionHandler
             mkdir($logDir, 0755, true);
         }
 
-        // Log to file
-        file_put_contents($logDir . '/error.log', $logMessage, FILE_APPEND | LOCK_EX);
+        // Log to file with error handling
+        try {
+            file_put_contents($logDir . '/error.log', $logMessage, FILE_APPEND | LOCK_EX);
+        } catch (\Exception $e) {
+            // If we can't write to log file, at least try to log to PHP error log
+            error_log("Failed to write to custom log file: " . $e->getMessage());
+            error_log($logMessage);
+        }
     }
 
     /**

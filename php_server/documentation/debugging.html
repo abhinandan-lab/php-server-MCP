@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debugging - PHP Light Framework</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h3>PHP Light Framework</h3>
+            <span class="version">v1.0.0</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">🏠 Home</a></li>
+            <li><a href="installation.html">📦 Installation</a></li>
+            <li><a href="routing.html">🛣️ Routing</a></li>
+            <li><a href="controllers.html">🎛️ Controllers</a></li>
+            <li><a href="validation.html">🔒 Validation & Security</a></li>
+            <li><a href="database.html">💾 Database</a></li>
+            <li><a href="debugging.html" class="active">🐛 Debugging</a></li>
+            <li><a href="exceptions.html">⚠️ Error Handling</a></li>
+            <li><a href="examples.html">📚 Examples</a></li>
+            <li><a href="reference.html">📖 API Reference</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="/api/docs" target="_blank" class="demo-link">🚀 Live Demo</a>
+        </div>
+    </nav>
+
+    <main class="content">
+        <div class="container">
+            <header class="page-header">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> > Debugging
+                </nav>
+                <h1>🐛 Debugging</h1>
+                <p>Debug functions and environment management</p>
+            </header>
+
+            <section class="debug-functions">
+                <h2>🔍 Debug Functions</h2>
+                <p>The framework provides two main debug functions that only output when <code>DEBUG_MODE=true</code>:</p>
+
+                <div class="debug-function">
+                    <h3>pp() - Print Debug</h3>
+                    <p>Simple debug printing with file and line information:</p>
+                    <pre><code class="language-php">pp("Debug message");
+pp($arrayData);
+pp($userData);
+
+// Output format:
+--- pp ---
+File: /path/to/file.php | Line: 123
+-------------------------------
+Debug message
+------------------------------
+--- /pp ---</code></pre>
+                </div>
+
+                <div class="debug-function">
+                    <h3>ppp() - Print Debug (var_dump)</h3>
+                    <p>Detailed debug output with variable types and structure:</p>
+                    <pre><code class="language-php">ppp($complexObject);
+ppp($multidimensionalArray);
+
+// Output format:
+--- ppp ---
+File: /path/to/file.php | Line: 456
+-------------------------------
+array(3) {
+  ["name"]=>
+  string(8) "John Doe"
+  ["age"]=>
+  int(30)
+  ["active"]=>
+  bool(true)
+}
+------------------------------
+--- /ppp ---</code></pre>
+                </div>
+            </section>
+
+            <section class="debug-examples">
+                <h2>📚 Debug Examples</h2>
+                
+                <div class="debug-example">
+                    <h3>Controller Debugging</h3>
+                    <pre><code class="language-php">public function createUser() 
+{
+    pp("Starting user creation");
+    
+    $data = $this->getRequestData();
+    pp("Request data received:");
+    ppp($data);
+    
+    $validatedData = $this->validateRequest([
+        'name' => 'required|min:2',
+        'email' => 'required|email'
+    ]);
+    pp("Validation passed");
+    ppp($validatedData);
+    
+    $result = RunQuery([
+        'conn' => $this->conn,
+        'query' => 'INSERT INTO users (name, email) VALUES (:name, :email)',
+        'params' => [':name' => $validatedData['name'], ':email' => $validatedData['email']],
+        'withSuccess' => true
+    ]);
+    
+    pp("Database result:");
+    ppp($result);
+    
+    if (isset($result['error'])) {
+        pp("Database error occurred");
+        $this->sendError('Failed to create user', 500);
+        return;
+    }
+    
+    pp("User created successfully with ID: " . $result['id']);
+    $this->sendSuccess('User created', ['user_id' => $result['id']]);
+}</code></pre>
+                </div>
+
+                <div class="debug-example">
+                    <h3>Database Query Debugging</h3>
+                    <pre><code class="language-php">public function getUserPosts($userId) 
+{
+    pp("Fetching posts for user ID: $userId");
+    
+    // Get compiled SQL for debugging
+    $sql = RunQuery([
+        'conn' => $this->conn,
+        'query' => 'SELECT * FROM posts WHERE user_id = :user_id AND status = :status',
+        'params' => [':user_id' => $userId, ':status' => 'published'],
+        'returnSql' => true
+    ]);
+    
+    pp("Generated SQL query:");
+    pp($sql);
+    
+    // Execute the actual query
+    $posts = RunQuery([
+        'conn' => $this->conn,
+        'query' => 'SELECT * FROM posts WHERE user_id = :user_id AND status = :status',
+        'params' => [':user_id' => $userId, ':status' => 'published']
+    ]);
+    
+    pp("Query returned " . count($posts) . " posts");
+    ppp($posts);
+    
+    $this->sendSuccess('Posts retrieved', $posts);
+}</code></pre>
+                </div>
+
+                <div class="debug-example">
+                    <h3>API Request Flow Debugging</h3>
+                    <pre><code class="language-php">public function processPayment() 
+{
+    pp("=== Payment Processing Started ===");
+    
+    $requestData = $this->getRequestData();
+    pp("Raw request data:");
+    ppp($requestData);
+    
+    // Validation
+    try {
+        $data = $this->validateRequest([
+            'amount' => 'required|numeric|min:0.01',
+            'currency' => 'required|alpha',
+            'payment_method' => 'required'
+        ]);
+        pp("Validation successful");
+    } catch (ValidationException $e) {
+        pp("Validation failed:");
+        ppp($e->getValidationErrors());
+        $this->sendValidationError($e->getMessage(), $e->getValidationErrors());
+        return;
+    }
+    
+    // Process payment
+    pp("Processing payment of {$data['amount']} {$data['currency']}");
+    
+    $paymentResult = $this->chargePayment($data);
+    pp("Payment gateway response:");
+    ppp($paymentResult);
+    
+    if ($paymentResult['success']) {
+        pp("Payment successful - Transaction ID: " . $paymentResult['transaction_id']);
+        $this->sendSuccess('Payment processed', [
+            'transaction_id' => $paymentResult['transaction_id'],
+            'amount' => $data['amount'],
+            'status' => 'completed'
+        ]);
+    } else {
+        pp("Payment failed: " . $paymentResult['error']);
+        $this->sendError('Payment failed', 402, $paymentResult);
+    }
+    
+    pp("=== Payment Processing Completed ===");
+}</code></pre>
+                </div>
+            </section>
+
+            <section class="environment-controls">
+                <h2>⚙️ Environment Controls</h2>
+                <p>Configure debugging behavior in your <code>.env</code> file:</p>
+                
+                <pre><code class="language-env"># Debug Configuration
+DEBUG_MODE=true     # Enable pp()/ppp() output (true/false)
+SHOW_ERRORS=true    # Show detailed error info in API responses (true/false)
+LOG_ERRORS=true     # Log errors to /api/logs/error.log (true/false)
+
+# Development vs Production Settings
+APP_ENV=development # development/staging/production</code></pre>
+
+                <div class="environment-explanation">
+                    <h3>Setting Explanations</h3>
+                    <ul>
+                        <li><strong>DEBUG_MODE:</strong> Controls whether pp() and ppp() functions output anything</li>
+                        <li><strong>SHOW_ERRORS:</strong> Shows detailed error traces in JSON responses</li>
+                        <li><strong>LOG_ERRORS:</strong> Writes errors to log files for later analysis</li>
+                        <li><strong>APP_ENV:</strong> Sets the overall application environment</li>
+                    </ul>
+                </div>
+
+                <div class="environment-examples">
+                    <h3>Environment Examples</h3>
+                    
+                    <h4>Development Settings</h4>
+                    <pre><code class="language-env">DEBUG_MODE=true
+SHOW_ERRORS=true
+LOG_ERRORS=true
+APP_ENV=development</code></pre>
+                    
+                    <h4>Production Settings</h4>
+                    <pre><code class="language-env">DEBUG_MODE=false
+SHOW_ERRORS=false
+LOG_ERRORS=true
+APP_ENV=production</code></pre>
+                </div>
+            </section>
+
+            <section class="environment-management">
+                <h2>🔧 Environment Management</h2>
+                <p>Manage environment variables through the interactive documentation:</p>
+                
+                <div class="management-steps">
+                    <h3>Using the Interactive Interface</h3>
+                    <ol>
+                        <li>Visit <code>/api/docs</code> in your browser</li>
+                        <li>Click the "⚙️ Environment" button in the top right</li>
+                        <li>View current environment variable values</li>
+                        <li>Edit values directly in the interface</li>
+                        <li>Changes are applied immediately</li>
+                        <li>Click "🔄 Refresh" to reload current values</li>
+                        <li>Click "💾 Save All Changes" to persist modifications</li>
+                    </ol>
+                </div>
+
+                <div class="allowed-variables">
+                    <h3>Allowed Environment Variables</h3>
+                    <p>The following variables can be modified through the interface:</p>
+                    <ul>
+                        <li><code>DEBUG_MODE</code> - Enable/disable debug functions</li>
+                        <li><code>SHOW_ERRORS</code> - Show/hide detailed errors</li>
+                        <li><code>LOG_ERRORS</code> - Enable/disable error logging</li>
+                        <li><code>APP_ENV</code> - Application environment</li>
+                        <li><code>API_VERSION</code> - API version string</li>
+                        <li><code>TIMEZONE</code> - Application timezone</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="log-files">
+                <h2>📋 Log Files</h2>
+                <p>When <code>LOG_ERRORS=true</code>, errors are logged to files:</p>
+                
+                <div class="log-locations">
+                    <h3>Log File Locations</h3>
+                    <pre><code class="language-text">/api/logs/error.log          # General errors
+/api/logs/validation.log     # Validation errors
+/api/logs/database.log       # Database errors
+/api/logs/security.log       # Security events</code></pre>
+                </div>
+
+                <div class="log-format">
+                    <h3>Log Format</h3>
+                    <pre><code class="language-text">[2025-09-30 00:15:32] ERROR: Database connection failed
+File: /api/controllers/UserController.php
+Line: 45
+Message: SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost'
+Stack Trace:
+#0 /api/controllers/UserController.php(45): PDO->__construct()
+#1 /api/controllers/UserController.php(23): UserController->getUser()
+#2 {main}</code></pre>
+                </div>
+            </section>
+
+            <section class="debugging-tips">
+                <h2>💡 Debugging Tips</h2>
+                
+                <div class="tip">
+                    <h3>🎯 Strategic Debug Placement</h3>
+                    <pre><code class="language-php">public function complexFunction() 
+{
+    pp("=== Function Start ===");
+    
+    // Debug at key decision points
+    if ($condition) {
+        pp("Taking branch A");
+    } else {
+        pp("Taking branch B");
+    }
+    
+    // Debug before/after important operations
+    pp("About to call external API");
+    $result = $this->callExternalAPI();
+    pp("API call completed");
+    ppp($result);
+    
+    pp("=== Function End ===");
+}</code></pre>
+                </div>
+
+                <div class="tip">
+                    <h3>🔍 Debug Variable States</h3>
+                    <pre><code class="language-php">// Track variable changes
+$userId = $_GET['user_id'] ?? null;
+pp("Initial user ID: " . ($userId ?? 'null'));
+
+$userId = (int)$userId;
+pp("After casting: $userId");
+
+if ($userId <= 0) {
+    pp("Invalid user ID detected");
+    $this->sendError('Invalid user ID', 400);
+    return;
+}</code></pre>
+                </div>
+
+                <div class="tip">
+                    <h3>📊 Performance Debugging</h3>
+                    <pre><code class="language-php">$startTime = microtime(true);
+pp("Starting expensive operation");
+
+$result = $this->heavyDatabaseQuery();
+
+$endTime = microtime(true);
+$duration = round(($endTime - $startTime) * 1000, 2);
+pp("Operation completed in {$duration}ms");</code></pre>
+                </div>
+            </section>
+
+            <section class="production-debugging">
+                <h2>🚀 Production Debugging</h2>
+                <p>Safe debugging practices for production environments:</p>
+                
+                <div class="production-practice">
+                    <h3>✅ Use Conditional Debugging</h3>
+                    <pre><code class="language-php">// Only debug specific users or conditions
+if ($_ENV['APP_ENV'] === 'development' || $userId === 1) {
+    pp("Debug info for admin user");
+    ppp($sensitiveData);
+}
+
+// Debug with IP restrictions
+$debugIPs = ['127.0.0.1', '192.168.1.100'];
+if (in_array($_SERVER['REMOTE_ADDR'], $debugIPs)) {
+    pp("Debug info for authorized IP");
+}</code></pre>
+                </div>
+
+                <div class="production-practice">
+                    <h3>📝 Use Error Logging Instead</h3>
+                    <pre><code class="language-php">// Don't use pp() in production, use error_log()
+if ($_ENV['APP_ENV'] === 'production') {
+    error_log("User creation attempt: " . json_encode($userData));
+} else {
+    pp("User creation attempt:");
+    ppp($userData);
+}</code></pre>
+                </div>
+            </section>
+
+            <section class="next-steps">
+                <h2>🎯 Next Steps</h2>
+                <div class="next-links">
+                    <a href="exceptions.html" class="next-link">
+                        <strong>⚠️ Error Handling</strong>
+                        <span>Learn about exception handling and error management</span>
+                    </a>
+                    <a href="examples.html" class="next-link">
+                        <strong>📚 Complete Examples</strong>
+                        <span>See debugging in action with real examples</span>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="assets/script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</body>
+</html>

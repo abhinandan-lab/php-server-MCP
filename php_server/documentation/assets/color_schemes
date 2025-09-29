@@ -1,0 +1,171 @@
+/* Option 1: 🟣 Purple Modern Theme
+:root {
+    --primary-color: #8b5cf6;        /* Purple */
+    --primary-dark: #7c3aed;         /* Dark Purple */
+    --secondary-color: #64748b;      /* Slate Gray */
+    --success-color: #10b981;        /* Emerald */
+    --warning-color: #f59e0b;        /* Amber */
+    --danger-color: #ef4444;         /* Red */
+    --info-color: #06b6d4;           /* Cyan */
+    
+    --bg-primary: #ffffff;           /* White */
+    --bg-secondary: #faf8ff;         /* Light Purple Tint */
+    --bg-tertiary: #f3f0ff;          /* Purple Tint */
+    --bg-code: #faf8ff;              /* Light Purple */
+    --text-primary: #1f2937;         /* Dark Gray */
+    --text-secondary: #6b7280;       /* Medium Gray */
+    --text-muted: #9ca3af;           /* Light Gray */
+    --border-color: #e5e7eb;         /* Light Border */
+    --border-light: #f3f4f6;         /* Very Light Border */
+    
+    --sidebar-width: 280px;
+    --content-max-width: 1200px;
+    --border-radius: 8px;
+    --shadow: 0 2px 4px rgba(139, 92, 246, 0.1);
+    --shadow-lg: 0 8px 25px rgba(139, 92, 246, 0.15);
+}
+
+
+
+Option 2: 🟢 Green Nature Theme
+:root {
+    --primary-color: #059669;        /* Emerald */
+    --primary-dark: #047857;         /* Dark Emerald */
+    --secondary-color: #6b7280;      /* Gray */
+    --success-color: #10b981;        /* Green */
+    --warning-color: #f59e0b;        /* Orange */
+    --danger-color: #ef4444;         /* Red */
+    --info-color: #0ea5e9;           /* Blue */
+    
+    --bg-primary: #ffffff;           /* White */
+    --bg-secondary: #f0fdf4;         /* Light Green Tint */
+    --bg-tertiary: #dcfce7;          /* Green Tint */
+    --bg-code: #f0fdf4;              /* Light Green */
+    --text-primary: #1f2937;         /* Dark Gray */
+    --text-secondary: #6b7280;       /* Medium Gray */
+    --text-muted: #9ca3af;           /* Light Gray */
+    --border-color: #d1d5db;         /* Light Border */
+    --border-light: #f3f4f6;         /* Very Light Border */
+    
+    --sidebar-width: 280px;
+    --content-max-width: 1200px;
+    --border-radius: 8px;
+    --shadow: 0 2px 4px rgba(5, 150, 105, 0.1);
+    --shadow-lg: 0 8px 25px rgba(5, 150, 105, 0.15);
+}
+
+
+Option 3: 🟠 Orange Sunset Theme
+:root {
+    --primary-color: #ea580c;        /* Orange */
+    --primary-dark: #c2410c;         /* Dark Orange */
+    --secondary-color: #64748b;      /* Slate */
+    --success-color: #10b981;        /* Green */
+    --warning-color: #f59e0b;        /* Amber */
+    --danger-color: #ef4444;         /* Red */
+    --info-color: #0ea5e9;           /* Sky Blue */
+    
+    --bg-primary: #ffffff;           /* White */
+    --bg-secondary: #fff7ed;         /* Light Orange Tint */
+    --bg-tertiary: #fed7aa;          /* Orange Tint */
+    --bg-code: #fff7ed;              /* Light Orange */
+    --text-primary: #1f2937;         /* Dark Gray */
+    --text-secondary: #6b7280;       /* Medium Gray */
+    --text-muted: #9ca3af;           /* Light Gray */
+    --border-color: #e5e7eb;         /* Light Border */
+    --border-light: #f9fafb;         /* Very Light Border */
+    
+    --sidebar-width: 280px;
+    --content-max-width: 1200px;
+    --border-radius: 8px;
+    --shadow: 0 2px 4px rgba(234, 88, 12, 0.1);
+    --shadow-lg: 0 8px 25px rgba(234, 88, 12, 0.15);
+}
+
+
+
+Option 4: 🔵 Ocean Blue Theme
+:root {
+    --primary-color: #0ea5e9;        /* Sky Blue */
+    --primary-dark: #0284c7;         /* Dark Blue */
+    --secondary-color: #64748b;      /* Slate */
+    --success-color: #10b981;        /* Green */
+    --warning-color: #f59e0b;        /* Amber */
+    --danger-color: #ef4444;         /* Red */
+    --info-color: #06b6d4;           /* Cyan */
+    
+    --bg-primary: #ffffff;           /* White */
+    --bg-secondary: #f0f9ff;         /* Light Blue Tint */
+    --bg-tertiary: #e0f2fe;          /* Blue Tint */
+    --bg-code: #f0f9ff;              /* Light Blue */
+    --text-primary: #1e293b;         /* Dark Slate */
+    --text-secondary: #64748b;       /* Slate */
+    --text-muted: #94a3b8;           /* Light Slate */
+    --border-color: #e2e8f0;         /* Light Border */
+    --border-light: #f1f5f9;         /* Very Light Border */
+    
+    --sidebar-width: 280px;
+    --content-max-width: 1200px;
+    --border-radius: 8px;
+    --shadow: 0 2px 4px rgba(14, 165, 233, 0.1);
+    --shadow-lg: 0 8px 25px rgba(14, 165, 233, 0.15);
+}
+
+
+
+
+Option 5: ⚫ Dark Professional Theme
+:root {
+    --primary-color: #3b82f6;        /* Blue */
+    --primary-dark: #2563eb;         /* Dark Blue */
+    --secondary-color: #6b7280;      /* Gray */
+    --success-color: #10b981;        /* Green */
+    --warning-color: #f59e0b;        /* Amber */
+    --danger-color: #ef4444;         /* Red */
+    --info-color: #06b6d4;           /* Cyan */
+    
+    --bg-primary: #111827;           /* Dark Gray */
+    --bg-secondary: #1f2937;         /* Medium Dark */
+    --bg-tertiary: #374151;          /* Light Dark */
+    --bg-code: #1f2937;              /* Dark Code */
+    --text-primary: #f9fafb;         /* Light Text */
+    --text-secondary: #d1d5db;       /* Medium Light */
+    --text-muted: #9ca3af;           /* Muted Light */
+    --border-color: #374151;         /* Dark Border */
+    --border-light: #4b5563;         /* Light Dark Border */
+    
+    --sidebar-width: 280px;
+    --content-max-width: 1200px;
+    --border-radius: 8px;
+    --shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+
+
+Option 6: 🟡 Golden Theme
+:root {
+    --primary-color: #d97706;        /* Amber */
+    --primary-dark: #b45309;         /* Dark Amber */
+    --secondary-color: #6b7280;      /* Gray */
+    --success-color: #10b981;        /* Green */
+    --warning-color: #f59e0b;        /* Orange */
+    --danger-color: #ef4444;         /* Red */
+    --info-color: #0ea5e9;           /* Blue */
+    
+    --bg-primary: #ffffff;           /* White */
+    --bg-secondary: #fffbeb;         /* Light Amber Tint */
+    --bg-tertiary: #fef3c7;          /* Amber Tint */
+    --bg-code: #fffbeb;              /* Light Amber */
+    --text-primary: #1f2937;         /* Dark Gray */
+    --text-secondary: #6b7280;       /* Medium Gray */
+    --text-muted: #9ca3af;           /* Light Gray */
+    --border-color: #e5e7eb;         /* Light Border */
+    --border-light: #f9fafb;         /* Very Light Border */
+    
+    --sidebar-width: 280px;
+    --content-max-width: 1200px;
+    --border-radius: 8px;
+    --shadow: 0 2px 4px rgba(217, 119, 6, 0.1);
+    --shadow-lg: 0 8px 25px rgba(217, 119, 6, 0.15);
+} */

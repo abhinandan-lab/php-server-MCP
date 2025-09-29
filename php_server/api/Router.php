@@ -14,20 +14,45 @@ class Router
         return $this->basePath;
     }
 
-    public function add($method, $pattern, $handler, $description = '', $visible = true, $inputs = [], $showHeaders = false, $tags = [])
+    /**
+     * Enhanced add method - only array syntax with best key names
+     */
+    public function add(array $config)
     {
+        // Extract with defaults and best naming
+        $method = strtoupper($config['method'] ?? 'GET');
+        $pattern = $config['url'] ?? $config['pattern'] ?? '/';
+        $handler = $config['controller'] ?? $config['handler'] ?? '';
+        $description = $config['desc'] ?? $config['description'] ?? '';
+        $visible = $config['visible'] ?? true;
+        $showHeaders = $config['showHeaders'] ?? false;
+        $tags = $config['group'] ?? $config['tags'] ?? [];
+        
+        // Enhanced parameter handling with types
+        $params = $config['params'] ?? [];
+        $urlParams = $params['url'] ?? [];
+        $getParams = $params['get'] ?? [];
+        $formParams = $params['form'] ?? $params['post'] ?? [];
+        $jsonParams = $params['json'] ?? $params['body'] ?? [];
+
         $route = [
-            'method' => strtoupper($method),
+            'method' => $method,
             'pattern' => $pattern,
             'handler' => $handler,
             'description' => $description,
             'visible' => $visible,
-            'inputs' => $inputs,
             'showHeaders' => $showHeaders,
             'tags' => is_array($tags) ? $tags : [$tags],
+            'params' => [
+                'url' => $urlParams,
+                'get' => $getParams,
+                'form' => $formParams,
+                'json' => $jsonParams
+            ],
             'regex' => $this->patternToRegex($pattern),
             'specificity' => $this->calculateSpecificity($pattern)
         ];
+        
         $this->routes[] = $route;
         usort($this->routes, fn($a, $b) => $b['specificity'] <=> $a['specificity']);
     }
@@ -79,95 +104,60 @@ class Router
                     continue;
 
                 if (preg_match($route['regex'], $uri, $matches)) {
-                    array_shift($matches); // remove full match
+                    array_shift($matches);
                     [$controller, $action] = explode('@', $route['handler']);
                     
-                    // Use Controllers namespace
                     $controllerClass = "App\\Controllers\\$controller";
                     
-                    // Check if class exists
                     if (!class_exists($controllerClass)) {
                         throw new \Exception("Controller not found: $controllerClass");
                     }
                     
-                    // Create controller instance
                     $controllerInstance = new $controllerClass();
                     
-                    // Check if method exists
+                    // Set router for DocsController
+                    if ($controller === 'DocsController') {
+                        $controllerInstance->setRouter($this);
+                    }
+                    
                     if (!method_exists($controllerInstance, $action)) {
                         throw new \Exception("Method '$action' not found in controller '$controllerClass'");
                     }
                     
-                    // Call the controller method
                     call_user_func_array([$controllerInstance, $action], $matches);
                     return;
                 }
             }
 
-            // If nothing matched, throw NotFoundException
             throw new NotFoundException("Route not found: $method $uri");
             
         } catch (\Throwable $e) {
-            // Let the global exception handler deal with it
             throw $e;
         }
     }
 
-    /**
-     * Get route information for a specific URI and method
-     */
-    public function getRouteInfo(string $method, string $uri): ?array
-    {
-        $uri = '/' . trim(str_replace($this->basePath, '', $uri), '/');
-        
-        foreach ($this->routes as $route) {
-            if ($method !== $route['method'])
-                continue;
-
-            if (preg_match($route['regex'], $uri, $matches)) {
-                return [
-                    'route' => $route,
-                    'matches' => array_slice($matches, 1) // Remove full match
-                ];
-            }
-        }
-        
-        return null;
-    }
-
-    /**
-     * Check if a route exists
-     */
-    public function routeExists(string $method, string $uri): bool
-    {
-        return $this->getRouteInfo($method, $uri) !== null;
-    }
-
     private function patternToRegex($pattern)
     {
-        // Handle wildcard: "/tokens/*"
         if (str_ends_with($pattern, '/*')) {
             $pattern = rtrim($pattern, '/*') . '(/.*)?';
         } else {
             $pattern = preg_replace('#\{([\w]+)\}#', '([^/]+)', $pattern);
         }
-
         return '#^' . $pattern . '$#';
     }
 
     private function calculateSpecificity($pattern)
     {
-        // Specificity score: lower for wildcards and dynamic, higher for exact
         $score = 0;
         $segments = explode('/', trim($pattern, '/'));
 
         foreach ($segments as $segment) {
             if ($segment === '*') {
-                $score -= 10; // wildcard = very generic
+                $score -= 10;
             } elseif (preg_match('/^\{.+\}$/', $segment)) {
-                $score += 1; // dynamic param = less specific
+                $score += 1;
             } else {
-                $score += 5; // static literal = more specific
+                $score += 5;
             }
         }
 

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Operations - PHP Light Framework</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h3>PHP Light Framework</h3>
+            <span class="version">v1.0.0</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">🏠 Home</a></li>
+            <li><a href="installation.html">📦 Installation</a></li>
+            <li><a href="routing.html">🛣️ Routing</a></li>
+            <li><a href="controllers.html">🎛️ Controllers</a></li>
+            <li><a href="validation.html">🔒 Validation & Security</a></li>
+            <li><a href="database.html" class="active">💾 Database</a></li>
+            <li><a href="debugging.html">🐛 Debugging</a></li>
+            <li><a href="exceptions.html">⚠️ Error Handling</a></li>
+            <li><a href="examples.html">📚 Examples</a></li>
+            <li><a href="reference.html">📖 API Reference</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="/api/docs" target="_blank" class="demo-link">🚀 Live Demo</a>
+        </div>
+    </nav>
+
+    <main class="content">
+        <div class="container">
+            <header class="page-header">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> > Database
+                </nav>
+                <h1>💾 Database Operations</h1>
+                <p>Database queries, migrations, and schema management</p>
+            </header>
+
+            <section class="migration-system">
+                <h2>🔄 Migration System</h2>
+                <p>The framework includes a built-in migration system for database schema management.</p>
+
+                <div class="migration-files">
+                    <h3>📁 Migration Files</h3>
+                    <p>Database schemas are stored in <code>/api/tables</code> file with this format:</p>
+                    
+                    <pre><code class="language-sql">-- |--------------------------------------------------------------------------------------------------------
+-- Admin Table
+-- |--------------------------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS admin_user;
+CREATE TABLE admin_user (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(40),
+    email VARCHAR(150) NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO admin_user (username, email, password) 
+VALUES ('admin', 'admin@example.com', '$2y$10$bkPD8BaqPY9gsbL15YLytOTuBy1G//VFscMtktpUCjo3KcH5BFrqG');
+
+-- |--------------------------------------------------------------------------------------------------------
+-- Challenges Table
+-- |--------------------------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS challenges;
+CREATE TABLE challenges (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    challenge_title VARCHAR(200) NOT NULL,
+    target_city VARCHAR(100),
+    description TEXT,
+    start_date DATE,
+    end_date DATE,
+    reward_points INT DEFAULT 0,
+    reward_coins INT DEFAULT 0,
+    difficulty_level ENUM('easy', 'medium', 'hard') DEFAULT 'medium',
+    hashtags VARCHAR(500),
+    location VARCHAR(200),
+    category VARCHAR(50),
+    feature_challenge TINYINT DEFAULT 0,
+    push_notifications_to_creators TINYINT DEFAULT 0,
+    created_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);</code></pre>
+                </div>
+
+                <div class="migration-execution">
+                    <h3>🚀 Running Migrations</h3>
+                    <p>Execute migrations using the <code>/api/run_migration</code> endpoint:</p>
+                    
+                    <pre><code class="language-bash"># Using curl
+curl -X POST http://localhost/api/run_migration \
+     -F "sql_file=@/path/to/your/tables"
+
+# Using interactive docs
+# Visit /api/docs and use the migration endpoint</code></pre>
+
+                    <div class="alert alert-info">
+                        <strong>💡 Note:</strong> The migration endpoint will execute all SQL statements in the tables file sequentially. Failed statements will cause a rollback.
+                    </div>
+                </div>
+
+                <div class="schema-reference">
+                    <h3>📋 Schema Reference File</h3>
+                    <p>Keep a quick reference of your table structures in <code>/api/shortTables</code>:</p>
+                    
+                    <pre><code class="language-text">admin_user: id (PK), username, email (UNIQUE), password, created_at
+
+challenges: id (PK), challenge_title, target_city, description, start_date, end_date, reward_points, reward_coins, difficulty_level, hashtags, location, category, feature_challenge (TINYINT), push_notifications_to_creators (TINYINT), created_by, created_at, updated_at
+
+users: id (PK), name, email (UNIQUE), password_hash, status, created_at, updated_at
+
+posts: id (PK), title, content, author_id (FK), status, published_at, created_at, updated_at</code></pre>
+
+                    <div class="alert alert-warning">
+                        <strong>⚠️ Manual Maintenance:</strong> The shortTables file is currently maintained manually. Update it whenever you modify your database schema.
+                    </div>
+                </div>
+            </section>
+
+            <section class="runquery-function">
+                <h2>🔧 RunQuery Function</h2>
+                <p>Enhanced database operations with array-based syntax:</p>
+
+                <div class="basic-usage">
+                    <h3>Basic Usage</h3>
+                    <pre><code class="language-php">// Simple SELECT query
+$users = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'SELECT * FROM users WHERE status = :status',
+    'params' => [':status' => 'active']
+]);
+
+// INSERT with success information
+$result = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'INSERT INTO users (name, email) VALUES (:name, :email)',
+    'params' => [
+        ':name' => 'John Doe',
+        ':email' => 'john@example.com'
+    ],
+    'withSuccess' => true
+]);
+
+// Returns: ['success' => true, 'affected_rows' => 1, 'id' => 123]</code></pre>
+                </div>
+
+                <div class="advanced-usage">
+                    <h3>Advanced Features</h3>
+                    <pre><code class="language-php">// Get compiled SQL for debugging
+$sql = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'SELECT * FROM users WHERE id = :id AND status = :status',
+    'params' => [':id' => 123, ':status' => 'active'],
+    'returnSql' => true
+]);
+// Returns: "SELECT * FROM users WHERE id = 123 AND status = 'active'"
+
+// Complex query with multiple conditions
+$posts = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'SELECT p.*, u.name as author_name 
+                FROM posts p 
+                JOIN users u ON p.author_id = u.id 
+                WHERE p.status = :status 
+                AND p.created_at >= :date
+                ORDER BY p.created_at DESC 
+                LIMIT :limit',
+    'params' => [
+        ':status' => 'published',
+        ':date' => '2024-01-01',
+        ':limit' => 10
+    ],
+    'fetchAssoc' => true
+]);</code></pre>
+                </div>
+
+                <div class="error-handling">
+                    <h3>Error Handling</h3>
+                    <pre><code class="language-php">$result = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'SELECT * FROM users WHERE id = :id',
+    'params' => [':id' => $userId]
+]);
+
+if (isset($result['error'])) {
+    // Handle database error
+    $this->sendError('Database error: ' . $result['error'], 500);
+    return;
+}
+
+// Process successful result
+foreach ($result as $user) {
+    // Process each user
+}</code></pre>
+                </div>
+            </section>
+
+            <section class="database-examples">
+                <h2>📚 Complete Examples</h2>
+
+                <div class="crud-example">
+                    <h3>CRUD Operations</h3>
+                    <pre><code class="language-php">class UserController extends BaseController 
+{
+    // CREATE - Insert new user
+    public function createUser() 
+    {
+        $data = $this->validateRequest([
+            'name' => 'required|min:2|max:50',
+            'email' => 'required|email'
+        ]);
+
+        $result = RunQuery([
+            'conn' => $this->conn,
+            'query' => 'INSERT INTO users (name, email, created_at) VALUES (:name, :email, NOW())',
+            'params' => [
+                ':name' => $data['name'],
+                ':email' => $data['email']
+            ],
+            'withSuccess' => true
+        ]);
+
+        if (isset($result['error'])) {
+            $this->sendError('Failed to create user', 500);
+            return;
+        }
+
+        $this->sendSuccess('User created successfully', [
+            'user_id' => $result['id'],
+            'name' => $data['name'],
+            'email' => $data['email']
+        ]);
+    }
+
+    // READ - Get user by ID
+    public function getUser($id) 
+    {
+        $user = RunQuery([
+            'conn' => $this->conn,
+            'query' => 'SELECT id, name, email, created_at FROM users WHERE id = :id',
+            'params' => [':id' => $id]
+        ]);
+
+        if (empty($user)) {
+            $this->sendError('User not found', 404);
+            return;
+        }
+
+        $this->sendSuccess('User retrieved successfully', $user[0]);
+    }
+
+    // UPDATE - Update user information
+    public function updateUser($id) 
+    {
+        $data = $this->getRequestData();
+        
+        $result = RunQuery([
+            'conn' => $this->conn,
+            'query' => 'UPDATE users SET name = :name, email = :email, updated_at = NOW() WHERE id = :id',
+            'params' => [
+                ':id' => $id,
+                ':name' => $data['name'],
+                ':email' => $data['email']
+            ],
+            'withSuccess' => true
+        ]);
+
+        if ($result['affected_rows'] === 0) {
+            $this->sendError('User not found or no changes made', 404);
+            return;
+        }
+
+        $this->sendSuccess('User updated successfully', ['user_id' => $id]);
+    }
+
+    // DELETE - Remove user
+    public function deleteUser($id) 
+    {
+        $result = RunQuery([
+            'conn' => $this->conn,
+            'query' => 'DELETE FROM users WHERE id = :id',
+            'params' => [':id' => $id],
+            'withSuccess' => true
+        ]);
+
+        if ($result['affected_rows'] === 0) {
+            $this->sendError('User not found', 404);
+            return;
+        }
+
+        $this->sendSuccess('User deleted successfully', ['user_id' => $id]);
+    }
+}</code></pre>
+                </div>
+            </section>
+
+            <section class="best-practices">
+                <h2>✅ Database Best Practices</h2>
+
+                <div class="practice">
+                    <h3>🔒 Always Use Parameters</h3>
+                    <pre><code class="language-php">// ✅ Good - Parameterized query
+RunQuery([
+    'conn' => $this->conn,
+    'query' => 'SELECT * FROM users WHERE id = :id',
+    'params' => [':id' => $userId]
+]);
+
+// ❌ Bad - Direct string interpolation (SQL injection risk)
+RunQuery([
+    'conn' => $this->conn,
+    'query' => "SELECT * FROM users WHERE id = $userId"
+]);</code></pre>
+                </div>
+
+                <div class="practice">
+                    <h3>🎯 Error Handling</h3>
+                    <pre><code class="language-php">// Always check for errors
+$result = RunQuery([/* ... */]);
+
+if (isset($result['error'])) {
+    error_log("Database error: " . $result['error']);
+    $this->sendError('Database operation failed', 500);
+    return;
+}</code></pre>
+                </div>
+
+                <div class="practice">
+                    <h3>📊 Use returnSql for Debugging</h3>
+                    <pre><code class="language-php">// Debug complex queries
+$sql = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'SELECT * FROM users WHERE status = :status AND created_at > :date',
+    'params' => [':status' => 'active', ':date' => '2024-01-01'],
+    'returnSql' => true
+]);
+
+pp("Generated SQL: " . $sql);</code></pre>
+                </div>
+            </section>
+
+            <section class="next-steps">
+                <h2>🎯 Next Steps</h2>
+                <div class="next-links">
+                    <a href="debugging.html" class="next-link">
+                        <strong>🐛 Learn Debugging</strong>
+                        <span>Debug your database operations effectively</span>
+                    </a>
+                    <a href="examples.html" class="next-link">
+                        <strong>📚 See Examples</strong>
+                        <span>Complete CRUD examples with database operations</span>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="assets/script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</body>
+</html>

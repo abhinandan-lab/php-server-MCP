@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Reference - PHP Light Framework</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h3>PHP Light Framework</h3>
+            <span class="version">v1.0.0</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">🏠 Home</a></li>
+            <li><a href="installation.html">📦 Installation</a></li>
+            <li><a href="routing.html">🛣️ Routing</a></li>
+            <li><a href="controllers.html">🎛️ Controllers</a></li>
+            <li><a href="validation.html">🔒 Validation & Security</a></li>
+            <li><a href="database.html">💾 Database</a></li>
+            <li><a href="debugging.html">🐛 Debugging</a></li>
+            <li><a href="exceptions.html">⚠️ Error Handling</a></li>
+            <li><a href="examples.html">📚 Examples</a></li>
+            <li><a href="reference.html" class="active">📖 API Reference</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="/api/docs" target="_blank" class="demo-link">🚀 Live Demo</a>
+        </div>
+    </nav>
+
+    <main class="content">
+        <div class="container">
+            <header class="page-header">
+                <nav class="breadcrumb">
+                    <a href="index.html">Home</a> > API Reference
+                </nav>
+                <h1>📖 API Reference</h1>
+                <p>Complete method reference and specifications</p>
+            </header>
+
+            <section class="router-class">
+                <h2>🛣️ Router Class</h2>
+                
+                <div class="method">
+                    <h3>add(array $route)</h3>
+                    <p>Add a new route to the router.</p>
+                    
+                    <h4>Parameters:</h4>
+                    <ul>
+                        <li><strong>$route</strong> (array) - Route configuration array</li>
+                    </ul>
+                    
+                    <h4>Route Array Structure:</h4>
+                    <pre><code class="language-php">[
+    'method' => 'GET|POST|PUT|DELETE|PATCH|OPTIONS',
+    'url' => '/path/{param}',
+    'controller' => 'ControllerName@methodName', 
+    'desc' => 'Route description',
+    'visible' => true,  // Show in documentation
+    'params' => [
+        'url' => ['param' => 'Description'],
+        'get' => ['query' => 'Description'],
+        'form' => ['field' => 'Description'],
+        'json' => ['key' => 'Description']
+    ],
+    'group' => ['Group Name']
+]</code></pre>
+
+                    <h4>Example:</h4>
+                    <pre><code class="language-php">$router->add([
+    'method' => 'POST',
+    'url' => '/users/{id}/update',
+    'controller' => 'UserController@updateUser',
+    'desc' => 'Update user information',
+    'visible' => true,
+    'params' => [
+        'url' => ['id' => 'integer (required) - User ID'],
+        'json' => ['name' => 'string (optional) - Updated name']
+    ],
+    'group' => ['Users']
+]);</code></pre>
+                </div>
+
+                <div class="method">
+                    <h3>dispatch()</h3>
+                    <p>Process the current request and route to appropriate controller.</p>
+                    
+                    <h4>Returns:</h4>
+                    <p>void - Executes controller method and outputs response</p>
+                    
+                    <h4>Example:</h4>
+                    <pre><code class="language-php">$router->dispatch();</code></pre>
+                </div>
+            </section>
+
+            <section class="basecontroller-class">
+                <h2>🎛️ BaseController Class</h2>
+                
+                <div class="method">
+                    <h3>validateRequest(array $rules)</h3>
+                    <p>Validate request data against validation rules.</p>
+                    
+                    <h4>Parameters:</h4>
+                    <ul>
+                        <li><strong>$rules</strong> (array) - Validation rules array</li>
+                    </ul>
+                    
+                    <h4>Returns:</h4>
+                    <p>array - Validated and sanitized data</p>
+                    
+                    <h4>Throws:</h4>
+                    <p>ValidationException - When validation fails</p>
+                    
+                    <h4>Example:</h4>
+                    <pre><code class="language-php">$data = $this->validateRequest([
+    'email' => 'required|email',
+    'password' => 'required|min:8',
+    'name' => 'required|min:2|max:50'
+]);</code></pre>
+                </div>
+
+                <div class="method">
+                    <h3>getRequestData()</h3>
+                    <p>Get all request data from GET, POST, and JSON sources.</p>
+                    
+                    <h4>Returns:</h4>
+                    <p>array - Combined request data</p>
+                    
+                    <h4>Example:</h4>
+                    <pre><code class="language-php">$data = $this->getRequestData();
+// Contains merged $_GET, $_POST, and JSON body data</code></pre>
+                </div>
+
+                <div class="method">
+                    <h3>sendSuccess(string $message, mixed $data = null, array $extra = null)</h3>
+                    <p>Send successful JSON response.</p>
+                    
+                    <h4>Parameters:</h4>
+                    <ul>
+                        <li><strong>$message</strong> (string) - Success message</li>
+                        <li><strong>$data</strong> (mixed) - Response data</li>
+                        <li><strong>$extra</strong> (array) - Additional response fields</li>
+                    </ul>
+                    
+                    <h4>HTTP Status:</h4>
+                    <p>200 OK</p>
+                    
+                    <h4>Example:</h4>
+                    <pre><code class="language-php">$this->sendSuccess('User created successfully', [
+    'user_id' => 123,
+    'name' => 'John Doe'
+], ['Location' => '/api/users/123']);</code></pre>
+                </div>
+
+                <div class="method">
+                    <h3>sendError(string $message, int $statusCode = 400, mixed $data = null)</h3>
+                    <p>Send error JSON response.</p>
+                    
+                    <h4>Parameters:</h4>
+                    <ul>
+                        <li><strong>$message</strong> (string) - Error message</li>
+                        <li><strong>$statusCode</strong> (int) - HTTP status code</li>
+                        <li><strong>$data</strong> (mixed) - Error data</li>
+                    </ul>
+                    
+                    <h4>Example:</h4>
+                    <pre><code class="language-php">$this->sendError('User not found', 404);
+$this->sendError('Validation failed', 422, $validationErrors);</code></pre>
+                </div>
+
+                <div class="method">
+                    <h3>sendValidationError(string $message, array $errors)</h3>
+                    <p>Send validation error response.</p>
+                    
+                    <h4>Parameters:</h4>
+                    <ul>
+                        <li><strong>$message</strong> (string) - Error message</li>
+                        <li><strong>$errors</strong> (array) - Validation errors by field</li>
+                    </ul>
+                    
+                    <h4>HTTP Status:</h4>
+                    <p>422 Unprocessable Entity</p>
+                    
+                    <h4>Example:</h4>
+                    <pre><code class="language-php">$this->sendValidationError('Validation failed', [
+    'email' => 'Email is required',
+    'password' => 'Password must be at least 8 characters'
+]);</code></pre>
+                </div>
+
+                <div class="method">
+                    <h3>sendServerError(string $message)</h3>
+                    <p>Send server error response.</p>
+                    
+                    <h4>Parameters:</h4>
+                    <ul>
+                        <li><strong>$message</strong> (string) - Error message</li>
+                    </ul>
+                    
+                    <h4>HTTP Status:</h4>
+                    <p>500 Internal Server Error</p>
+                    
+                    <h4>Example:</h4>
+                    <pre><code class="language-php">$this->sendServerError('Database connection failed');</code></pre>
+                </div>
+            </section>
+
+            <section class="runquery-function">
+                <h2>💾 RunQuery Function</h2>
+                
+                <div class="method">
+                    <h3>RunQuery(array $options)</h3>
+                    <p>Execute database queries with enhanced features.</p>
+                    
+                    <h4>Parameters:</h4>
+                    <ul>
+                        <li><strong>conn</strong> (PDO) - Database connection</li>
+                        <li><strong>query</strong> (string) - SQL query</li>
+                        <li><strong>params</strong> (array) - Query parameters (optional)</li>
+                        <li><strong>fetchAssoc</strong> (bool) - Return associative array (default: true)</li>
+                        <li><strong>withSuccess</strong> (bool) - Return success info (default: false)</li>
+                        <li><strong>returnSql</strong> (bool) - Return compiled SQL (default: false)</li>
+                    </ul>
+                    
+                    <h4>Returns:</h4>
+                    <p>array|string - Query results, success info, or SQL string</p>
+                    
+                    <h4>Examples:</h4>
+                    <pre><code class="language-php">// Basic SELECT query
+$users = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'SELECT * FROM users WHERE status = :status',
+    'params' => [':status' => 'active']
+]);
+
+// INSERT with success info
+$result = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'INSERT INTO users (name, email) VALUES (:name, :email)',
+    'params' => [':name' => 'John', ':email' => 'john@example.com'],
+    'withSuccess' => true
+]);
+// Returns: ['success' => true, 'affected_rows' => 1, 'id' => 123]
+
+// Get compiled SQL for debugging
+$sql = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'SELECT * FROM users WHERE id = :id',
+    'params' => [':id' => 123],
+    'returnSql' => true
+]);
+// Returns: "SELECT * FROM users WHERE id = 123"</code></pre>
+                </div>
+            </section>
+
+            <section class="validation-rules">
+                <h2>✅ Validation Rules Reference</h2>
+                
+                <div class="validation-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Rule</th>
+                                <th>Description</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>required</strong></td>
+                                <td>Field must be present and not empty</td>
+                                <td><code>'name' => 'required'</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>email</strong></td>
+                                <td>Must be valid email format</td>
+                                <td><code>'email' => 'required|email'</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>min:X</strong></td>
+                                <td>Minimum length or value</td>
+                                <td><code>'password' => 'min:8'</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>max:X</strong></td>
+                                <td>Maximum length or value</td>
+                                <td><code>'name' => 'max:50'</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>numeric</strong></td>
+                                <td>Must be numeric (int or float)</td>
+                                <td><code>'price' => 'numeric'</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>integer</strong></td>
+                                <td>Must be integer</td>
+                                <td><code>'age' => 'integer'</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>url</strong></td>
+                                <td>Must be valid URL</td>
+                                <td><code>'website' => 'url'</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>alpha</strong></td>
+                                <td>Only letters allowed</td>
+                                <td><code>'status' => 'alpha'</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>alphanumeric</strong></td>
+                                <td>Only letters and numbers</td>
+                                <td><code>'username' => 'alphanumeric'</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="debug-functions">
+                <h2>🐛 Debug Functions Reference</h2>
+                
+                <div class="method">
+                    <h3>pp($data)</h3>
+                    <p>Debug print with file and line information. Only outputs when <code>DEBUG_MODE=true</code>.</p>
+                    
+                    <h4>Parameters:</h4>
+                    <ul>
+                        <li><strong>$data</strong> (mixed) - Data to debug print</li>
+                    </ul>
+                    
+                    <h4>Output Format:</h4>
+                    <pre><code class="language-text">--- pp ---
+File: /path/to/file.php | Line: 123
+-------------------------------
+Debug message
+------------------------------
+--- /pp ---</code></pre>
+                    
+                    <h4>Example:</h4>
+                    <pre><code class="language-php">pp("Debug message");
+pp($userData);
+pp("Processing user ID: " . $userId);</code></pre>
+                </div>
+
+                <div class="method">
+                    <h3>ppp($data)</h3>
+                    <p>Debug var_dump with file and line information. Only outputs when <code>DEBUG_MODE=true</code>.</p>
+                    
+                    <h4>Parameters:</h4>
+                    <ul>
+                        <li><strong>$data</strong> (mixed) - Data to var_dump</li>
+                    </ul>
+                    
+                    <h4>Output Format:</h4>
+                    <pre><code class="language-text">--- ppp ---
+File: /path/to/file.php | Line: 456
+-------------------------------
+array(3) {
+  ["name"]=>
+  string(8) "John Doe"
+  ["age"]=>
+  int(30)
+  ["active"]=>
+  bool(true)
+}
+------------------------------
+--- /ppp ---</code></pre>
+                    
+                    <h4>Example:</h4>
+                    <pre><code class="language-php">ppp($complexArray);
+ppp($userObject);
+ppp($validationResult);</code></pre>
+                </div>
+            </section>
+
+            <section class="response-formats">
+                <h2>📤 Response Formats</h2>
+                
+                <div class="response-format">
+                    <h3>Success Response</h3>
+                    <pre><code class="language-json">{
+    "status": "success",
+    "message": "Operation completed successfully",
+    "data": {
+        "user_id": 123,
+        "name": "John Doe",
+        "email": "john@example.com"
+    }
+}</code></pre>
+                </div>
+
+                <div class="response-format">
+                    <h3>Error Response</h3>
+                    <pre><code class="language-json">{
+    "status": "error",
+    "message": "User not found",
+    "data": {
+        "error_type": "not_found",
+        "request_id": "req_1234567890"
+    }
+}</code></pre>
+                </div>
+
+                <div class="response-format">
+                    <h3>Validation Error Response</h3>
+                    <pre><code class="language-json">{
+    "status": "error",
+    "message": "Validation failed",
+    "data": {
+        "validation_errors": {
+            "email": ["Email is required", "Email must be valid"],
+            "password": ["Password must be at least 8 characters"]
+        },
+        "error_type": "validation_error"
+    }
+}</code></pre>
+                </div>
+            </section>
+
+            <section class="environment-variables">
+                <h2>⚙️ Environment Variables Reference</h2>
+                
+                <div class="env-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Variable</th>
+                                <th>Description</th>
+                                <th>Default</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>DEBUG_MODE</strong></td>
+                                <td>Enable debug functions</td>
+                                <td>false</td>
+                                <td><code>DEBUG_MODE=true</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>SHOW_ERRORS</strong></td>
+                                <td>Show detailed errors in responses</td>
+                                <td>false</td>
+                                <td><code>SHOW_ERRORS=true</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>LOG_ERRORS</strong></td>
+                                <td>Log errors to files</td>
+                                <td>false</td>
+                                <td><code>LOG_ERRORS=true</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>DB_HOST</strong></td>
+                                <td>Database host</td>
+                                <td>localhost</td>
+                                <td><code>DB_HOST=localhost</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>DB_PORT</strong></td>
+                                <td>Database port</td>
+                                <td>3306</td>
+                                <td><code>DB_PORT=3306</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>DB_NAME</strong></td>
+                                <td>Database name</td>
+                                <td>-</td>
+                                <td><code>DB_NAME=my_database</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>DB_USER</strong></td>
+                                <td>Database username</td>
+                                <td>-</td>
+                                <td><code>DB_USER=root</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>DB_PASS</strong></td>
+                                <td>Database password</td>
+                                <td>-</td>
+                                <td><code>DB_PASS=secret123</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>ALLOWED_ORIGINS</strong></td>
+                                <td>CORS allowed origins</td>
+                                <td>*</td>
+                                <td><code>ALLOWED_ORIGINS=https://example.com</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>RATE_LIMIT_REQUESTS</strong></td>
+                                <td>Max requests per time window</td>
+                                <td>100</td>
+                                <td><code>RATE_LIMIT_REQUESTS=200</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>RATE_LIMIT_WINDOW</strong></td>
+                                <td>Rate limit time window (seconds)</td>
+                                <td>3600</td>
+                                <td><code>RATE_LIMIT_WINDOW=1800</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="http-status-codes">
+                <h2>🔢 HTTP Status Codes Used</h2>
+                
+                <div class="status-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Status</th>
+                                <th>Usage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>200</strong></td>
+                                <td>OK</td>
+                                <td>Successful requests</td>
+                            </tr>
+                            <tr>
+                                <td><strong>400</strong></td>
+                                <td>Bad Request</td>
+                                <td>Generic client errors</td>
+                            </tr>
+                            <tr>
+                                <td><strong>401</strong></td>
+                                <td>Unauthorized</td>
+                                <td>Authentication required</td>
+                            </tr>
+                            <tr>
+                                <td><strong>404</strong></td>
+                                <td>Not Found</td>
+                                <td>Resource not found</td>
+                            </tr>
+                            <tr>
+                                <td><strong>422</strong></td>
+                                <td>Unprocessable Entity</td>
+                                <td>Validation errors</td>
+                            </tr>
+                            <tr>
+                                <td><strong>429</strong></td>
+                                <td>Too Many Requests</td>
+                                <td>Rate limit exceeded</td>
+                            </tr>
+                            <tr>
+                                <td><strong>500</strong></td>
+                                <td>Internal Server Error</td>
+                                <td>Server/database errors</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="assets/script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</body>
+</html>
