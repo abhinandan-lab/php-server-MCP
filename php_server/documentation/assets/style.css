@@ -1,29 +1,29 @@
 /* PHP Light Framework Documentation Styles */
 
 :root {
-    --primary-color: #d97706;        /* Amber */
-    --primary-dark: #b45309;         /* Dark Amber */
+    --primary-color: #3b82f6;        /* Blue */
+    --primary-dark: #2563eb;         /* Dark Blue */
     --secondary-color: #6b7280;      /* Gray */
     --success-color: #10b981;        /* Green */
-    --warning-color: #f59e0b;        /* Orange */
+    --warning-color: #f59e0b;        /* Amber */
     --danger-color: #ef4444;         /* Red */
-    --info-color: #0ea5e9;           /* Blue */
+    --info-color: #06b6d4;           /* Cyan */
     
-    --bg-primary: #ffffff;           /* White */
-    --bg-secondary: #fffbeb;         /* Light Amber Tint */
-    --bg-tertiary: #fef3c7;          /* Amber Tint */
-    --bg-code: #fffbeb;              /* Light Amber */
-    --text-primary: #1f2937;         /* Dark Gray */
-    --text-secondary: #6b7280;       /* Medium Gray */
-    --text-muted: #9ca3af;           /* Light Gray */
-    --border-color: #e5e7eb;         /* Light Border */
-    --border-light: #f9fafb;         /* Very Light Border */
+    --bg-primary: #111827;           /* Dark Gray */
+    --bg-secondary: #1f2937;         /* Medium Dark */
+    --bg-tertiary: #374151;          /* Light Dark */
+    --bg-code: #1f2937;              /* Dark Code */
+    --text-primary: #f9fafb;         /* Light Text */
+    --text-secondary: #d1d5db;       /* Medium Light */
+    --text-muted: #9ca3af;           /* Muted Light */
+    --border-color: #374151;         /* Dark Border */
+    --border-light: #4b5563;         /* Light Dark Border */
     
     --sidebar-width: 280px;
     --content-max-width: 1200px;
     --border-radius: 8px;
-    --shadow: 0 2px 4px rgba(217, 119, 6, 0.1);
-    --shadow-lg: 0 8px 25px rgba(217, 119, 6, 0.15);
+    --shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.4);
 }
 
 
@@ -499,13 +499,13 @@ pre:hover .copy-code-btn {
 .alert-warning {
     background: rgba(255, 193, 7, 0.1);
     border-left-color: var(--warning-color);
-    color: #856404;
+    color: #d1d1d1;
 }
 
 .alert-success {
     background: rgba(40, 167, 69, 0.1);
     border-left-color: var(--success-color);
-    color: #155724;
+    color: #cacaca;
 }
 
 /* Navigation Links */

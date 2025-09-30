@@ -302,7 +302,7 @@ class DocsController extends BaseController
                     justify-content: space-between;
                     align-items: center;
                     margin-bottom: 30px;
-                    padding: 20px;
+                    padding: 0 12px;
                     background: var(--bg-secondary);
                     border-radius: 12px;
                     box-shadow: var(--shadow);
@@ -315,6 +315,12 @@ class DocsController extends BaseController
                     -webkit-text-fill-color: transparent;
                     background-clip: text;
                     font-size: 32px;
+                }
+
+                .header h1 span {
+                    -webkit-background-clip: border-box;
+                    -webkit-text-fill-color: initial;
+                    background: none;
                 }
 
                 .header-controls {
@@ -443,16 +449,16 @@ class DocsController extends BaseController
                 /* API Groups */
                 .group-section {
                     margin-bottom: 25px;
-                    border-radius: 12px;
+                    border-radius: 4px;
                     overflow: hidden;
                     box-shadow: var(--shadow);
                     transition: all 0.3s ease;
                 }
 
                 .group-header {
-                    background: linear-gradient(135deg, #667eea, #764ba2);
+                    background: linear-gradient(135deg, #192d87, #764ba2);
                     color: white;
-                    padding: 15px 25px;
+                    padding: 0.1rem 0.4rem;
                     font-size: 18px;
                     font-weight: 600;
                     display: flex;
@@ -468,11 +474,12 @@ class DocsController extends BaseController
 
                 .group-content {
                     background: var(--bg-secondary);
-                    padding: 20px;
+                    padding: 6px;
                 }
 
                 .group-toggle {
                     transition: transform 0.3s ease;
+                    font-size: 0.8rem;
                 }
 
                 .collapsed .group-content {
@@ -480,6 +487,8 @@ class DocsController extends BaseController
                 }
 
                 .collapsed .group-toggle {
+                    /* transform: scale(0.7); */
+                    font-size: 0.8rem;
                     transform: rotate(180deg);
                 }
 
@@ -495,11 +504,10 @@ class DocsController extends BaseController
 
                 .api-item:hover {
                     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                    transform: translateY(-2px);
                 }
 
                 .api-header {
-                    padding: 20px;
+                    padding: 10px;
                     display: flex;
                     justify-content: space-between;
                     align-items: flex-start;
@@ -567,7 +575,6 @@ class DocsController extends BaseController
 
                 .test-btn:hover {
                     background: #218838;
-                    transform: translateY(-2px);
                 }
 
                 /* Parameter Sections */
@@ -759,6 +766,7 @@ class DocsController extends BaseController
 
                 .fade-in {
                     animation: fadeIn 0.3s ease;
+
                 }
 
                 /* Responsive */
@@ -797,7 +805,7 @@ class DocsController extends BaseController
                 <!-- Header -->
                 <div class="header">
                     <div>
-                        <h1>🚀 Enhanced API Documentation</h1>
+                        <h1><span>🚀</span> Enhanced API Documentation</h1>
                         <p>Total APIs: <strong><?= $totalRoutes ?></strong> | Groups: <strong><?= count($groupedRoutes) ?></strong></p>
                     </div>
                     <div class="header-controls">

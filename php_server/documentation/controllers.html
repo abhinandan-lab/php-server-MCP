@@ -37,12 +37,31 @@
                     <a href="index.html">Home</a> > Controllers
                 </nav>
                 <h1>🎛️ Controllers</h1>
-                <p>Request handling and response methods</p>
+                <p>Handle requests and manage application logic</p>
             </header>
 
-            <section class="basecontroller">
-                <h2>🏗️ BaseController</h2>
-                <p>All controllers extend <code>BaseController</code> which provides common functionality:</p>
+            <section class="intro">
+                <h2>📖 What are Controllers?</h2>
+                <p>Controllers are PHP classes that handle HTTP requests and return responses. They act as the bridge between your routes and your application logic, processing user input and returning structured data.</p>
+                
+                <div class="info-box">
+                    <strong>💡 Key Benefits:</strong>
+                    <ul>
+                        <li>Organize request handling logic</li>
+                        <li>Automatic input validation and sanitization</li>
+                        <li>Standardized response formats</li>
+                        <li>Built-in database connection</li>
+                        <li>Debugging and error handling</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="creating-controller">
+                <h2>🏗️ Creating Your First Controller</h2>
+                <p>Controllers are stored in <code>/api/controllers/</code> directory and follow PSR-4 autoloading standards.</p>
+                
+                <h3>Step 1: Create Controller File</h3>
+                <p>Create <code>/api/controllers/UserController.php</code>:</p>
                 
                 <pre><code class="language-php">&lt;?php
 
@@ -50,43 +69,193 @@ namespace App\Controllers;
 
 class UserController extends BaseController 
 {
-    // Database connection automatically available as $this->conn
-    // Validation and response methods inherited
-    
+    /**
+     * Get user by ID
+     * Route: GET /user/{id}
+     */
     public function getUser($id) 
     {
-        // Validate input
+        // Validate the ID parameter
         if (!is_numeric($id)) {
             $this->sendError('Invalid user ID', 400);
             return;
         }
         
-        // Query database
-        $user = RunQuery([
-            'conn' => $this->conn,
-            'query' => 'SELECT * FROM users WHERE id = :id',
-            'params' => [':id' => $id]
+        // Return success response
+        $this->sendSuccess('User found', [
+            'id' => $id,
+            'name' => 'John Doe',
+            'email' => 'john@example.com'
         ]);
-        
-        if (empty($user)) {
-            $this->sendError('User not found', 404);
-            return;
-        }
-        
-        $this->sendSuccess('User retrieved successfully', $user[0]);
     }
+}</code></pre>
+            </section>
+
+            <section class="registering-controllers">
+                <h2>📋 Step 2: Register Controller</h2>
+                <p>Add your controller to <code>/api/index.php</code> to make it available to the framework:</p>
+                
+                <pre><code class="language-php">// /api/index.php
+
+// ... existing code ...
+
+// Register Controllers
+require_once 'controllers/BaseController.php';
+require_once 'controllers/UserController.php';     // Add this line
+require_once 'controllers/PostController.php';     // Add more as needed
+
+// ... rest of the file ...</code></pre>
+                
+                <div class="info-box">
+                    <strong>📌 Important:</strong> Controllers must be registered in <code>index.php</code> before they can be used in routes.
+                </div>
+            </section>
+
+            <section class="connecting-routes">
+                <h2>🛣️ Step 3: Connect to Routes</h2>
+                <p>Use the <code>controller@method</code> syntax to connect routes to controller methods:</p>
+                
+                <pre><code class="language-php">// In your routing configuration
+$routes = [
+    'GET' => [
+        '/user/{id}' => 'UserController@getUser',
+        '/users' => 'UserController@getAllUsers',
+        '/posts' => 'PostController@getPosts'
+    ],
+    'POST' => [
+        '/user' => 'UserController@createUser',
+        '/login' => 'AuthController@login'
+    ]
+];</code></pre>
+
+                <div class="route-pattern">
+                    <h3>Route Pattern Breakdown</h3>
+                    <pre><code class="language-php">'/user/{id}' => 'UserController@getUser'
+//    ↑           ↑              ↑
+//   Route    Controller     Method</code></pre>
+                    
+                    <p>URL parameters like <code>{id}</code> are automatically passed as method arguments.</p>
+                </div>
+            </section>
+
+            <section class="helper-functions">
+                <h2>🔧 Custom Helper Functions</h2>
+                <p>Create reusable helper functions in <code>/api/helpers/</code> directory and include them in your controllers.</p>
+                
+                <h3>Creating Helper Files</h3>
+                <p>Create <code>/api/helpers/StringHelper.php</code>:</p>
+                
+                <pre><code class="language-php">&lt;?php
+// /api/helpers/StringHelper.php
+
+function slugify($text) {
+    return strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $text), '-'));
+}
+
+function truncate($text, $length = 100) {
+    return strlen($text) > $length ? substr($text, 0, $length) . '...' : $text;
+}</code></pre>
+
+                <h3>Including Helpers in Controllers</h3>
+                <p>Add helpers to your controller's constructor:</p>
+                
+                <pre><code class="language-php">&lt;?php
+
+namespace App\Controllers;
+
+class PostController extends BaseController 
+{
+    public function __construct() 
+    {
+        parent::__construct();
+        
+        // Include custom helpers
+        require_once 'helpers/StringHelper.php';
+        require_once 'helpers/DateHelper.php';
+        require_once 'helpers/ValidationHelper.php';
+    }
+    
+    public function createPost() 
+    {
+        $data = $this->getRequestData();
+        
+        // Use helper functions
+        $slug = slugify($data['title']);
+        $excerpt = truncate($data['content'], 150);
+        
+        // ... rest of method
+    }
+}</code></pre>
+            </section>
+
+            <section class="database-operations">
+                <h2>💾 Database Operations</h2>
+                <p>All database queries must use the <code>RunQuery()</code> function for consistency and security.</p>
+                
+                <div class="info-box">
+                    <strong>📚 Learn More:</strong> See the complete <a href="database.html#runquery">RunQuery Documentation</a> for detailed usage and examples.
+                </div>
+                
+                <h3>Basic Database Query</h3>
+                <pre><code class="language-php">public function getUser($id) 
+{
+    // Always use RunQuery for database operations
+    $user = RunQuery([
+        'conn' => $this->conn,                    // Database connection (auto-available)
+        'query' => 'SELECT * FROM users WHERE id = :id',
+        'params' => [':id' => $id],              // Always use parameterized queries
+        'dataAsASSOC' => true,                   // Return associative array (default)
+        'withSUCCESS' => false                   // Return data only (default)
+    ]);
+    
+    if (empty($user)) {
+        $this->sendError('User not found', 404);
+        return;
+    }
+    
+    $this->sendSuccess('User retrieved', $user[0]);
+}</code></pre>
+
+                <h3>Insert with Success Tracking</h3>
+                <pre><code class="language-php">public function createUser() 
+{
+    $data = $this->validateRequest([
+        'name' => 'required|min:2|max:50',
+        'email' => 'required|email'
+    ]);
+    
+    $result = RunQuery([
+        'conn' => $this->conn,
+        'query' => 'INSERT INTO users (name, email) VALUES (:name, :email)',
+        'params' => [
+            ':name' => $data['name'],
+            ':email' => $data['email']
+        ],
+        'withSUCCESS' => true                    // Returns success info with inserted ID
+    ]);
+    
+    if (isset($result['error'])) {
+        $this->sendServerError('Failed to create user');
+        return;
+    }
+    
+    $this->sendSuccess('User created', [
+        'user_id' => $result['id'],
+        'name' => $data['name']
+    ]);
 }</code></pre>
             </section>
 
             <section class="response-methods">
                 <h2>📤 Response Methods</h2>
+                <p>Controllers provide standardized response methods for consistent API responses.</p>
                 
                 <div class="method">
                     <h3>Success Responses</h3>
-                    <pre><code class="language-php">// Basic success response
+                    <pre><code class="language-php">// Basic success
 $this->sendSuccess('Operation completed', $data);
 
-// Success with extra headers
+// Success with custom headers
 $this->sendSuccess('User created', $userData, [
     'Location' => '/api/users/' . $userId
 ]);</code></pre>
@@ -111,40 +280,13 @@ $this->sendServerError('Database connection failed');</code></pre>
             <section class="request-handling">
                 <h2>📥 Request Handling</h2>
                 
-                <pre><code class="language-php">public function createUser() 
-{
-    try {
-        // Get and validate request data
-        $data = $this->validateRequest([
-            'name' => 'required|min:2|max:50',
-            'email' => 'required|email',
-            'password' => 'required|min:8'
-        ]);
-        
-        // Process the data (automatically sanitized)
-        $userId = $this->createUserInDatabase($data);
-        
-        $this->sendSuccess('User created successfully', [
-            'user_id' => $userId,
-            'email' => $data['email']
-        ]);
-        
-    } catch (ValidationException $e) {
-        $this->sendValidationError($e->getMessage(), $e->getValidationErrors());
-    }
-}</code></pre>
-            </section>
-
-            <section class="parameter-access">
-                <h2>📨 Parameter Access</h2>
-                
                 <div class="param-type">
                     <h3>URL Parameters</h3>
                     <p>URL parameters are passed as function arguments:</p>
                     <pre><code class="language-php">// Route: /user/{id}/posts/{postId}
 public function getUserPost($id, $postId) 
 {
-    pp("User ID: $id, Post ID: $postId");
+    pp("User ID: $id, Post ID: $postId");  // Debug output
     
     // Use the parameters
     $post = $this->getPostByUserAndId($id, $postId);
@@ -152,28 +294,16 @@ public function getUserPost($id, $postId)
                 </div>
 
                 <div class="param-type">
-                    <h3>GET Parameters</h3>
-                    <p>Access via $_GET superglobal:</p>
-                    <pre><code class="language-php">public function getPosts() 
+                    <h3>Form Data & JSON</h3>
+                    <p>Use <code>getRequestData()</code> or <code>validateRequest()</code>:</p>
+                    <pre><code class="language-php">public function createUser() 
 {
-    $page = (int)($_GET['page'] ?? 1);
-    $limit = (int)($_GET['limit'] ?? 10);
-    $status = $_GET['status'] ?? null;
-    
-    pp("Page: $page, Limit: $limit, Status: $status");
-}</code></pre>
-                </div>
-
-                <div class="param-type">
-                    <h3>Form Data</h3>
-                    <p>Use getRequestData() or validateRequest():</p>
-                    <pre><code class="language-php">public function login() 
-{
-    // Get all request data (GET, POST, JSON)
+    // Get all request data (GET, POST, JSON automatically merged)
     $data = $this->getRequestData();
     
-    // Or validate with rules
+    // Or validate with rules (recommended)
     $data = $this->validateRequest([
+        'name' => 'required|min:2|max:50',
         'email' => 'required|email',
         'password' => 'required|min:8'
     ]);
@@ -181,142 +311,349 @@ public function getUserPost($id, $postId)
                 </div>
 
                 <div class="param-type">
-                    <h3>JSON Body</h3>
-                    <p>JSON data is automatically included in getRequestData():</p>
-                    <pre><code class="language-php">public function createUser() 
+                    <h3>Query Parameters</h3>
+                    <p>Access via <code>$_GET</code> superglobal:</p>
+                    <pre><code class="language-php">public function getUsers() 
 {
-    // JSON automatically parsed and merged
-    $data = $this->getRequestData();
+    $page = max(1, (int)($_GET['page'] ?? 1));
+    $limit = min(100, (int)($_GET['limit'] ?? 10));
+    $search = $_GET['search'] ?? null;
     
-    // Validate JSON data
-    $data = $this->validateRequest([
-        'name' => 'required|min:2|max:50',
-        'profile' => 'required' // JSON object
-    ]);
+    pp("Page: $page, Limit: $limit, Search: $search");
 }</code></pre>
                 </div>
             </section>
 
-            <section class="complete-example">
-                <h2>📚 Complete Controller Example</h2>
+            <section class="simple-example">
+                <h2>📝 Simple Controller Example</h2>
+                <p>A basic controller demonstrating core concepts:</p>
+                
+                <pre><code class="language-php">&lt;?php
+
+namespace App\Controllers;
+
+class ProductController extends BaseController
+{
+    public function __construct() 
+    {
+        parent::__construct();
+        require_once 'helpers/StringHelper.php';
+    }
+    
+    /**
+     * Get all products
+     * Route: GET /products?page=1&limit=10
+     */
+    public function getProducts()
+    {
+        $page = max(1, (int)($_GET['page'] ?? 1));
+        $limit = min(50, max(1, (int)($_GET['limit'] ?? 10)));
+        $offset = ($page - 1) * $limit;
+        
+        $products = RunQuery([
+            'conn' => $this->conn,
+            'query' => 'SELECT * FROM products ORDER BY created_at DESC LIMIT :limit OFFSET :offset',
+            'params' => [':limit' => $limit, ':offset' => $offset]
+        ]);
+        
+        $this->sendSuccess('Products retrieved', [
+            'products' => $products,
+            'page' => $page,
+            'limit' => $limit
+        ]);
+    }
+    
+    /**
+     * Create new product
+     * Route: POST /products
+     */
+    public function createProduct()
+    {
+        try {
+            $data = $this->validateRequest([
+                'name' => 'required|min:3|max:100',
+                'price' => 'required|numeric|min:0'
+            ]);
+            
+            // Use helper function
+            $slug = slugify($data['name']);
+            
+            $result = RunQuery([
+                'conn' => $this->conn,
+                'query' => 'INSERT INTO products (name, slug, price) VALUES (:name, :slug, :price)',
+                'params' => [
+                    ':name' => $data['name'],
+                    ':slug' => $slug,
+                    ':price' => $data['price']
+                ],
+                'withSUCCESS' => true
+            ]);
+            
+            $this->sendSuccess('Product created', [
+                'id' => $result['id'],
+                'name' => $data['name'],
+                'slug' => $slug
+            ]);
+            
+        } catch (ValidationException $e) {
+            $this->sendValidationError($e->getMessage(), $e->getValidationErrors());
+        }
+    }
+    
+    /**
+     * Get single product
+     * Route: GET /products/{id}
+     */
+    public function getProduct($id)
+    {
+        if (!is_numeric($id)) {
+            $this->sendError('Invalid product ID', 400);
+            return;
+        }
+        
+        $product = RunQuery([
+            'conn' => $this->conn,
+            'query' => 'SELECT * FROM products WHERE id = :id',
+            'params' => [':id' => $id]
+        ]);
+        
+        if (empty($product)) {
+            $this->sendError('Product not found', 404);
+            return;
+        }
+        
+        $this->sendSuccess('Product retrieved', $product[0]);
+    }
+}</code></pre>
+            </section>
+
+            <section class="advanced-example">
+                <h2>🚀 Advanced Controller Example</h2>
+                <p>A comprehensive controller with complex logic, error handling, and multiple operations:</p>
+                
                 <pre><code class="language-php">&lt;?php
 
 namespace App\Controllers;
 
 use App\Exceptions\ValidationException;
 
-class PostController extends BaseController
+class OrderController extends BaseController
 {
-    /**
-     * Get all posts with pagination and filtering
-     * Route: GET /posts?page=1&limit=10&status=published
-     */
-    public function getPosts()
+    public function __construct() 
     {
-        $page = max(1, (int)($_GET['page'] ?? 1));
-        $limit = min(100, max(1, (int)($_GET['limit'] ?? 10)));
-        $status = $_GET['status'] ?? null;
-        
-        $offset = ($page - 1) * $limit;
-        
-        // Build dynamic query
-        $whereClause = '';
-        $params = [':limit' => $limit, ':offset' => $offset];
-        
-        if ($status) {
-            $whereClause = 'WHERE status = :status';
-            $params[':status'] = $status;
-        }
-        
-        // Get posts
-        $posts = RunQuery([
-            'conn' => $this->conn,
-            'query' => "SELECT * FROM posts $whereClause ORDER BY created_at DESC LIMIT :limit OFFSET :offset",
-            'params' => $params
-        ]);
-        
-        // Get total count
-        $totalQuery = $status ? 'SELECT COUNT(*) as count FROM posts WHERE status = :status' : 'SELECT COUNT(*) as count FROM posts';
-        $totalParams = $status ? [':status' => $status] : [];
-        $total = RunQuery(['conn' => $this->conn, 'query' => $totalQuery, 'params' => $totalParams])[0]['count'];
-        
-        $this->sendSuccess('Posts retrieved successfully', [
-            'posts' => $posts,
-            'pagination' => [
-                'page' => $page,
-                'limit' => $limit,
-                'total' => (int)$total,
-                'pages' => ceil($total / $limit)
-            ]
-        ]);
+        parent::__construct();
+        require_once 'helpers/DateHelper.php';
+        require_once 'helpers/EmailHelper.php';
+        require_once 'helpers/PaymentHelper.php';
     }
     
     /**
-     * Create new post
-     * Route: POST /posts
+     * Create order with inventory check and payment processing
+     * Route: POST /orders
      */
-    public function createPost()
+    public function createOrder()
     {
         try {
             $data = $this->validateRequest([
-                'title' => 'required|min:5|max:200',
-                'content' => 'required|min:50',
-                'status' => 'alpha'
+                'customer_id' => 'required|numeric',
+                'items' => 'required|array|min:1',
+                'payment_method' => 'required|alpha',
+                'shipping_address' => 'required|min:10|max:500'
             ]);
             
-            $result = RunQuery([
+            pp("Creating order for customer: " . $data['customer_id']);
+            
+            // Validate customer exists
+            $customer = RunQuery([
                 'conn' => $this->conn,
-                'query' => 'INSERT INTO posts (title, content, status, created_at) VALUES (:title, :content, :status, NOW())',
-                'params' => [
-                    ':title' => $data['title'],
-                    ':content' => $data['content'],
-                    ':status' => $data['status'] ?? 'draft'
-                ],
-                'withSuccess' => true
+                'query' => 'SELECT * FROM customers WHERE id = :id',
+                'params' => [':id' => $data['customer_id']]
             ]);
             
-            if (isset($result['error'])) {
-                $this->sendServerError('Failed to create post');
+            if (empty($customer)) {
+                $this->sendError('Customer not found', 404);
                 return;
             }
             
-            $this->sendSuccess('Post created successfully', [
-                'post_id' => $result['id'],
-                'title' => $data['title'],
-                'status' => $data['status'] ?? 'draft'
-            ], ['Location' => "/api/posts/{$result['id']}"]);
+            // Calculate total and check inventory
+            $totalAmount = 0;
+            $orderItems = [];
+            
+            foreach ($data['items'] as $item) {
+                if (!isset($item['product_id']) || !isset($item['quantity'])) {
+                    $this->sendValidationError('Invalid item format', [
+                        'items' => 'Each item must have product_id and quantity'
+                    ]);
+                    return;
+                }
+                
+                // Check product and inventory
+                $product = RunQuery([
+                    'conn' => $this->conn,
+                    'query' => 'SELECT * FROM products WHERE id = :id AND stock >= :quantity',
+                    'params' => [
+                        ':id' => $item['product_id'],
+                        ':quantity' => $item['quantity']
+                    ]
+                ]);
+                
+                if (empty($product)) {
+                    $this->sendError("Product {$item['product_id']} not available or insufficient stock", 400);
+                    return;
+                }
+                
+                $itemTotal = $product[0]['price'] * $item['quantity'];
+                $totalAmount += $itemTotal;
+                
+                $orderItems[] = [
+                    'product_id' => $item['product_id'],
+                    'product_name' => $product[0]['name'],
+                    'quantity' => $item['quantity'],
+                    'unit_price' => $product[0]['price'],
+                    'total_price' => $itemTotal
+                ];
+            }
+            
+            pp("Order total calculated: $totalAmount");
+            
+            // Create order record
+            $orderResult = RunQuery([
+                'conn' => $this->conn,
+                'query' => 'INSERT INTO orders (customer_id, total_amount, status, shipping_address, created_at) VALUES (:customer_id, :total, :status, :address, NOW())',
+                'params' => [
+                    ':customer_id' => $data['customer_id'],
+                    ':total' => $totalAmount,
+                    ':status' => 'pending',
+                    ':address' => $data['shipping_address']
+                ],
+                'withSUCCESS' => true
+            ]);
+            
+            if (isset($orderResult['error'])) {
+                $this->sendServerError('Failed to create order');
+                return;
+            }
+            
+            $orderId = $orderResult['id'];
+            
+            // Insert order items and update inventory
+            foreach ($orderItems as $item) {
+                // Add order item
+                RunQuery([
+                    'conn' => $this->conn,
+                    'query' => 'INSERT INTO order_items (order_id, product_id, quantity, unit_price, total_price) VALUES (:order_id, :product_id, :quantity, :unit_price, :total_price)',
+                    'params' => [
+                        ':order_id' => $orderId,
+                        ':product_id' => $item['product_id'],
+                        ':quantity' => $item['quantity'],
+                        ':unit_price' => $item['unit_price'],
+                        ':total_price' => $item['total_price']
+                    ]
+                ]);
+                
+                // Update product stock
+                RunQuery([
+                    'conn' => $this->conn,
+                    'query' => 'UPDATE products SET stock = stock - :quantity WHERE id = :id',
+                    'params' => [
+                        ':quantity' => $item['quantity'],
+                        ':id' => $item['product_id']
+                    ]
+                ]);
+            }
+            
+            // Process payment (using helper function)
+            $paymentResult = processPayment($data['payment_method'], $totalAmount, $orderId);
+            
+            if (!$paymentResult['success']) {
+                // Rollback inventory if payment fails
+                foreach ($orderItems as $item) {
+                    RunQuery([
+                        'conn' => $this->conn,
+                        'query' => 'UPDATE products SET stock = stock + :quantity WHERE id = :id',
+                        'params' => [
+                            ':quantity' => $item['quantity'],
+                            ':id' => $item['product_id']
+                        ]
+                    ]);
+                }
+                
+                $this->sendError('Payment processing failed: ' . $paymentResult['message'], 402);
+                return;
+            }
+            
+            // Update order status
+            RunQuery([
+                'conn' => $this->conn,
+                'query' => 'UPDATE orders SET status = :status, payment_id = :payment_id WHERE id = :id',
+                'params' => [
+                    ':status' => 'confirmed',
+                    ':payment_id' => $paymentResult['transaction_id'],
+                    ':id' => $orderId
+                ]
+            ]);
+            
+            // Send confirmation email (using helper)
+            sendOrderConfirmationEmail($customer[0]['email'], $orderId, $orderItems);
+            
+            pp("Order $orderId created successfully");
+            
+            $this->sendSuccess('Order created successfully', [
+                'order_id' => $orderId,
+                'total_amount' => $totalAmount,
+                'status' => 'confirmed',
+                'payment_id' => $paymentResult['transaction_id'],
+                'items' => $orderItems
+            ], ['Location' => "/api/orders/$orderId"]);
             
         } catch (ValidationException $e) {
             $this->sendValidationError($e->getMessage(), $e->getValidationErrors());
         } catch (\Exception $e) {
-            pp("Error creating post: " . $e->getMessage());
+            pp("Error creating order: " . $e->getMessage());
             $this->sendServerError('Internal server error');
         }
     }
     
     /**
-     * Get specific post by ID
-     * Route: GET /posts/{id}
+     * Get order with items
+     * Route: GET /orders/{id}
      */
-    public function getPost($id)
+    public function getOrder($id)
     {
         if (!is_numeric($id)) {
-            $this->sendError('Invalid post ID', 400);
+            $this->sendError('Invalid order ID', 400);
             return;
         }
         
-        $post = RunQuery([
+        // Get order details
+        $order = RunQuery([
             'conn' => $this->conn,
-            'query' => 'SELECT * FROM posts WHERE id = :id',
+            'query' => 'SELECT o.*, c.name as customer_name, c.email as customer_email 
+                       FROM orders o 
+                       JOIN customers c ON o.customer_id = c.id 
+                       WHERE o.id = :id',
             'params' => [':id' => $id]
         ]);
         
-        if (empty($post)) {
-            $this->sendError('Post not found', 404);
+        if (empty($order)) {
+            $this->sendError('Order not found', 404);
             return;
         }
         
-        $this->sendSuccess('Post retrieved successfully', $post[0]);
+        // Get order items
+        $items = RunQuery([
+            'conn' => $this->conn,
+            'query' => 'SELECT oi.*, p.name as product_name 
+                       FROM order_items oi 
+                       JOIN products p ON oi.product_id = p.id 
+                       WHERE oi.order_id = :order_id',
+            'params' => [':order_id' => $id]
+        ]);
+        
+        $orderData = $order[0];
+        $orderData['items'] = $items;
+        
+        $this->sendSuccess('Order retrieved successfully', $orderData);
     }
 }</code></pre>
             </section>
@@ -337,8 +674,22 @@ $email = $_POST['email'];</code></pre>
                 </div>
 
                 <div class="practice">
+                    <h3>💾 Use RunQuery for All Database Operations</h3>
+                    <pre><code class="language-php">// ✅ Good - Use RunQuery function
+$users = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'SELECT * FROM users WHERE active = :active',
+    'params' => [':active' => 1]
+]);
+
+// ❌ Bad - Direct PDO usage
+$stmt = $this->conn->prepare('SELECT * FROM users');
+$stmt->execute();</code></pre>
+                </div>
+
+                <div class="practice">
                     <h3>🔍 Handle Errors Gracefully</h3>
-                    <pre><code class="language-php">// ✅ Good - Proper error handling
+                    <pre><code class="language-php">// ✅ Good - Specific error messages
 if (!$user) {
     $this->sendError('User not found', 404);
     return;
@@ -351,12 +702,27 @@ if (!$user) {
                 </div>
 
                 <div class="practice">
-                    <h3>📊 Use Debugging</h3>
+                    <h3>📊 Use Debugging Tools</h3>
                     <pre><code class="language-php">// ✅ Good - Debug during development
 pp("Processing user ID: $id");
-ppp($requestData);
+ppp($requestData);  // Pretty print arrays
 
-// Will only show when DEBUG_MODE=true</code></pre>
+// Shows only when DEBUG_MODE=true</code></pre>
+                </div>
+
+                <div class="practice">
+                    <h3>🔧 Organize Helper Functions</h3>
+                    <pre><code class="language-php">// ✅ Good - Include helpers in constructor
+public function __construct() 
+{
+    parent::__construct();
+    require_once 'helpers/StringHelper.php';
+    require_once 'helpers/ValidationHelper.php';
+}
+
+// Use throughout controller methods
+$slug = slugify($title);
+$isValid = validateEmail($email);</code></pre>
                 </div>
             </section>
 
@@ -365,11 +731,15 @@ ppp($requestData);
                 <div class="next-links">
                     <a href="validation.html" class="next-link">
                         <strong>🔒 Learn Validation</strong>
-                        <span>Secure your endpoints with input validation</span>
+                        <span>Secure your endpoints with input validation and sanitization</span>
                     </a>
-                    <a href="database.html" class="next-link">
-                        <strong>💾 Database Operations</strong>
-                        <span>Work with database queries and migrations</span>
+                    <a href="database.html#runquery" class="next-link">
+                        <strong>💾 RunQuery Documentation</strong>
+                        <span>Master database operations with the RunQuery function</span>
+                    </a>
+                    <a href="routing.html" class="next-link">
+                        <strong>🛣️ Advanced Routing</strong>
+                        <span>Learn complex routing patterns and middleware</span>
                     </a>
                 </div>
             </section>
