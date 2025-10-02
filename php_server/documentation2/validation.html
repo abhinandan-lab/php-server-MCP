@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validation & Security - PHP Light Framework</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+
+
+
+
+    <!-- Theme Toggle Script -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+    <span class="theme-icon">🌙</span>
+</button>
+
+<script>
+    // Theme Toggle Functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.querySelector('.theme-icon');
+    const htmlElement = document.documentElement;
+
+    // Check for saved theme preference or default to 'light' mode
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    htmlElement.setAttribute('data-theme', currentTheme);
+    updateThemeIcon(currentTheme);
+
+    themeToggle.addEventListener('click', function() {
+        const currentTheme = htmlElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        
+        htmlElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
+    });
+
+    function updateThemeIcon(theme) {
+        themeIcon.textContent = theme === 'light' ? '🌙' : '☀️';
+    }
+</script>
+
+
+
+
+
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h3>PHP Light Framework</h3>
+            <span class="version">v1.0.0</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">🏠 Home</a></li>
+            <li><a href="getting-started.html">🚀 Getting Started</a></li>
+            <li><a href="routing.html">🛣️ Routing</a></li>
+            <li><a href="controllers.html">🎛️ Controllers</a></li>
+            <li><a href="database.html">💾 Database</a></li>
+            <li><a href="runquery-guide.html">🔍 RunQuery Guide</a></li>
+            <li><a href="migrations.html">📋 Migrations</a></li>
+            <li><a href="validation.html" class="active">🔒 Validation & Security</a></li>
+            <li><a href="testing.html">🧪 Testing</a></li>
+            <li><a href="function-reference.html">📚 Function Reference</a></li>
+        </ul>
+    </nav>
+
+    <main class="content">
+        <header class="doc-header">
+            <div class="header-content">
+                <div class="search-container">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" id="globalSearch" placeholder="Search documentation..." />
+                    <div class="search-results" id="searchResults"></div>
+                </div>
+            </div>
+        </header>
+
+        <div class="content-inner">
+            <div class="breadcrumb">
+                <a href="index.html">Home</a> &gt; Validation & Security
+            </div>
+
+            <h1>🔒 Validation & Security</h1>
+            <p class="intro">Protect your API with built-in validation, security headers, and best practices for secure application development.</p>
+
+            <section class="card highlight">
+                <h2>⚡ Quick Example</h2>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">public function createUser()
+{
+    // Validate and sanitize input automatically
+    $data = $this->validateRequest([
+        'name' => 'required|min:3|max:100',
+        'email' => 'required|email',
+        'password' => 'required|min:8',
+        'age' => 'numeric|min:18'
+    ]);
+    
+    // $data is now safe and validated
+    // Continue with business logic
+}</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>✅ Validation Rules</h2>
+                
+                <h3>Available Rules</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rule</th>
+                            <th>Description</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>required</code></td>
+                            <td>Field must be present</td>
+                            <td>'email' => 'required'</td>
+                        </tr>
+                        <tr>
+                            <td><code>email</code></td>
+                            <td>Valid email format</td>
+                            <td>'email' => 'email'</td>
+                        </tr>
+                        <tr>
+                            <td><code>min:X</code></td>
+                            <td>Minimum length X</td>
+                            <td>'password' => 'min:8'</td>
+                        </tr>
+                        <tr>
+                            <td><code>max:X</code></td>
+                            <td>Maximum length X</td>
+                            <td>'name' => 'max:100'</td>
+                        </tr>
+                        <tr>
+                            <td><code>numeric</code></td>
+                            <td>Must be numeric</td>
+                            <td>'age' => 'numeric'</td>
+                        </tr>
+                        <tr>
+                            <td><code>string</code></td>
+                            <td>Must be string</td>
+                            <td>'name' => 'string'</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="card">
+                <h2>🛡️ Using Validation</h2>
+                
+                <h3>In Controllers</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">public function register()
+{
+    $data = $this->validateRequest([
+        'name' => 'required|string|min:3|max:100',
+        'email' => 'required|email',
+        'password' => 'required|min:8',
+        'age' => 'numeric|min:18'
+    ]);
+    
+    // If validation fails, framework automatically
+    // returns 422 error with validation messages
+    
+    // If validation passes, continue...
+    $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
+}</code></pre>
+                </div>
+
+                <h3>Multiple Rules</h3>
+                <p>Chain multiple validation rules with <code>|</code> separator:</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$data = $this->validateRequest([
+    'username' => 'required|string|min:3|max:20',
+    'email' => 'required|email|max:150',
+    'age' => 'required|numeric|min:18|max:120',
+    'bio' => 'string|max:500'  // Optional field
+]);</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>🚫 Error Responses</h2>
+                
+                <h3>Validation Error Response</h3>
+                <p>When validation fails, the framework automatically returns:</p>
+                
+                <div class="code-block">
+                    <pre><code class="language-json">{
+  "status": "error",
+  "message": "Validation failed",
+  "errors": {
+    "email": "Invalid email format",
+    "password": "Minimum length is 8 characters",
+    "age": "Must be numeric"
+  }
+}</code></pre>
+                </div>
+
+                <p>HTTP Status Code: <code>422 Unprocessable Entity</code></p>
+            </section>
+
+            <section class="card">
+                <h2>🔐 Security Features</h2>
+                
+                <h3>Automatic Security Headers</h3>
+                <p>The framework automatically applies security headers to all responses:</p>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Header</th>
+                            <th>Value</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>X-XSS-Protection</td>
+                            <td>1; mode=block</td>
+                            <td>XSS attack prevention</td>
+                        </tr>
+                        <tr>
+                            <td>X-Content-Type-Options</td>
+                            <td>nosniff</td>
+                            <td>MIME type sniffing prevention</td>
+                        </tr>
+                        <tr>
+                            <td>X-Frame-Options</td>
+                            <td>DENY</td>
+                            <td>Clickjacking prevention</td>
+                        </tr>
+                        <tr>
+                            <td>Content-Security-Policy</td>
+                            <td>default-src 'self'</td>
+                            <td>XSS and injection prevention</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>CORS Configuration</h3>
+                <p>Configure allowed origins in <code>.env</code>:</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-bash">ALLOWED_ORIGINS=http://localhost:3000,https://yourdomain.com</code></pre>
+                </div>
+
+                <h3>Rate Limiting</h3>
+                <p>Built-in rate limiting prevents API abuse:</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">// In index.php
+SecurityMiddleware::rateLimiting(100, 3600); // 100 requests per hour</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>🔒 Input Sanitization</h2>
+                
+                <h3>Automatic Sanitization</h3>
+                <p>All input is automatically sanitized by ValidationMiddleware:</p>
+                
+                <ul>
+                    <li>HTML tags stripped from strings</li>
+                    <li>Special characters escaped</li>
+                    <li>SQL injection protection via prepared statements</li>
+                    <li>XSS attack prevention</li>
+                </ul>
+
+                <h3>Manual Sanitization</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">// Sanitize HTML
+$clean = htmlspecialchars($userInput, ENT_QUOTES, 'UTF-8');
+
+// Sanitize for database (use prepared statements instead)
+$safe = filter_var($input, FILTER_SANITIZE_STRING);
+
+// Validate email
+if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    // Valid email
+}</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>🛡️ Password Security</h2>
+                
+                <h3>Hashing Passwords</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">// Hash password before storing
+$hashedPassword = password_hash($plainPassword, PASSWORD_DEFAULT);
+
+// Store in database
+RunQuery([
+    'conn' => $this->conn,
+    'query' => 'INSERT INTO users (email, password) VALUES (:email, :password)',
+    'params' => [
+        ':email' => $email,
+        ':password' => $hashedPassword
+    ]
+]);</code></pre>
+                </div>
+
+                <h3>Verifying Passwords</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">// Get user from database
+$user = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'SELECT * FROM users WHERE email = :email',
+    'params' => [':email' => $email]
+]);
+
+// Verify password
+if (!empty($user) && password_verify($plainPassword, $user[0]['password'])) {
+    // Password is correct
+    $this->sendSuccess('Login successful', $user[0]);
+} else {
+    // Invalid credentials
+    $this->sendError('Invalid credentials', 401);
+}</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>💡 Security Best Practices</h2>
+                
+                <div class="tips-grid">
+                    <div class="tip">
+                        <h4>Never Trust User Input</h4>
+                        <p>Always validate and sanitize all incoming data</p>
+                    </div>
+                    
+                    <div class="tip">
+                        <h4>Use Prepared Statements</h4>
+                        <p>Always use RunQuery with parameters to prevent SQL injection</p>
+                    </div>
+                    
+                    <div class="tip">
+                        <h4>Hash Passwords</h4>
+                        <p>Never store plain text passwords - use password_hash()</p>
+                    </div>
+                    
+                    <div class="tip">
+                        <h4>Enable HTTPS</h4>
+                        <p>Use SSL/TLS in production for encrypted communication</p>
+                    </div>
+                    
+                    <div class="tip">
+                        <h4>Limit API Rate</h4>
+                        <p>Implement rate limiting to prevent abuse</p>
+                    </div>
+                    
+                    <div class="tip">
+                        <h4>Keep Dependencies Updated</h4>
+                        <p>Regularly update framework and PHP version</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>🔗 Next Steps</h2>
+                
+                <div class="next-steps-grid">
+                    <a href="controllers.html" class="next-step-card">
+                        <h3>🎛️ Controllers</h3>
+                        <p>Use validation in controllers</p>
+                    </a>
+                    
+                    <a href="testing.html" class="next-step-card">
+                        <h3>🧪 Testing</h3>
+                        <p>Test validation rules</p>
+                    </a>
+                    
+                    <a href="database.html" class="next-step-card">
+                        <h3>💾 Database</h3>
+                        <p>Secure database queries</p>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="assets/search.js"></script>
+    <script>
+        hljs.highlightAll();
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = 'Copied!';
+                button.style.background = '#10b981';
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                    button.style.background = '#2563eb';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

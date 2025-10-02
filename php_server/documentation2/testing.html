@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testing - PHP Light Framework</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+
+
+
+    <!-- Theme Toggle Script -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+    <span class="theme-icon">🌙</span>
+</button>
+
+<script>
+    // Theme Toggle Functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.querySelector('.theme-icon');
+    const htmlElement = document.documentElement;
+
+    // Check for saved theme preference or default to 'light' mode
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    htmlElement.setAttribute('data-theme', currentTheme);
+    updateThemeIcon(currentTheme);
+
+    themeToggle.addEventListener('click', function() {
+        const currentTheme = htmlElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        
+        htmlElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
+    });
+
+    function updateThemeIcon(theme) {
+        themeIcon.textContent = theme === 'light' ? '🌙' : '☀️';
+    }
+</script>
+
+
+
+
+
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h3>PHP Light Framework</h3>
+            <span class="version">v1.0.0</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">🏠 Home</a></li>
+            <li><a href="getting-started.html">🚀 Getting Started</a></li>
+            <li><a href="routing.html">🛣️ Routing</a></li>
+            <li><a href="controllers.html">🎛️ Controllers</a></li>
+            <li><a href="database.html">💾 Database</a></li>
+            <li><a href="runquery-guide.html">🔍 RunQuery Guide</a></li>
+            <li><a href="migrations.html">📋 Migrations</a></li>
+            <li><a href="validation.html">🔒 Validation & Security</a></li>
+            <li><a href="testing.html" class="active">🧪 Testing</a></li>
+            <li><a href="function-reference.html">📚 Function Reference</a></li>
+        </ul>
+    </nav>
+
+    <main class="content">
+        <header class="doc-header">
+            <div class="header-content">
+                <div class="search-container">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" id="globalSearch" placeholder="Search documentation..." />
+                    <div class="search-results" id="searchResults"></div>
+                </div>
+            </div>
+        </header>
+
+        <div class="content-inner">
+            <div class="breadcrumb">
+                <a href="index.html">Home</a> &gt; Testing
+            </div>
+
+            <h1>🧪 Testing APIs</h1>
+            <p class="intro">Learn how to test your API endpoints using cURL, Postman, and the built-in documentation interface. Test everything from simple GET requests to complex authentication flows.</p>
+
+            <section class="card highlight">
+                <h2>⚡ Quick Test</h2>
+                <p>Test your first endpoint with cURL:</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-bash">curl http://localhost:8080/api/health</code></pre>
+                </div>
+
+                <p>Expected response:</p>
+                <div class="code-block">
+                    <pre><code class="language-json">{
+  "status": "success",
+  "message": "API is healthy",
+  "data": {
+    "timestamp": "2025-10-02 16:30:00"
+  }
+}</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>🌐 Built-in Testing Interface</h2>
+                <p>The framework provides an interactive testing interface at <code>/api/docs</code></p>
+
+                <h3>Using the Interface</h3>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Open Documentation</h4>
+                            <p>Visit <a href="http://localhost:8080/api/docs" target="_blank">http://localhost:8080/api/docs</a></p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Select Endpoint</h4>
+                            <p>Choose any endpoint from the list to expand details</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Fill Parameters</h4>
+                            <p>Enter test data in the auto-generated form</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Execute Test</h4>
+                            <p>Click "Test" button and view formatted response</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>💻 Testing with cURL</h2>
+
+                <h3>GET Requests</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-bash"># Simple GET
+curl http://localhost:8080/api/users
+
+# GET with query parameters
+curl "http://localhost:8080/api/users?status=active&role=admin"
+
+# GET with headers
+curl -H "Authorization: Bearer token123" \
+     http://localhost:8080/api/users</code></pre>
+                </div>
+
+                <h3>POST Requests</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-bash"># POST with JSON body
+curl -X POST http://localhost:8080/api/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "secret123"
+  }'
+
+# POST with form data
+curl -X POST http://localhost:8080/api/login \
+  -d "email=john@example.com" \
+  -d "password=secret123"</code></pre>
+                </div>
+
+                <h3>PUT Requests</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-bash"># Update resource
+curl -X PUT http://localhost:8080/api/users/5 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Updated",
+    "email": "john.new@example.com"
+  }'</code></pre>
+                </div>
+
+                <h3>DELETE Requests</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-bash"># Delete resource
+curl -X DELETE http://localhost:8080/api/users/5
+
+# Delete with confirmation
+curl -X DELETE "http://localhost:8080/api/users/5?confirm=true"</code></pre>
+                </div>
+
+                <h3>Viewing Response Details</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-bash"># Show headers and status
+curl -i http://localhost:8080/api/users
+
+# Show only status code
+curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/api/users
+
+# Verbose output
+curl -v http://localhost:8080/api/users
+
+# Pretty print JSON (requires jq)
+curl http://localhost:8080/api/users | jq .</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>📮 Testing with Postman</h2>
+
+                <h3>Setting Up Postman</h3>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Download Postman</h4>
+                            <p>Get Postman from <a href="https://www.postman.com/downloads/" target="_blank">postman.com</a></p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Create Collection</h4>
+                            <p>Create a new collection named "PHP Light Framework"</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Add Requests</h4>
+                            <p>Add your API endpoints as requests in the collection</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Set Base URL</h4>
+                            <p>Create variable: <code>{{baseUrl}}</code> = <code>http://localhost:8080/api</code></p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Example Postman Requests</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>URL</th>
+                            <th>Body</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>GET</td>
+                            <td>{{baseUrl}}/users</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td>POST</td>
+                            <td>{{baseUrl}}/users</td>
+                            <td>JSON: {"name":"John","email":"john@test.com"}</td>
+                        </tr>
+                        <tr>
+                            <td>PUT</td>
+                            <td>{{baseUrl}}/users/5</td>
+                            <td>JSON: {"name":"Updated Name"}</td>
+                        </tr>
+                        <tr>
+                            <td>DELETE</td>
+                            <td>{{baseUrl}}/users/5</td>
+                            <td>None</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="card">
+                <h2>✅ Test Scenarios</h2>
+
+                <h3>Testing CRUD Operations</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-bash"># 1. Create
+curl -X POST http://localhost:8080/api/products \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Test Product","price":99.99}'
+
+# 2. Read (get ID from create response)
+curl http://localhost:8080/api/products/1
+
+# 3. Update
+curl -X PUT http://localhost:8080/api/products/1 \
+  -H "Content-Type: application/json" \
+  -d '{"price":79.99}'
+
+# 4. Delete
+curl -X DELETE http://localhost:8080/api/products/1</code></pre>
+                </div>
+
+                <h3>Testing Validation</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-bash"># Test with invalid data
+curl -X POST http://localhost:8080/api/users \
+  -H "Content-Type: application/json" \
+  -d '{"name":"J","email":"invalid-email"}'
+
+# Expected: 422 status with validation errors</code></pre>
+                </div>
+
+                <h3>Testing Error Handling</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-bash"># Test 404 - Not Found
+curl http://localhost:8080/api/users/99999
+
+# Test 400 - Bad Request
+curl http://localhost:8080/api/users/abc
+
+# Test 401 - Unauthorized
+curl http://localhost:8080/api/protected-route</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>💡 Testing Best Practices</h2>
+
+                <div class="tips-grid">
+                    <div class="tip">
+                        <h4>Test All Methods</h4>
+                        <p>Test GET, POST, PUT, DELETE for each endpoint</p>
+                    </div>
+
+                    <div class="tip">
+                        <h4>Test Edge Cases</h4>
+                        <p>Try invalid data, missing fields, wrong types</p>
+                    </div>
+
+                    <div class="tip">
+                        <h4>Test Error Codes</h4>
+                        <p>Verify correct HTTP status codes (200, 404, 422, 500)</p>
+                    </div>
+
+                    <div class="tip">
+                        <h4>Save Test Collections</h4>
+                        <p>Create Postman collections for reusable tests</p>
+                    </div>
+
+                    <div class="tip">
+                        <h4>Document Test Cases</h4>
+                        <p>Keep a list of test scenarios and expected results</p>
+                    </div>
+
+                    <div class="tip">
+                        <h4>Automate Tests</h4>
+                        <p>Create bash scripts for common test sequences</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>🔗 Next Steps</h2>
+
+                <div class="next-steps-grid">
+                    <a href="function-reference.html" class="next-step-card">
+                        <h3>📚 Function Reference</h3>
+                        <p>Complete API reference</p>
+                    </a>
+
+                    <a href="validation.html" class="next-step-card">
+                        <h3>🔒 Validation</h3>
+                        <p>Understand validation rules</p>
+                    </a>
+
+                    <a href="controllers.html" class="next-step-card">
+                        <h3>🎛️ Controllers</h3>
+                        <p>Build testable controllers</p>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="assets/search.js"></script>
+    <script>
+        hljs.highlightAll();
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = 'Copied!';
+                button.style.background = '#10b981';
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                    button.style.background = '#2563eb';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

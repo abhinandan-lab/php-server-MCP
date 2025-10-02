@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Routing - PHP Light Framework</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+
+
+
+    <!-- Theme Toggle Script -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+    <span class="theme-icon">🌙</span>
+</button>
+
+<script>
+    // Theme Toggle Functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.querySelector('.theme-icon');
+    const htmlElement = document.documentElement;
+
+    // Check for saved theme preference or default to 'light' mode
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    htmlElement.setAttribute('data-theme', currentTheme);
+    updateThemeIcon(currentTheme);
+
+    themeToggle.addEventListener('click', function() {
+        const currentTheme = htmlElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        
+        htmlElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
+    });
+
+    function updateThemeIcon(theme) {
+        themeIcon.textContent = theme === 'light' ? '🌙' : '☀️';
+    }
+</script>
+
+
+
+
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h3>PHP Light Framework</h3>
+            <span class="version">v1.0.0</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">🏠 Home</a></li>
+            <li><a href="getting-started.html">🚀 Getting Started</a></li>
+            <li><a href="routing.html" class="active">🛣️ Routing</a></li>
+            <li><a href="controllers.html">🎛️ Controllers</a></li>
+            <li><a href="database.html">💾 Database</a></li>
+            <li><a href="runquery-guide.html">🔍 RunQuery Guide</a></li>
+            <li><a href="migrations.html">📋 Migrations</a></li>
+            <li><a href="validation.html">🔒 Validation & Security</a></li>
+            <li><a href="testing.html">🧪 Testing</a></li>
+            <li><a href="function-reference.html">📚 Function Reference</a></li>
+        </ul>
+    </nav>
+
+    <main class="content">
+        <header class="doc-header">
+            <div class="header-content">
+                <div class="search-container">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" id="globalSearch" placeholder="Search documentation..." />
+                    <div class="search-results" id="searchResults"></div>
+                </div>
+            </div>
+        </header>
+
+        <div class="content-inner">
+            <div class="breadcrumb">
+                <a href="index.html">Home</a> &gt; Routing
+            </div>
+
+            <h1>🛣️ Routing</h1>
+            <p class="intro">Learn how to define API routes, handle parameters, and organize your endpoints with the powerful routing system.</p>
+
+            <section class="card highlight">
+                <h2>⚡ Quick Example</h2>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$router->add([
+    'method' => 'GET',
+    'url' => '/users/:id',
+    'controller' => [UserController::class, 'getUser'],
+    'desc' => 'Get user by ID',
+    'params' => [
+        'url' => ['id' => 'integer - User ID']
+    ]
+]);</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>📝 Route Definition</h2>
+                
+                <h3>Basic Structure</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$router->add([
+    'method' => 'GET',              // HTTP method
+    'url' => '/endpoint',           // Route pattern
+    'controller' => [Class, 'method'], // Handler
+    'desc' => 'Description',        // For docs
+    'params' => [],                 // Parameters (optional)
+    'group' => 'Category'           // Grouping (optional)
+]);</code></pre>
+                </div>
+
+                <h3>Required Fields</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>method</code></td>
+                            <td>string</td>
+                            <td>GET, POST, PUT, DELETE</td>
+                        </tr>
+                        <tr>
+                            <td><code>url</code></td>
+                            <td>string</td>
+                            <td>Route pattern with parameters</td>
+                        </tr>
+                        <tr>
+                            <td><code>controller</code></td>
+                            <td>array/string</td>
+                            <td>[ClassName::class, 'method'] or 'ClassName@method'</td>
+                        </tr>
+                        <tr>
+                            <td><code>desc</code></td>
+                            <td>string</td>
+                            <td>Human-readable description</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="card">
+                <h2>🎯 Controller Syntax Options</h2>
+                <p>The framework supports two formats for defining controllers:</p>
+
+                <h3>Option 1: Array Syntax (Recommended)</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$router->add([
+    'method' => 'POST',
+    'url' => '/users',
+    'controller' => [UserController::class, 'create'],  // Recommended
+    'desc' => 'Create user'
+]);</code></pre>
+                </div>
+                <p><strong>Benefits:</strong> Better IDE autocomplete, type safety, and refactoring support</p>
+
+                <h3>Option 2: String Syntax</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$router->add([
+    'method' => 'POST',
+    'url' => '/users',
+    'controller' => 'UserController@create',  // Also works
+    'desc' => 'Create user'
+]);</code></pre>
+                </div>
+                <p><strong>Format:</strong> Use <code>ClassName@methodName</code> pattern with @ separator</p>
+
+                <div class="alert alert-info">
+                    <strong>💡 Recommendation:</strong> Use array syntax <code>[ClassName::class, 'method']</code> for better IDE support and type safety. The string syntax is supported for flexibility.
+                </div>
+
+                <h3>Both Formats Work Identically</h3>
+                <div class="comparison">
+                    <div class="good">
+                        <h4>✅ Array Format</h4>
+                        <div class="code-block">
+                            <pre><code class="language-php">'controller' => [UserController::class, 'create']</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="good">
+                        <h4>✅ String Format</h4>
+                        <div class="code-block">
+                            <pre><code class="language-php">'controller' => 'UserController@create'</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>🎯 HTTP Methods</h2>
+                
+                <h3>GET - Retrieve Data</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$router->add([
+    'method' => 'GET',
+    'url' => '/users',
+    'controller' => [UserController::class, 'list'],
+    'desc' => 'Get all users'
+]);</code></pre>
+                </div>
+
+                <h3>POST - Create Data</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$router->add([
+    'method' => 'POST',
+    'url' => '/users',
+    'controller' => [UserController::class, 'create'],
+    'desc' => 'Create new user',
+    'params' => [
+        'json' => [
+            'name' => 'string (required)',
+            'email' => 'string (required)'
+        ]
+    ]
+]);</code></pre>
+                </div>
+
+                <h3>PUT - Update Data</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$router->add([
+    'method' => 'PUT',
+    'url' => '/users/:id',
+    'controller' => [UserController::class, 'update'],
+    'desc' => 'Update user',
+    'params' => [
+        'url' => ['id' => 'integer - User ID'],
+        'json' => ['name' => 'string (optional)']
+    ]
+]);</code></pre>
+                </div>
+
+                <h3>DELETE - Remove Data</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$router->add([
+    'method' => 'DELETE',
+    'url' => '/users/:id',
+    'controller' => [UserController::class, 'delete'],
+    'desc' => 'Delete user',
+    'params' => [
+        'url' => ['id' => 'integer - User ID']
+    ]
+]);</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>🔗 URL Parameters</h2>
+                
+                <h3>Single Parameter</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">// Route: /users/:id
+$router->add([
+    'method' => 'GET',
+    'url' => '/users/:id',
+    'controller' => [UserController::class, 'getUser']
+]);
+
+// Access in controller
+public function getUser($id) {
+    echo $id; // Gets value from URL
+}</code></pre>
+                </div>
+
+                <h3>Multiple Parameters</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">// Route: /users/:userId/posts/:postId
+$router->add([
+    'method' => 'GET',
+    'url' => '/users/:userId/posts/:postId',
+    'controller' => [PostController::class, 'getUserPost']
+]);
+
+// Access in controller
+public function getUserPost($userId, $postId) {
+    // Both parameters available
+}</code></pre>
+                </div>
+
+                <h3>Query Parameters</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">// Route: /users?status=active&role=admin
+$router->add([
+    'method' => 'GET',
+    'url' => '/users',
+    'controller' => [UserController::class, 'list'],
+    'params' => [
+        'get' => [
+            'status' => 'string (optional)',
+            'role' => 'string (optional)'
+        ]
+    ]
+]);
+
+// Access in controller
+public function list() {
+    $status = $_GET['status'] ?? 'all';
+    $role = $_GET['role'] ?? null;
+}</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>📦 Request Body Parameters</h2>
+                
+                <h3>JSON Body</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$router->add([
+    'method' => 'POST',
+    'url' => '/users',
+    'controller' => [UserController::class, 'create'],
+    'params' => [
+        'json' => [
+            'name' => 'string (required)',
+            'email' => 'string (required)',
+            'age' => 'integer (optional)'
+        ]
+    ]
+]);
+
+// Access in controller
+public function create() {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $name = $data['name'];
+}</code></pre>
+                </div>
+
+                <h3>Form Data</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$router->add([
+    'method' => 'POST',
+    'url' => '/upload',
+    'controller' => [FileController::class, 'upload'],
+    'params' => [
+        'post' => [
+            'title' => 'string (required)',
+            'file' => 'file (required)'
+        ]
+    ]
+]);
+
+// Access in controller
+public function upload() {
+    $title = $_POST['title'];
+    $file = $_FILES['file'];
+}</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>📚 Route Groups</h2>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">// User endpoints
+$router->add([
+    'method' => 'GET',
+    'url' => '/users',
+    'controller' => [UserController::class, 'list'],
+    'desc' => 'List users',
+    'group' => 'Users'
+]);
+
+$router->add([
+    'method' => 'POST',
+    'url' => '/users',
+    'controller' => [UserController::class, 'create'],
+    'desc' => 'Create user',
+    'group' => 'Users'
+]);
+
+// Product endpoints
+$router->add([
+    'method' => 'GET',
+    'url' => '/products',
+    'controller' => [ProductController::class, 'list'],
+    'desc' => 'List products',
+    'group' => 'Products'
+]);</code></pre>
+                </div>
+
+                <p>Groups help organize documentation and make APIs easier to navigate.</p>
+            </section>
+
+            <section class="card">
+                <h2>💡 Best Practices</h2>
+                
+                <div class="tips-grid">
+                    <div class="tip">
+                        <h4>Use RESTful Conventions</h4>
+                        <p>GET /users, POST /users, PUT /users/:id, DELETE /users/:id</p>
+                    </div>
+                    
+                    <div class="tip">
+                        <h4>Descriptive URLs</h4>
+                        <p>Use clear, readable URL patterns: /users/:id/posts instead of /u/:i/p</p>
+                    </div>
+                    
+                    <div class="tip">
+                        <h4>Document Parameters</h4>
+                        <p>Always document params for auto-generated API docs</p>
+                    </div>
+                    
+                    <div class="tip">
+                        <h4>Group Related Routes</h4>
+                        <p>Use groups to organize endpoints logically</p>
+                    </div>
+
+                    <div class="tip">
+                        <h4>Prefer Array Syntax</h4>
+                        <p>Use [Class::class, 'method'] for better IDE support</p>
+                    </div>
+
+                    <div class="tip">
+                        <h4>Consistent Naming</h4>
+                        <p>Use consistent controller and method names across routes</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>🔗 Next Steps</h2>
+                
+                <div class="next-steps-grid">
+                    <a href="controllers.html" class="next-step-card">
+                        <h3>🎛️ Controllers</h3>
+                        <p>Build controller logic</p>
+                    </a>
+                    
+                    <a href="validation.html" class="next-step-card">
+                        <h3>🔒 Validation</h3>
+                        <p>Validate request data</p>
+                    </a>
+                    
+                    <a href="testing.html" class="next-step-card">
+                        <h3>🧪 Testing</h3>
+                        <p>Test your routes</p>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="assets/search.js"></script>
+    <script>
+        hljs.highlightAll();
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = 'Copied!';
+                button.style.background = '#10b981';
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                    button.style.background = '#2563eb';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

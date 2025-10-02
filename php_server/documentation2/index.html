@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHP Light Framework - Documentation</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+
+
+
+    <!-- Theme Toggle Script -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+    <span class="theme-icon">🌙</span>
+</button>
+
+<script>
+    // Theme Toggle Functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.querySelector('.theme-icon');
+    const htmlElement = document.documentElement;
+
+    // Check for saved theme preference or default to 'light' mode
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    htmlElement.setAttribute('data-theme', currentTheme);
+    updateThemeIcon(currentTheme);
+
+    themeToggle.addEventListener('click', function() {
+        const currentTheme = htmlElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        
+        htmlElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
+    });
+
+    function updateThemeIcon(theme) {
+        themeIcon.textContent = theme === 'light' ? '🌙' : '☀️';
+    }
+</script>
+
+
+
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h3>PHP Light Framework</h3>
+            <span class="version">v1.0.0</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html" class="active">🏠 Home</a></li>
+            <li><a href="getting-started.html">🚀 Getting Started</a></li>
+            <li><a href="routing.html">🛣️ Routing</a></li>
+            <li><a href="controllers.html">🎛️ Controllers</a></li>
+            <li><a href="database.html">💾 Database</a></li>
+            <li><a href="runquery-guide.html">🔍 RunQuery Guide</a></li>
+            <li><a href="migrations.html">📋 Migrations</a></li>
+            <li><a href="validation.html">🔒 Validation & Security</a></li>
+            <li><a href="testing.html">🧪 Testing</a></li>
+            <li><a href="function-reference.html">📚 Function Reference</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="content">
+        <!-- Fixed Header with Search -->
+        <header class="doc-header">
+            <div class="header-content">
+                <div class="search-container">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" id="globalSearch" placeholder="Search documentation..." />
+                    <div class="search-results" id="searchResults"></div>
+                </div>
+            </div>
+        </header>
+
+        <div class="content-inner">
+            <div class="breadcrumb">
+                Documentation
+            </div>
+
+            <h1>Welcome to PHP Light Framework</h1>
+            <p class="intro">A modern, lightweight PHP framework for building secure RESTful APIs with zero configuration. Built-in documentation, validation, and security from day one.</p>
+
+            <!-- Quick Start -->
+            <section class="card highlight">
+                <h2>⚡ Quick Start</h2>
+                <p>Get your API running in 60 seconds:</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-bash">git clone https://github.com/yourrepo/php-light-framework.git
+cd php-light-framework
+docker-compose up -d
+
+# Visit: http://localhost:8080/api/docs</code></pre>
+                </div>
+            </section>
+
+            <!-- Features Grid -->
+            <section class="card">
+                <h2>✨ Core Features</h2>
+                
+                <div class="next-steps-grid">
+                    <div class="next-step-card">
+                        <h3>🔒 Security First</h3>
+                        <p>Built-in XSS protection, CSRF prevention, rate limiting, and security headers out of the box.</p>
+                    </div>
+                    
+                    <div class="next-step-card">
+                        <h3>📝 Auto Documentation</h3>
+                        <p>Interactive API docs generated from your routes. Test endpoints directly in the browser.</p>
+                    </div>
+                    
+                    <div class="next-step-card">
+                        <h3>✅ Validation</h3>
+                        <p>Automatic input sanitization and validation with custom rules. Never trust user input.</p>
+                    </div>
+                    
+                    <div class="next-step-card">
+                        <h3>💾 Database</h3>
+                        <p>Secure queries with prepared statements, migrations, and developer-friendly helpers.</p>
+                    </div>
+                    
+                    <div class="next-step-card">
+                        <h3>🎯 Simple Routing</h3>
+                        <p>Clean route definitions with parameter validation and automatic REST patterns.</p>
+                    </div>
+                    
+                    <div class="next-step-card">
+                        <h3>🐳 Docker Ready</h3>
+                        <p>Complete Docker setup included. Same config for local development and production.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Example Code -->
+            <section class="card">
+                <h2>📝 Complete Example</h2>
+                <p>Create a secure API endpoint in minutes:</p>
+
+                <h3>Define Route</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$router->add([
+    'method' => 'POST',
+    'url' => '/users',
+    'controller' => [UserController::class, 'create'],
+    'desc' => 'Create new user',
+    'params' => [
+        'json' => [
+            'name' => 'string (required)',
+            'email' => 'string (required)',
+            'password' => 'string (required)'
+        ]
+    ]
+]);</code></pre>
+                </div>
+
+                <h3>Controller Logic</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">class UserController extends BaseController
+{
+    public function create()
+    {
+        $data = $this->validateRequest([
+            'name' => 'required|min:3',
+            'email' => 'required|email',
+            'password' => 'required|min:8'
+        ]);
+        
+        $result = RunQuery([
+            'conn' => $this->conn,
+            'query' => 'INSERT INTO users (name, email, password) 
+                        VALUES (:name, :email, :password)',
+            'params' => [
+                ':name' => $data['name'],
+                ':email' => $data['email'],
+                ':password' => password_hash($data['password'], PASSWORD_DEFAULT)
+            ],
+            'withSuccess' => true
+        ]);
+        
+        $this->sendSuccess('User created', ['id' => $result['id']]);
+    }
+}</code></pre>
+                </div>
+
+                <div class="alert alert-success">
+                    <strong>Done!</strong> Your endpoint is now secure, validated, documented, and protected from SQL injection.
+                </div>
+            </section>
+
+            <!-- Learning Path -->
+            <section class="card">
+                <h2>🎓 Learning Path</h2>
+                
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4><a href="getting-started.html">Getting Started</a></h4>
+                            <p>Set up Docker environment and create your first endpoint</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4><a href="routing.html">Routing</a></h4>
+                            <p>Learn route definitions and parameter handling</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4><a href="controllers.html">Controllers</a></h4>
+                            <p>Build controllers with business logic</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4><a href="runquery-guide.html">Database & RunQuery</a></h4>
+                            <p>Master secure database operations</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Links -->
+            <section class="card">
+                <h2>🔗 Quick Links</h2>
+                
+                <div class="next-steps-grid">
+                    <a href="getting-started.html" class="next-step-card">
+                        <h3>🚀 Get Started</h3>
+                        <p>60 second setup guide</p>
+                    </a>
+                    
+                    <a href="function-reference.html" class="next-step-card">
+                        <h3>📚 Function Reference</h3>
+                        <p>Searchable docs</p>
+                    </a>
+                    
+                    <a href="testing.html" class="next-step-card">
+                        <h3>🧪 Testing Guide</h3>
+                        <p>Test your APIs</p>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="assets/search.js"></script>
+    <script>
+        hljs.highlightAll();
+
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const code = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = 'Copied!';
+                button.style.background = '#10b981';
+                
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                    button.style.background = '#2563eb';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database - PHP Light Framework</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+
+
+    <!-- Theme Toggle Script -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+    <span class="theme-icon">🌙</span>
+</button>
+
+<script>
+    // Theme Toggle Functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.querySelector('.theme-icon');
+    const htmlElement = document.documentElement;
+
+    // Check for saved theme preference or default to 'light' mode
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    htmlElement.setAttribute('data-theme', currentTheme);
+    updateThemeIcon(currentTheme);
+
+    themeToggle.addEventListener('click', function() {
+        const currentTheme = htmlElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        
+        htmlElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
+    });
+
+    function updateThemeIcon(theme) {
+        themeIcon.textContent = theme === 'light' ? '🌙' : '☀️';
+    }
+</script>
+
+
+
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h3>PHP Light Framework</h3>
+            <span class="version">v1.0.0</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">🏠 Home</a></li>
+            <li><a href="getting-started.html">🚀 Getting Started</a></li>
+            <li><a href="routing.html">🛣️ Routing</a></li>
+            <li><a href="controllers.html">🎛️ Controllers</a></li>
+            <li><a href="database.html" class="active">💾 Database</a></li>
+            <li><a href="runquery-guide.html">🔍 RunQuery Guide</a></li>
+            <li><a href="migrations.html">📋 Migrations</a></li>
+            <li><a href="validation.html">🔒 Validation & Security</a></li>
+            <li><a href="testing.html">🧪 Testing</a></li>
+            <li><a href="function-reference.html">📚 Function Reference</a></li>
+        </ul>
+    </nav>
+
+    <main class="content">
+        <header class="doc-header">
+            <div class="header-content">
+                <div class="search-container">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" id="globalSearch" placeholder="Search documentation..." />
+                    <div class="search-results" id="searchResults"></div>
+                </div>
+            </div>
+        </header>
+
+        <div class="content-inner">
+            <div class="breadcrumb">
+                <a href="index.html">Home</a> &gt; Database
+            </div>
+
+            <h1>💾 Database</h1>
+            <p class="intro">Learn how to work with databases securely using prepared statements, the RunQuery helper, and database migrations.</p>
+
+            <section class="card highlight">
+                <h2>⚡ Quick Start</h2>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">// Simple database query
+$users = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'SELECT * FROM users WHERE status = :status',
+    'params' => [':status' => 'active']
+]);
+
+foreach ($users as $user) {
+    echo $user['name'];
+}</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>🔌 Database Connection</h2>
+                
+                <h3>Configuration</h3>
+                <p>Database settings are configured in your <code>.env</code> file:</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-bash">DB_HOST=db
+DB_PORT=3306
+DB_NAME=testdb
+DB_USER=root
+DB_PASSWORD=abcd</code></pre>
+                </div>
+
+                <h3>Accessing Connection</h3>
+                <p>The database connection is automatically available in controllers:</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">class UserController extends BaseController
+{
+    public function getUsers()
+    {
+        // Connection available as $this->conn
+        $users = RunQuery([
+            'conn' => $this->conn,
+            'query' => 'SELECT * FROM users'
+        ]);
+        
+        $this->sendSuccess('Users retrieved', $users);
+    }
+}</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>🔍 RunQuery Function</h2>
+                
+                <h3>Basic Usage</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$result = RunQuery([
+    'conn' => $this->conn,           // PDO connection
+    'query' => 'SELECT * FROM users', // SQL query
+    'params' => [],                   // Parameters (optional)
+    'fetchAssoc' => true,            // Return format (optional)
+    'withSuccess' => false            // Get metadata (optional)
+]);</code></pre>
+                </div>
+
+                <h3>SELECT Query</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$users = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'SELECT id, name, email FROM users WHERE role = :role',
+    'params' => [':role' => 'admin']
+]);
+
+// Returns array of rows
+// [
+//   ['id' => 1, 'name' => 'John', 'email' => 'john@example.com'],
+//   ['id' => 2, 'name' => 'Jane', 'email' => 'jane@example.com']
+// ]</code></pre>
+                </div>
+
+                <h3>INSERT Query</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$result = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'INSERT INTO users (name, email, password) 
+                VALUES (:name, :email, :password)',
+    'params' => [
+        ':name' => 'John Doe',
+        ':email' => 'john@example.com',
+        ':password' => password_hash('secret', PASSWORD_DEFAULT)
+    ],
+    'withSuccess' => true
+]);
+
+// Returns metadata
+// [
+//   'success' => true,
+//   'affected_rows' => 1,
+//   'id' => 123  // Last insert ID
+// ]
+
+$newUserId = $result['id'];</code></pre>
+                </div>
+
+                <h3>UPDATE Query</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$result = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'UPDATE users SET name = :name WHERE id = :id',
+    'params' => [
+        ':name' => 'Updated Name',
+        ':id' => 5
+    ],
+    'withSuccess' => true
+]);
+
+if ($result['affected_rows'] > 0) {
+    echo "User updated";
+} else {
+    echo "No changes or user not found";
+}</code></pre>
+                </div>
+
+                <h3>DELETE Query</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$result = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'DELETE FROM users WHERE id = :id',
+    'params' => [':id' => 5],
+    'withSuccess' => true
+]);
+
+if ($result['affected_rows'] > 0) {
+    echo "User deleted";
+} else {
+    echo "User not found";
+}</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>🔒 Security Best Practices</h2>
+                
+                <h3>✅ Always Use Prepared Statements</h3>
+                <div class="comparison">
+                    <div class="bad">
+                        <h4>❌ Vulnerable to SQL Injection</h4>
+                        <div class="code-block">
+                            <pre><code class="language-php">// NEVER DO THIS!
+$id = $_GET['id'];
+$query = "SELECT * FROM users WHERE id = $id";
+$result = RunQuery([
+    'conn' => $this->conn,
+    'query' => $query
+]);</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="good">
+                        <h4>✅ Safe with Parameters</h4>
+                        <div class="code-block">
+                            <pre><code class="language-php">// ALWAYS DO THIS
+$id = $_GET['id'];
+$result = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'SELECT * FROM users WHERE id = :id',
+    'params' => [':id' => $id]
+]);</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-danger">
+                    <strong>⚠️ Critical:</strong> Never concatenate user input into SQL queries. Always use named parameters with RunQuery.
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>📊 Common Patterns</h2>
+                
+                <h3>Check if Record Exists</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$existing = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'SELECT id FROM users WHERE email = :email',
+    'params' => [':email' => $email]
+]);
+
+if (!empty($existing)) {
+    // Email already exists
+    $this->sendError('Email already registered', 409);
+}</code></pre>
+                </div>
+
+                <h3>Count Records</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$result = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'SELECT COUNT(*) as total FROM users WHERE status = :status',
+    'params' => [':status' => 'active']
+]);
+
+$totalUsers = $result[0]['total'];</code></pre>
+                </div>
+
+                <h3>Search with LIKE</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$search = $_GET['search'] ?? '';
+
+$users = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'SELECT * FROM users WHERE name LIKE :search',
+    'params' => [':search' => "%$search%"]
+]);</code></pre>
+                </div>
+
+                <h3>Pagination</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$page = $_GET['page'] ?? 1;
+$perPage = 20;
+$offset = ($page - 1) * $perPage;
+
+$users = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'SELECT * FROM users 
+                ORDER BY created_at DESC 
+                LIMIT :limit OFFSET :offset',
+    'params' => [
+        ':limit' => $perPage,
+        ':offset' => $offset
+    ]
+]);</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>💡 Tips & Best Practices</h2>
+                
+                <div class="tips-grid">
+                    <div class="tip">
+                        <h4>Use Named Parameters</h4>
+                        <p>Always use :paramName syntax for clarity and safety</p>
+                    </div>
+                    
+                    <div class="tip">
+                        <h4>SELECT Specific Columns</h4>
+                        <p>Avoid SELECT * - specify only needed columns</p>
+                    </div>
+                    
+                    <div class="tip">
+                        <h4>Use withSuccess</h4>
+                        <p>Set withSuccess: true for INSERT/UPDATE/DELETE to get metadata</p>
+                    </div>
+                    
+                    <div class="tip">
+                        <h4>Handle Empty Results</h4>
+                        <p>Always check if query returned results before accessing data</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>🔗 Next Steps</h2>
+                
+                <div class="next-steps-grid">
+                    <a href="runquery-guide.html" class="next-step-card">
+                        <h3>🔍 RunQuery Guide</h3>
+                        <p>Complete RunQuery documentation</p>
+                    </a>
+                    
+                    <a href="migrations.html" class="next-step-card">
+                        <h3>📋 Migrations</h3>
+                        <p>Manage database schema</p>
+                    </a>
+                    
+                    <a href="controllers.html" class="next-step-card">
+                        <h3>🎛️ Controllers</h3>
+                        <p>Use database in controllers</p>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="assets/search.js"></script>
+    <script>
+        hljs.highlightAll();
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = 'Copied!';
+                button.style.background = '#10b981';
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                    button.style.background = '#2563eb';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

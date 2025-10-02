@@ -126,7 +126,7 @@ class AuthController extends BaseController
         if ($includeProfile === 'true' || $includeProfile === '1') {
             $userData['profile'] = [
                 'age' => 30,
-                'bio' => 'Software developer with 5+ years experience',
+                'bio' => 'Software developer with 5+ years experience', 
                 'location' => 'New York, USA',
                 'skills' => ['PHP', 'JavaScript', 'Python', 'MySQL']
             ];
