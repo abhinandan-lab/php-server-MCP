@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RunQuery Complete Guide - PHP Light Framework</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+
+
+
+    <!-- Theme Toggle Script -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+    <span class="theme-icon">🌙</span>
+</button>
+
+<script>
+    // Theme Toggle Functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.querySelector('.theme-icon');
+    const htmlElement = document.documentElement;
+
+    // Check for saved theme preference or default to 'light' mode
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    htmlElement.setAttribute('data-theme', currentTheme);
+    updateThemeIcon(currentTheme);
+
+    themeToggle.addEventListener('click', function() {
+        const currentTheme = htmlElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        
+        htmlElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
+    });
+
+    function updateThemeIcon(theme) {
+        themeIcon.textContent = theme === 'light' ? '🌙' : '☀️';
+    }
+</script>
+
+
+
+
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h3>PHP Light Framework</h3>
+            <span class="version">v1.0.0</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">🏠 Home</a></li>
+            <li><a href="getting-started.html">🚀 Getting Started</a></li>
+            <li><a href="routing.html">🛣️ Routing</a></li>
+            <li><a href="controllers.html">🎛️ Controllers</a></li>
+            <li><a href="database.html">💾 Database</a></li>
+            <li><a href="runquery-guide.html" class="active">🔍 RunQuery Guide</a></li>
+            <li><a href="migrations.html">📋 Migrations</a></li>
+            <li><a href="validation.html">🔒 Validation & Security</a></li>
+            <li><a href="testing.html">🧪 Testing</a></li>
+            <li><a href="function-reference.html">📚 Function Reference</a></li>
+        </ul>
+    </nav>
+
+    <main class="content">
+        <header class="doc-header">
+            <div class="header-content">
+                <div class="search-container">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" id="globalSearch" placeholder="Search documentation..." />
+                    <div class="search-results" id="searchResults"></div>
+                </div>
+            </div>
+        </header>
+
+        <div class="content-inner">
+            <div class="breadcrumb">
+                <a href="index.html">Home</a> &gt; RunQuery Complete Guide
+            </div>
+
+            <h1>🔍 RunQuery Complete Guide</h1>
+            <p class="intro">Master the RunQuery function - the core database helper that provides secure, prepared statement execution with automatic parameter binding and comprehensive response formats.</p>
+
+            <section class="card highlight">
+                <h2>⚡ Quick Reference</h2>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$result = RunQuery([
+    'conn' => $this->conn,           // PDO connection (required)
+    'query' => 'SELECT * FROM users', // SQL query (required)
+    'params' => [],                   // Named parameters (optional)
+    'fetchAssoc' => true,            // Return format (optional, default: true)
+    'withSuccess' => false,          // Get metadata (optional, default: false)
+    'returnSql' => false             // Debug SQL (optional, default: false)
+]);</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>📋 All Parameters</h2>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Required</th>
+                            <th>Default</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>conn</code></td>
+                            <td>PDO</td>
+                            <td>✅ Yes</td>
+                            <td>-</td>
+                            <td>Database connection object</td>
+                        </tr>
+                        <tr>
+                            <td><code>query</code></td>
+                            <td>string</td>
+                            <td>✅ Yes</td>
+                            <td>-</td>
+                            <td>SQL query with named parameters</td>
+                        </tr>
+                        <tr>
+                            <td><code>params</code></td>
+                            <td>array</td>
+                            <td>❌ No</td>
+                            <td>[]</td>
+                            <td>Associative array of parameters</td>
+                        </tr>
+                        <tr>
+                            <td><code>fetchAssoc</code></td>
+                            <td>bool</td>
+                            <td>❌ No</td>
+                            <td>true</td>
+                            <td>Return as associative array</td>
+                        </tr>
+                        <tr>
+                            <td><code>withSuccess</code></td>
+                            <td>bool</td>
+                            <td>❌ No</td>
+                            <td>false</td>
+                            <td>Return metadata (INSERT/UPDATE/DELETE)</td>
+                        </tr>
+                        <tr>
+                            <td><code>returnSql</code></td>
+                            <td>bool</td>
+                            <td>❌ No</td>
+                            <td>false</td>
+                            <td>Return SQL string for debugging</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="card">
+                <h2>🔍 SELECT Queries</h2>
+                
+                <h3>Basic SELECT</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$users = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'SELECT * FROM users'
+]);
+
+// Expected Response: Array of rows
+// [
+//   ['id' => 1, 'name' => 'John', 'email' => 'john@example.com'],
+//   ['id' => 2, 'name' => 'Jane', 'email' => 'jane@example.com']
+// ]</code></pre>
+                </div>
+
+                <h3>SELECT with Parameters</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$user = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'SELECT * FROM users WHERE id = :id',
+    'params' => [':id' => 5]
+]);
+
+// Expected Response: Array with single row
+// [
+//   ['id' => 5, 'name' => 'John', 'email' => 'john@example.com']
+// ]
+
+// Access data
+if (!empty($user)) {
+    echo $user[0]['name']; // John
+}</code></pre>
+                </div>
+
+                <h3>SELECT with Multiple Parameters</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$users = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'SELECT * FROM users 
+                WHERE status = :status AND role = :role',
+    'params' => [
+        ':status' => 'active',
+        ':role' => 'admin'
+    ]
+]);
+
+// Expected Response: Array of matching rows
+// [
+//   ['id' => 1, 'name' => 'Admin1', 'status' => 'active', 'role' => 'admin'],
+//   ['id' => 3, 'name' => 'Admin2', 'status' => 'active', 'role' => 'admin']
+// ]</code></pre>
+                </div>
+
+                <h3>SELECT with COUNT</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$result = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'SELECT COUNT(*) as total FROM users WHERE status = :status',
+    'params' => [':status' => 'active']
+]);
+
+// Expected Response:
+// [
+//   ['total' => 42]
+// ]
+
+$totalUsers = $result[0]['total']; // 42</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>➕ INSERT Queries (with withSuccess)</h2>
+                
+                <div class="alert alert-warning">
+                    <strong>⚠️ Important:</strong> Always use <code>withSuccess: true</code> for INSERT queries to get the new record ID!
+                </div>
+
+                <h3>Basic INSERT</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$result = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'INSERT INTO users (name, email, password) 
+                VALUES (:name, :email, :password)',
+    'params' => [
+        ':name' => 'John Doe',
+        ':email' => 'john@example.com',
+        ':password' => password_hash('secret', PASSWORD_DEFAULT)
+    ],
+    'withSuccess' => true  // ⚠️ REQUIRED for INSERT
+]);
+
+// Expected Response (withSuccess: true):
+// [
+//   'success' => true,
+//   'affected_rows' => 1,
+//   'id' => 123  // ⭐ Last insert ID
+// ]
+
+$newUserId = $result['id']; // 123</code></pre>
+                </div>
+
+                <h3>INSERT without withSuccess ❌</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">// WITHOUT withSuccess - No ID returned!
+$result = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'INSERT INTO users (name, email) VALUES (:name, :email)',
+    'params' => [':name' => 'John', ':email' => 'john@test.com']
+    // withSuccess not set (defaults to false)
+]);
+
+// Expected Response: Empty array
+// []
+
+// ❌ Cannot get new ID without withSuccess!</code></pre>
+                </div>
+
+                <h3>Bulk INSERT</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$result = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'INSERT INTO products (name, price) VALUES 
+                (:name1, :price1), 
+                (:name2, :price2)',
+    'params' => [
+        ':name1' => 'Product A',
+        ':price1' => 99.99,
+        ':name2' => 'Product B',
+        ':price2' => 149.99
+    ],
+    'withSuccess' => true
+]);
+
+// Expected Response:
+// [
+//   'success' => true,
+//   'affected_rows' => 2,
+//   'id' => 456  // ID of last inserted row
+// ]</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>✏️ UPDATE Queries (with withSuccess)</h2>
+                
+                <div class="alert alert-warning">
+                    <strong>⚠️ Important:</strong> Use <code>withSuccess: true</code> for UPDATE queries to check affected rows!
+                </div>
+
+                <h3>Basic UPDATE</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$result = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'UPDATE users SET name = :name WHERE id = :id',
+    'params' => [
+        ':name' => 'Updated Name',
+        ':id' => 5
+    ],
+    'withSuccess' => true  // ⚠️ REQUIRED to check affected rows
+]);
+
+// Expected Response (withSuccess: true):
+// [
+//   'success' => true,
+//   'affected_rows' => 1,  // ⭐ Number of rows updated
+//   'id' => null
+// ]
+
+// Check if update was successful
+if ($result['affected_rows'] > 0) {
+    echo "User updated successfully";
+} else {
+    echo "No user found or no changes made";
+}</code></pre>
+                </div>
+
+                <h3>UPDATE without withSuccess ❌</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">// WITHOUT withSuccess - No affected rows info!
+$result = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'UPDATE users SET name = :name WHERE id = :id',
+    'params' => [':name' => 'New Name', ':id' => 5]
+    // withSuccess not set
+]);
+
+// Expected Response: Empty array
+// []
+
+// ❌ Cannot check if update succeeded!</code></pre>
+                </div>
+
+                <h3>UPDATE Multiple Columns</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$result = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'UPDATE users 
+                SET name = :name, email = :email, status = :status 
+                WHERE id = :id',
+    'params' => [
+        ':name' => 'John Updated',
+        ':email' => 'john.new@example.com',
+        ':status' => 'active',
+        ':id' => 5
+    ],
+    'withSuccess' => true
+]);
+
+// Expected Response:
+// [
+//   'success' => true,
+//   'affected_rows' => 1,
+//   'id' => null
+// ]</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>🗑️ DELETE Queries (with withSuccess)</h2>
+                
+                <div class="alert alert-warning">
+                    <strong>⚠️ Important:</strong> Use <code>withSuccess: true</code> for DELETE queries to verify deletion!
+                </div>
+
+                <h3>Basic DELETE</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$result = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'DELETE FROM users WHERE id = :id',
+    'params' => [':id' => 5],
+    'withSuccess' => true  // ⚠️ REQUIRED to verify deletion
+]);
+
+// Expected Response (withSuccess: true):
+// [
+//   'success' => true,
+//   'affected_rows' => 1,  // ⭐ Number of rows deleted
+//   'id' => null
+// ]
+
+// Check if deletion was successful
+if ($result['affected_rows'] > 0) {
+    echo "User deleted successfully";
+} else {
+    echo "User not found";
+}</code></pre>
+                </div>
+
+                <h3>DELETE with Condition</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$result = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'DELETE FROM users WHERE status = :status',
+    'params' => [':status' => 'inactive'],
+    'withSuccess' => true
+]);
+
+// Expected Response:
+// [
+//   'success' => true,
+//   'affected_rows' => 15,  // Multiple rows deleted
+//   'id' => null
+// ]
+
+echo "Deleted {$result['affected_rows']} inactive users";</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>📊 Expected Response Formats</h2>
+                
+                <h3>SELECT Response (Default)</h3>
+                <div class="code-block">
+                    <pre><code class="language-php">// Array of associative arrays
+[
+    ['id' => 1, 'name' => 'John', 'email' => 'john@example.com'],
+    ['id' => 2, 'name' => 'Jane', 'email' => 'jane@example.com']
+]
+
+// Empty SELECT returns empty array
+[]</code></pre>
+                </div>
+
+                <h3>INSERT Response (with withSuccess: true)</h3>
+                <div class="code-block">
+                    <pre><code class="language-php">// Success
+[
+    'success' => true,
+    'affected_rows' => 1,
+    'id' => 123  // Last insert ID
+]</code></pre>
+                </div>
+
+                <h3>UPDATE Response (with withSuccess: true)</h3>
+                <div class="code-block">
+                    <pre><code class="language-php">// Success - Row updated
+[
+    'success' => true,
+    'affected_rows' => 1,
+    'id' => null
+]
+
+// Success - No rows updated (record not found or no changes)
+[
+    'success' => true,
+    'affected_rows' => 0,
+    'id' => null
+]</code></pre>
+                </div>
+
+                <h3>DELETE Response (with withSuccess: true)</h3>
+                <div class="code-block">
+                    <pre><code class="language-php">// Success - Row deleted
+[
+    'success' => true,
+    'affected_rows' => 1,
+    'id' => null
+]
+
+// Success - No rows deleted (record not found)
+[
+    'success' => true,
+    'affected_rows' => 0,
+    'id' => null
+]</code></pre>
+                </div>
+
+                <h3>Error Response</h3>
+                <div class="code-block">
+                    <pre><code class="language-php">// On error (SQL syntax, constraint violation, etc.)
+[
+    'error' => true,
+    'message' => 'Database error message',
+    'code' => 'SQLSTATE code'
+]</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>🛠️ Advanced Usage</h2>
+
+                <h3>Debug SQL (returnSql)</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">$sql = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'SELECT * FROM users WHERE id = :id',
+    'params' => [':id' => 5],
+    'returnSql' => true
+]);
+
+// Expected Response: SQL string
+// "SELECT * FROM users WHERE id = 5"
+
+echo $sql; // For debugging</code></pre>
+                </div>
+
+                <h3>fetchAssoc Parameter</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">// fetchAssoc: true (default) - Associative array
+$users = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'SELECT * FROM users',
+    'fetchAssoc' => true
+]);
+// [['id' => 1, 'name' => 'John'], ...]
+
+// fetchAssoc: false - Indexed array
+$users = RunQuery([
+    'conn' => $this->conn,
+    'query' => 'SELECT * FROM users',
+    'fetchAssoc' => false
+]);
+// [[1, 'John'], ...]</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>💡 Best Practices</h2>
+
+                <div class="tips-grid">
+                    <div class="tip">
+                        <h4>Always Use withSuccess</h4>
+                        <p>Set <code>withSuccess: true</code> for INSERT/UPDATE/DELETE to get metadata</p>
+                    </div>
+
+                    <div class="tip">
+                        <h4>Check Affected Rows</h4>
+                        <p>Always check <code>affected_rows</code> to verify UPDATE/DELETE success</p>
+                    </div>
+
+                    <div class="tip">
+                        <h4>Use Named Parameters</h4>
+                        <p>Always use <code>:paramName</code> format for safety and clarity</p>
+                    </div>
+
+                    <div class="tip">
+                        <h4>Handle Empty Results</h4>
+                        <p>Check if result array is empty before accessing data</p>
+                    </div>
+
+                    <div class="tip">
+                        <h4>Store Insert IDs</h4>
+                        <p>Capture <code>$result['id']</code> after INSERT for further operations</p>
+                    </div>
+
+                    <div class="tip">
+                        <h4>Error Handling</h4>
+                        <p>Check for <code>$result['error']</code> key to handle errors</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>🔗 Next Steps</h2>
+
+                <div class="next-steps-grid">
+                    <a href="database.html" class="next-step-card">
+                        <h3>💾 Database</h3>
+                        <p>Database basics</p>
+                    </a>
+
+                    <a href="controllers.html" class="next-step-card">
+                        <h3>🎛️ Controllers</h3>
+                        <p>Use RunQuery in controllers</p>
+                    </a>
+
+                    <a href="testing.html" class="next-step-card">
+                        <h3>🧪 Testing</h3>
+                        <p>Test database operations</p>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="assets/search.js"></script>
+    <script>
+        hljs.highlightAll();
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = 'Copied!';
+                button.style.background = '#10b981';
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                    button.style.background = '#2563eb';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

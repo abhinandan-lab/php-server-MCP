@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controllers - PHP Light Framework</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+
+
+    <!-- Theme Toggle Script -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+    <span class="theme-icon">🌙</span>
+</button>
+
+<script>
+    // Theme Toggle Functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.querySelector('.theme-icon');
+    const htmlElement = document.documentElement;
+
+    // Check for saved theme preference or default to 'light' mode
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    htmlElement.setAttribute('data-theme', currentTheme);
+    updateThemeIcon(currentTheme);
+
+    themeToggle.addEventListener('click', function() {
+        const currentTheme = htmlElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        
+        htmlElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
+    });
+
+    function updateThemeIcon(theme) {
+        themeIcon.textContent = theme === 'light' ? '🌙' : '☀️';
+    }
+</script>
+
+
+
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h3>PHP Light Framework</h3>
+            <span class="version">v1.0.0</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">🏠 Home</a></li>
+            <li><a href="getting-started.html">🚀 Getting Started</a></li>
+            <li><a href="routing.html">🛣️ Routing</a></li>
+            <li><a href="controllers.html" class="active">🎛️ Controllers</a></li>
+            <li><a href="database.html">💾 Database</a></li>
+            <li><a href="runquery-guide.html">🔍 RunQuery Guide</a></li>
+            <li><a href="migrations.html">📋 Migrations</a></li>
+            <li><a href="validation.html">🔒 Validation & Security</a></li>
+            <li><a href="testing.html">🧪 Testing</a></li>
+            <li><a href="function-reference.html">📚 Function Reference</a></li>
+        </ul>
+    </nav>
+
+    <main class="content">
+        <header class="doc-header">
+            <div class="header-content">
+                <div class="search-container">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" id="globalSearch" placeholder="Search documentation..." />
+                    <div class="search-results" id="searchResults"></div>
+                </div>
+            </div>
+        </header>
+
+        <div class="content-inner">
+            <div class="breadcrumb">
+                <a href="index.html">Home</a> &gt; Controllers
+            </div>
+
+            <h1>🎛️ Controllers</h1>
+            <p class="intro">Controllers contain your business logic and handle requests. Learn how to create controllers, access request data, and send responses.</p>
+
+            <section class="card highlight">
+                <h2>⚡ Quick Example</h2>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">&lt;?php
+namespace App\Controllers;
+
+class UserController extends BaseController
+{
+    public function getUser($id)
+    {
+        $user = RunQuery([
+            'conn' => $this->conn,
+            'query' => 'SELECT * FROM users WHERE id = :id',
+            'params' => [':id' => $id]
+        ]);
+        
+        if (empty($user)) {
+            $this->sendError('User not found', 404);
+        }
+        
+        $this->sendSuccess('User found', $user[0]);
+    }
+}</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>📝 Creating a Controller</h2>
+                
+                <h3>Basic Structure</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">&lt;?php
+// api/controllers/ProductController.php
+namespace App\Controllers;
+
+class ProductController extends BaseController
+{
+    public function list()
+    {
+        // Your logic here
+    }
+    
+    public function create()
+    {
+        // Your logic here
+    }
+    
+    public function update($id)
+    {
+        // Your logic here
+    }
+    
+    public function delete($id)
+    {
+        // Your logic here
+    }
+}</code></pre>
+                </div>
+
+                <div class="alert alert-info">
+                    <strong>💡 Note:</strong> All controllers must extend <code>BaseController</code> to access framework features.
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>📨 Sending Responses</h2>
+                
+                <h3>Success Response</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">public function getProducts()
+{
+    $products = RunQuery([
+        'conn' => $this->conn,
+        'query' => 'SELECT * FROM products'
+    ]);
+    
+    $this->sendSuccess('Products retrieved', $products);
+}
+
+// Response:
+// {
+//   "status": "success",
+//   "message": "Products retrieved",
+//   "data": [...]
+// }</code></pre>
+                </div>
+
+                <h3>Error Response</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">public function getProduct($id)
+{
+    if (!is_numeric($id)) {
+        $this->sendError('Invalid product ID', 400);
+    }
+    
+    $product = RunQuery([
+        'conn' => $this->conn,
+        'query' => 'SELECT * FROM products WHERE id = :id',
+        'params' => [':id' => $id]
+    ]);
+    
+    if (empty($product)) {
+        $this->sendError('Product not found', 404);
+    }
+    
+    $this->sendSuccess('Product found', $product[0]);
+}</code></pre>
+                </div>
+
+                <h3>Common HTTP Status Codes</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Meaning</th>
+                            <th>When to Use</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>200</td>
+                            <td>OK</td>
+                            <td>Successful GET, PUT, DELETE</td>
+                        </tr>
+                        <tr>
+                            <td>201</td>
+                            <td>Created</td>
+                            <td>Successful POST (resource created)</td>
+                        </tr>
+                        <tr>
+                            <td>400</td>
+                            <td>Bad Request</td>
+                            <td>Invalid request data</td>
+                        </tr>
+                        <tr>
+                            <td>404</td>
+                            <td>Not Found</td>
+                            <td>Resource doesn't exist</td>
+                        </tr>
+                        <tr>
+                            <td>422</td>
+                            <td>Unprocessable</td>
+                            <td>Validation failed</td>
+                        </tr>
+                        <tr>
+                            <td>500</td>
+                            <td>Server Error</td>
+                            <td>Unexpected server error</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="card">
+                <h2>🔐 Request Validation</h2>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">public function createProduct()
+{
+    // Validate and sanitize input
+    $data = $this->validateRequest([
+        'name' => 'required|min:3|max:100',
+        'price' => 'required|numeric',
+        'category' => 'required|string'
+    ]);
+    
+    // $data is now safe to use
+    $result = RunQuery([
+        'conn' => $this->conn,
+        'query' => 'INSERT INTO products (name, price, category) 
+                    VALUES (:name, :price, :category)',
+        'params' => [
+            ':name' => $data['name'],
+            ':price' => $data['price'],
+            ':category' => $data['category']
+        ],
+        'withSuccess' => true
+    ]);
+    
+    $this->sendSuccess('Product created', ['id' => $result['id']]);
+}</code></pre>
+                </div>
+
+                <p>See <a href="validation.html">Validation Guide</a> for all validation rules.</p>
+            </section>
+
+            <section class="card">
+                <h2>💾 Database Access</h2>
+                
+                <h3>Using $this->conn</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">public function getActiveUsers()
+{
+    // Database connection available as $this->conn
+    $users = RunQuery([
+        'conn' => $this->conn,
+        'query' => 'SELECT * FROM users WHERE status = :status',
+        'params' => [':status' => 'active']
+    ]);
+    
+    $this->sendSuccess('Active users', $users);
+}</code></pre>
+                </div>
+
+                <p>The <code>$this->conn</code> property provides access to the PDO database connection. See <a href="runquery-guide.html">RunQuery Guide</a> for detailed database usage.</p>
+            </section>
+
+            <section class="card">
+                <h2>🔄 Complete CRUD Example</h2>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">&lt;?php
+namespace App\Controllers;
+
+class ProductController extends BaseController
+{
+    // List all products
+    public function list()
+    {
+        $products = RunQuery([
+            'conn' => $this->conn,
+            'query' => 'SELECT * FROM products ORDER BY created_at DESC'
+        ]);
+        
+        $this->sendSuccess('Products retrieved', $products);
+    }
+    
+    // Get single product
+    public function get($id)
+    {
+        $product = RunQuery([
+            'conn' => $this->conn,
+            'query' => 'SELECT * FROM products WHERE id = :id',
+            'params' => [':id' => $id]
+        ]);
+        
+        if (empty($product)) {
+            $this->sendError('Product not found', 404);
+        }
+        
+        $this->sendSuccess('Product found', $product[0]);
+    }
+    
+    // Create product
+    public function create()
+    {
+        $data = $this->validateRequest([
+            'name' => 'required|min:3',
+            'price' => 'required|numeric',
+            'stock' => 'required|numeric'
+        ]);
+        
+        $result = RunQuery([
+            'conn' => $this->conn,
+            'query' => 'INSERT INTO products (name, price, stock) 
+                        VALUES (:name, :price, :stock)',
+            'params' => $data,
+            'withSuccess' => true
+        ]);
+        
+        $this->sendSuccess('Product created', ['id' => $result['id']]);
+    }
+    
+    // Update product
+    public function update($id)
+    {
+        $data = $this->validateRequest([
+            'name' => 'min:3',
+            'price' => 'numeric',
+            'stock' => 'numeric'
+        ]);
+        
+        $result = RunQuery([
+            'conn' => $this->conn,
+            'query' => 'UPDATE products 
+                        SET name = :name, price = :price, stock = :stock 
+                        WHERE id = :id',
+            'params' => array_merge($data, [':id' => $id]),
+            'withSuccess' => true
+        ]);
+        
+        if ($result['affected_rows'] === 0) {
+            $this->sendError('Product not found', 404);
+        }
+        
+        $this->sendSuccess('Product updated');
+    }
+    
+    // Delete product
+    public function delete($id)
+    {
+        $result = RunQuery([
+            'conn' => $this->conn,
+            'query' => 'DELETE FROM products WHERE id = :id',
+            'params' => [':id' => $id],
+            'withSuccess' => true
+        ]);
+        
+        if ($result['affected_rows'] === 0) {
+            $this->sendError('Product not found', 404);
+        }
+        
+        $this->sendSuccess('Product deleted');
+    }
+}</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>💡 Best Practices</h2>
+                
+                <div class="tips-grid">
+                    <div class="tip">
+                        <h4>Keep Controllers Thin</h4>
+                        <p>Move complex logic to separate service classes</p>
+                    </div>
+                    
+                    <div class="tip">
+                        <h4>Validate Everything</h4>
+                        <p>Always validate input before processing</p>
+                    </div>
+                    
+                    <div class="tip">
+                        <h4>Handle Errors</h4>
+                        <p>Check for errors and return appropriate status codes</p>
+                    </div>
+                    
+                    <div class="tip">
+                        <h4>Use Proper Status Codes</h4>
+                        <p>Return correct HTTP codes (404, 422, 500, etc.)</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>🔗 Next Steps</h2>
+                
+                <div class="next-steps-grid">
+                    <a href="database.html" class="next-step-card">
+                        <h3>💾 Database</h3>
+                        <p>Learn database operations</p>
+                    </a>
+                    
+                    <a href="validation.html" class="next-step-card">
+                        <h3>🔒 Validation</h3>
+                        <p>Master input validation</p>
+                    </a>
+                    
+                    <a href="testing.html" class="next-step-card">
+                        <h3>🧪 Testing</h3>
+                        <p>Test your controllers</p>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="assets/search.js"></script>
+    <script>
+        hljs.highlightAll();
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = 'Copied!';
+                button.style.background = '#10b981';
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                    button.style.background = '#2563eb';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

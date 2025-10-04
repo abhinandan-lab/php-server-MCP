@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Function Reference - PHP Light Framework</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+
+
+
+    <!-- Theme Toggle Script -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+    <span class="theme-icon">🌙</span>
+</button>
+
+<script>
+    // Theme Toggle Functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.querySelector('.theme-icon');
+    const htmlElement = document.documentElement;
+
+    // Check for saved theme preference or default to 'light' mode
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    htmlElement.setAttribute('data-theme', currentTheme);
+    updateThemeIcon(currentTheme);
+
+    themeToggle.addEventListener('click', function() {
+        const currentTheme = htmlElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        
+        htmlElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
+    });
+
+    function updateThemeIcon(theme) {
+        themeIcon.textContent = theme === 'light' ? '🌙' : '☀️';
+    }
+</script>
+
+
+
+
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h3>PHP Light Framework</h3>
+            <span class="version">v1.0.0</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">🏠 Home</a></li>
+            <li><a href="getting-started.html">🚀 Getting Started</a></li>
+            <li><a href="routing.html">🛣️ Routing</a></li>
+            <li><a href="controllers.html">🎛️ Controllers</a></li>
+            <li><a href="database.html">💾 Database</a></li>
+            <li><a href="runquery-guide.html">🔍 RunQuery Guide</a></li>
+            <li><a href="migrations.html">📋 Migrations</a></li>
+            <li><a href="validation.html">🔒 Validation & Security</a></li>
+            <li><a href="testing.html">🧪 Testing</a></li>
+            <li><a href="function-reference.html" class="active">📚 Function Reference</a></li>
+        </ul>
+    </nav>
+
+    <main class="content">
+        <header class="doc-header">
+            <div class="header-content">
+                <div class="search-container">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" id="functionSearch" placeholder="Search functions..." />
+                    <div class="search-results" id="searchResults"></div>
+                </div>
+            </div>
+        </header>
+
+        <div class="content-inner">
+            <div class="breadcrumb">
+                <a href="index.html">Home</a> &gt; Function Reference
+            </div>
+
+            <h1>📚 Function Reference</h1>
+            <p class="intro">Complete searchable reference for all framework functions, methods, and helpers.</p>
+
+            <section class="card highlight">
+                <h2>🔍 Search Functions</h2>
+                <p>Use the search bar above to quickly find any function. Start typing function name, description, or category.</p>
+            </section>
+
+            <!-- Database Functions -->
+            <section class="card function-category" data-category="database">
+                <h2>💾 Database Functions</h2>
+
+                <div class="function-card" data-function="RunQuery">
+                    <h3>RunQuery()</h3>
+                    <p>Execute SQL queries with prepared statements</p>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code class="language-php">RunQuery([
+    'conn' => $conn,
+    'query' => 'SELECT * FROM users WHERE id = :id',
+    'params' => [':id' => 5],
+    'withSuccess' => false
+]);</code></pre>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>conn</code></td>
+                                <td>PDO</td>
+                                <td>Database connection</td>
+                            </tr>
+                            <tr>
+                                <td><code>query</code></td>
+                                <td>string</td>
+                                <td>SQL query with named parameters</td>
+                            </tr>
+                            <tr>
+                                <td><code>params</code></td>
+                                <td>array</td>
+                                <td>Parameter values</td>
+                            </tr>
+                            <tr>
+                                <td><code>withSuccess</code></td>
+                                <td>bool</td>
+                                <td>Return metadata (INSERT/UPDATE/DELETE)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p><strong>Returns:</strong> Array of results (SELECT) or metadata (INSERT/UPDATE/DELETE with withSuccess)</p>
+                    <p><strong>See:</strong> <a href="runquery-guide.html">Complete RunQuery Guide</a></p>
+                </div>
+
+                <div class="function-card" data-function="getConnection">
+                    <h3>getConnection()</h3>
+                    <p>Get PDO database connection</p>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code class="language-php">$conn = getConnection();</code></pre>
+                    </div>
+
+                    <p><strong>Returns:</strong> PDO connection object</p>
+                    <p><strong>Location:</strong> api/core/connection.php</p>
+                </div>
+            </section>
+
+            <!-- Controller Functions -->
+            <section class="card function-category" data-category="controller">
+                <h2>🎛️ Controller Methods</h2>
+
+                <div class="function-card" data-function="validateRequest">
+                    <h3>$this->validateRequest()</h3>
+                    <p>Validate and sanitize request data</p>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code class="language-php">$data = $this->validateRequest([
+    'name' => 'required|min:3|max:100',
+    'email' => 'required|email',
+    'age' => 'numeric|min:18'
+]);</code></pre>
+                    </div>
+
+                    <p><strong>Parameter:</strong> Array of validation rules</p>
+                    <p><strong>Returns:</strong> Validated and sanitized data array</p>
+                    <p><strong>Throws:</strong> ValidationException on failure</p>
+                </div>
+
+                <div class="function-card" data-function="sendSuccess">
+                    <h3>$this->sendSuccess()</h3>
+                    <p>Send success JSON response</p>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code class="language-php">$this->sendSuccess('User created', [
+    'id' => 123,
+    'name' => 'John Doe'
+]);</code></pre>
+                    </div>
+
+                    <p><strong>Parameters:</strong> message (string), data (array), status (int, default: 200)</p>
+                    <p><strong>Response Format:</strong></p>
+                    <div class="code-block">
+                        <pre><code class="language-json">{
+  "status": "success",
+  "message": "User created",
+  "data": { "id": 123, "name": "John Doe" }
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="function-card" data-function="sendError">
+                    <h3>$this->sendError()</h3>
+                    <p>Send error JSON response</p>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code class="language-php">$this->sendError('User not found', 404);</code></pre>
+                    </div>
+
+                    <p><strong>Parameters:</strong> message (string), status (int, default: 400)</p>
+                    <p><strong>Response Format:</strong></p>
+                    <div class="code-block">
+                        <pre><code class="language-json">{
+  "status": "error",
+  "message": "User not found"
+}</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Helper Functions -->
+            <section class="card function-category" data-category="helper">
+                <h2>🛠️ Helper Functions</h2>
+
+                <div class="function-card" data-function="sendResponse">
+                    <h3>sendResponse()</h3>
+                    <p>Send standardized JSON response</p>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code class="language-php">sendResponse([
+    'status' => 'success',
+    'message' => 'Data retrieved',
+    'data' => $results
+]);</code></pre>
+                    </div>
+
+                    <p><strong>Parameter:</strong> Response array</p>
+                    <p><strong>Location:</strong> api/helpers/globalHelpers.php</p>
+                </div>
+
+                <div class="function-card" data-function="dd">
+                    <h3>dd()</h3>
+                    <p>Dump and die - debug helper</p>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code class="language-php">dd($variable); // Outputs and stops execution</code></pre>
+                    </div>
+
+                    <p><strong>Parameter:</strong> Any variable to dump</p>
+                    <p><strong>Note:</strong> Terminates script execution</p>
+                </div>
+
+                <div class="function-card" data-function="ddd">
+                    <h3>ddd()</h3>
+                    <p>Dump without dying - debug helper</p>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code class="language-php">ddd($variable); // Outputs but continues execution</code></pre>
+                    </div>
+
+                    <p><strong>Parameter:</strong> Any variable to dump</p>
+                    <p><strong>Note:</strong> Continues script execution</p>
+                </div>
+            </section>
+
+            <!-- Router Functions -->
+            <section class="card function-category" data-category="router">
+                <h2>🛣️ Router Methods</h2>
+
+                <div class="function-card" data-function="router-add">
+                    <h3>$router->add()</h3>
+                    <p>Register new route</p>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code class="language-php">$router->add([
+    'method' => 'POST',
+    'url' => '/users',
+    'controller' => [UserController::class, 'create'],
+    'desc' => 'Create user',
+    'params' => [
+        'json' => ['name' => 'string (required)']
+    ]
+]);</code></pre>
+                    </div>
+
+                    <p><strong>Parameter:</strong> Route configuration array</p>
+                    <p><strong>See:</strong> <a href="routing.html">Routing Guide</a></p>
+                </div>
+
+                <div class="function-card" data-function="router-dispatch">
+                    <h3>$router->dispatch()</h3>
+                    <p>Execute matched route</p>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code class="language-php">$router->dispatch();</code></pre>
+                    </div>
+
+                    <p><strong>Returns:</strong> Executes controller method</p>
+                    <p><strong>Throws:</strong> NotFoundException if route not found</p>
+                </div>
+            </section>
+
+            <!-- Validation Rules -->
+            <section class="card function-category" data-category="validation">
+                <h2>✅ Validation Rules</h2>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rule</th>
+                            <th>Description</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>required</code></td>
+                            <td>Field must be present and not empty</td>
+                            <td>'email' => 'required'</td>
+                        </tr>
+                        <tr>
+                            <td><code>email</code></td>
+                            <td>Must be valid email format</td>
+                            <td>'email' => 'email'</td>
+                        </tr>
+                        <tr>
+                            <td><code>numeric</code></td>
+                            <td>Must be numeric value</td>
+                            <td>'age' => 'numeric'</td>
+                        </tr>
+                        <tr>
+                            <td><code>string</code></td>
+                            <td>Must be string type</td>
+                            <td>'name' => 'string'</td>
+                        </tr>
+                        <tr>
+                            <td><code>min:X</code></td>
+                            <td>Minimum length or value</td>
+                            <td>'password' => 'min:8'</td>
+                        </tr>
+                        <tr>
+                            <td><code>max:X</code></td>
+                            <td>Maximum length or value</td>
+                            <td>'name' => 'max:100'</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p><strong>See:</strong> <a href="validation.html">Complete Validation Guide</a></p>
+            </section>
+
+            <!-- PHP Built-in Functions -->
+            <section class="card function-category" data-category="php">
+                <h2>🔐 Security Functions</h2>
+
+                <div class="function-card" data-function="password_hash">
+                    <h3>password_hash()</h3>
+                    <p>Hash password securely</p>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code class="language-php">$hash = password_hash($plainPassword, PASSWORD_DEFAULT);</code></pre>
+                    </div>
+
+                    <p><strong>Returns:</strong> Hashed password string</p>
+                </div>
+
+                <div class="function-card" data-function="password_verify">
+                    <h3>password_verify()</h3>
+                    <p>Verify password against hash</p>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code class="language-php">if (password_verify($plainPassword, $hashedPassword)) {
+    // Password correct
+}</code></pre>
+                    </div>
+
+                    <p><strong>Returns:</strong> Boolean (true if match)</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>
+        hljs.highlightAll();
+
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = 'Copied!';
+                button.style.background = '#10b981';
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                    button.style.background = '#2563eb';
+                }, 2000);
+            });
+        }
+
+        // Function search
+        const searchInput = document.getElementById('functionSearch');
+        const functionCards = document.querySelectorAll('.function-card');
+        const categories = document.querySelectorAll('.function-category');
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                const query = e.target.value.toLowerCase();
+                
+                if (query.length === 0) {
+                    // Show all
+                    functionCards.forEach(card => card.style.display = 'block');
+                    categories.forEach(cat => cat.style.display = 'block');
+                    return;
+                }
+
+                let visibleCount = 0;
+                
+                functionCards.forEach(card => {
+                    const text = card.textContent.toLowerCase();
+                    if (text.includes(query)) {
+                        card.style.display = 'block';
+                        visibleCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                // Hide categories with no visible functions
+                categories.forEach(cat => {
+                    const visibleFunctions = cat.querySelectorAll('.function-card[style="display: block;"]');
+                    if (visibleFunctions.length === 0) {
+                        cat.style.display = 'none';
+                    } else {
+                        cat.style.display = 'block';
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>

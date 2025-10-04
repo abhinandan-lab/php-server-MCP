@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHP Light Framework - Documentation</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+
+<body>
+
+
+
+    <!-- Global Search (add right after <body> tag) -->
+    <div class="global-search">
+        <input type="text" id="globalSearch" placeholder="Search documentation..." />
+        <div class="search-results" id="searchResults"></div>
+    </div>
+
+    <!-- Add this script before closing </body> tag -->
+    <script>
+        const searchData = [
+            { title: 'Getting Started', url: 'getting-started.html', desc: 'Docker setup and first API endpoint' },
+            { title: 'RunQuery Guide', url: 'runquery-guide.html', desc: 'Complete database query documentation' },
+            { title: 'Migrations', url: 'migrations.html', desc: 'Database schema management' },
+            { title: 'Testing APIs', url: 'testing.html', desc: 'cURL, Postman, automated testing' },
+            { title: 'Function Reference', url: 'function-reference.html', desc: 'Searchable function database' },
+            { title: 'Routing', url: 'routing.html', desc: 'Define API routes and parameters' },
+            { title: 'Controllers', url: 'controllers.html', desc: 'Create controller classes' },
+            { title: 'Validation & Security', url: 'validation.html', desc: 'Input validation and security' },
+            { title: 'Database', url: 'database.html', desc: 'Database connections and queries' },
+            { title: 'Installation', url: 'installation.html', desc: 'Framework installation guide' }
+        ];
+
+        const globalSearch = document.getElementById('globalSearch');
+        const searchResults = document.getElementById('searchResults');
+
+        if (globalSearch) {
+            globalSearch.addEventListener('input', function (e) {
+                const query = e.target.value.toLowerCase().trim();
+
+                if (query.length < 2) {
+                    searchResults.classList.remove('show');
+                    return;
+                }
+
+                const filtered = searchData.filter(item =>
+                    item.title.toLowerCase().includes(query) ||
+                    item.desc.toLowerCase().includes(query)
+                );
+
+                if (filtered.length > 0) {
+                    searchResults.innerHTML = filtered.map(item => `
+                <a href="${item.url}" class="search-result-item">
+                    <div class="search-result-title">${item.title}</div>
+                    <div class="search-result-desc">${item.desc}</div>
+                </a>
+            `).join('');
+                    searchResults.classList.add('show');
+                } else {
+                    searchResults.innerHTML = '<div class="search-result-item">No results found</div>';
+                    searchResults.classList.add('show');
+                }
+            });
+
+            // Close search results when clicking outside
+            document.addEventListener('click', function (e) {
+                if (!globalSearch.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.classList.remove('show');
+                }
+            });
+        }
+    </script>
+
+
+
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h3>PHP Light Framework</h3>
+            <span class="version">v1.0.0</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html" class="active">🏠 Home</a></li>
+            <li><a href="getting-started.html">🚀 Getting Started</a></li>
+            <li><a href="installation.html">📦 Installation</a></li>
+            <li><a href="routing.html">🛣️ Routing</a></li>
+            <li><a href="controllers.html">🎛️ Controllers</a></li>
+            <li><a href="validation.html">🔒 Validation & Security</a></li>
+            <li><a href="database.html">💾 Database</a></li>
+            <li><a href="runquery-guide.html">🔍 RunQuery Guide</a></li>
+            <li><a href="migrations.html">📋 Migrations</a></li>
+            <li><a href="testing.html">🧪 Testing</a></li>
+            <li><a href="function-reference.html">📚 Function Reference</a></li>
+        </ul>
+    </nav>
+
+    <main class="content">
+        <h1>📚 PHP Light Framework</h1>
+        <p class="intro">A lightweight, modern PHP framework for building RESTful APIs with built-in security,
+            validation, and documentation. Perfect for rapid development without sacrificing best practices.</p>
+
+        <!-- Quick Start Card -->
+        <section class="card highlight">
+            <h2>⚡ Quick Start</h2>
+            <p>Get your API running in under 60 seconds:</p>
+
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                <pre><code class="language-bash"># Clone and start
+git clone https://github.com/yourrepo/php-light-framework.git
+cd php-light-framework
+docker-compose up -d
+
+# Visit your API
+# 🌐 http://localhost:8080/api/docs</code></pre>
+            </div>
+
+            <p><strong>That's it!</strong> Your API is now running with interactive documentation. Check out the <a
+                    href="getting-started.html">Getting Started Guide</a> for detailed setup.</p>
+        </section>
+
+        <!-- Key Features -->
+        <section class="card">
+            <h2>✨ Key Features</h2>
+
+            <div class="next-steps-grid">
+                <div class="next-step-card">
+                    <h3>🔒 Security First</h3>
+                    <p>Built-in XSS protection, CSRF prevention, rate limiting, and security headers. Your API is secure
+                        by default.</p>
+                </div>
+
+                <div class="next-step-card">
+                    <h3>📝 Auto Documentation</h3>
+                    <p>Interactive API documentation generated automatically from your routes. Test endpoints in the
+                        browser.</p>
+                </div>
+
+                <div class="next-step-card">
+                    <h3>✅ Request Validation</h3>
+                    <p>Automatic input sanitization and validation with custom rules. Prevent bad data from reaching
+                        your code.</p>
+                </div>
+
+                <div class="next-step-card">
+                    <h3>💾 Database Made Easy</h3>
+                    <p>Secure query execution with prepared statements, migrations, and developer-friendly helpers.</p>
+                </div>
+
+                <div class="next-step-card">
+                    <h3>🎯 Simple Routing</h3>
+                    <p>Clean, intuitive route definitions with parameter validation and automatic REST patterns.</p>
+                </div>
+
+                <div class="next-step-card">
+                    <h3>🐳 Docker Ready</h3>
+                    <p>Complete Docker setup included. Run locally or deploy to production with the same configuration.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- What Makes It Different -->
+        <section class="card">
+            <h2>💡 What Makes It Different?</h2>
+
+            <h3>Beginner Friendly, Production Ready</h3>
+            <p>Most frameworks force you to choose between simplicity and security. PHP Light Framework gives you both:
+            </p>
+
+            <ul>
+                <li><strong>Zero Configuration</strong> - Works out of the box with sensible defaults</li>
+                <li><strong>Enterprise Security</strong> - Production-grade security without complex setup</li>
+                <li><strong>Developer Experience</strong> - Write clean code, not boilerplate</li>
+                <li><strong>Documentation Built-in</strong> - Your API documentation updates automatically</li>
+                <li><strong>Modern PHP</strong> - Uses PHP 8+ features and best practices</li>
+            </ul>
+
+            <div class="comparison">
+                <div class="bad">
+                    <h4>❌ Traditional Approach</h4>
+                    <div class="code-block">
+                        <pre><code class="language-php">// Multiple files, complex setup
+require_once 'vendor/autoload.php';
+$app = new Framework();
+$app->configureMiddleware();
+$app->configureSecurity();
+$app->configureDatabase();
+// ... 50 more lines of setup</code></pre>
+                    </div>
+                </div>
+
+                <div class="good">
+                    <h4>✅ PHP Light Framework</h4>
+                    <div class="code-block">
+                        <pre><code class="language-php">// Everything works immediately
+$router->add([
+    'method' => 'GET',
+    'url' => '/users',
+    'controller' => [UserController::class, 'list']
+]);
+// Security, validation, docs - all automatic</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture Overview -->
+        <section class="card">
+            <h2>🏗️ Architecture Overview</h2>
+
+            <div class="code-block">
+                <pre><code class="language-plaintext">┌─────────────────────────────────────────────┐
+│           HTTP Request                       │
+└────────────────┬────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────────┐
+│     Security Middleware                      │
+│  • Headers (XSS, CSP, HSTS)                 │
+│  • CORS Handling                             │
+│  • Rate Limiting                             │
+└────────────────┬────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────────┐
+│     Router                                   │
+│  • Pattern Matching                          │
+│  • Parameter Extraction                      │
+│  • Controller Resolution                     │
+└────────────────┬────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────────┐
+│     Validation Middleware                    │
+│  • Input Sanitization                        │
+│  • Rule Validation                           │
+│  • Error Handling                            │
+└────────────────┬────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────────┐
+│     Controller                               │
+│  • Business Logic                            │
+│  • Database Queries                          │
+│  • Response Formatting                       │
+└────────────────┬────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────────┐
+│     JSON Response                            │
+│  • Standardized Format                       │
+│  • Error/Success Handling                    │
+│  • HTTP Status Codes                         │
+└─────────────────────────────────────────────┘</code></pre>
+            </div>
+        </section>
+
+        <!-- Example API Endpoint -->
+        <section class="card">
+            <h2>📝 Example: Complete API Endpoint</h2>
+            <p>Here's how simple it is to create a secure, validated, documented API endpoint:</p>
+
+            <h3>1. Define the Route</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                <pre><code class="language-php">// In api/index.php
+$router->add([
+    'method' => 'POST',
+    'url' => '/users',
+    'controller' => [UserController::class, 'create'],
+    'desc' => 'Create a new user',
+    'params' => [
+        'json' => [
+            'name' => 'string (required) - User full name',
+            'email' => 'string (required) - Valid email address',
+            'password' => 'string (required) - Minimum 8 characters'
+        ]
+    ],
+    'group' => 'Users'
+]);</code></pre>
+            </div>
+
+            <h3>2. Create the Controller</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                <pre><code class="language-php">// In api/controllers/UserController.php
+class UserController extends BaseController
+{
+    public function create()
+    {
+        // Automatic validation and sanitization
+        $data = $this->validateRequest([
+            'name' => 'required|min:3|max:100',
+            'email' => 'required|email',
+            'password' => 'required|min:8'
+        ]);
+        
+        // Check if email exists
+        $existing = RunQuery([
+            'conn' => $this->conn,
+            'query' => 'SELECT id FROM users WHERE email = :email',
+            'params' => [':email' => $data['email']]
+        ]);
+        
+        if (!empty($existing)) {
+            $this->sendError('Email already exists', 409);
+        }
+        
+        // Create user
+        $result = RunQuery([
+            'conn' => $this->conn,
+            'query' => 'INSERT INTO users (name, email, password, created_at) 
+                        VALUES (:name, :email, :password, NOW())',
+            'params' => [
+                ':name' => $data['name'],
+                ':email' => $data['email'],
+                ':password' => password_hash($data['password'], PASSWORD_DEFAULT)
+            ],
+            'withSuccess' => true
+        ]);
+        
+        $this->sendSuccess('User created successfully', [
+            'id' => $result['id'],
+            'name' => $data['name'],
+            'email' => $data['email']
+        ]);
+    }
+}</code></pre>
+            </div>
+
+            <h3>3. That's It! 🎉</h3>
+            <p>Your endpoint is now:</p>
+            <ul>
+                <li>✅ Secured with automatic XSS prevention</li>
+                <li>✅ Validated against your rules</li>
+                <li>✅ Documented at <code>/api/docs</code></li>
+                <li>✅ Protected from SQL injection</li>
+                <li>✅ Rate-limited automatically</li>
+                <li>✅ Returning standardized JSON responses</li>
+            </ul>
+        </section>
+
+        <!-- Learning Path -->
+        <section class="card">
+            <h2>🎓 Learning Path</h2>
+            <p>Follow this recommended path to master the framework:</p>
+
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4><a href="getting-started.html">Getting Started</a></h4>
+                        <p>Set up your development environment with Docker and create your first endpoint</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4><a href="routing.html">Routing</a></h4>
+                        <p>Learn how to define routes, handle parameters, and organize your API</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4><a href="controllers.html">Controllers</a></h4>
+                        <p>Master controllers and learn to write clean business logic</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4><a href="database.html">Database</a> & <a href="runquery-guide.html">RunQuery</a></h4>
+                        <p>Work with databases safely using prepared statements and migrations</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4><a href="validation.html">Validation & Security</a></h4>
+                        <p>Implement validation rules and understand security best practices</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h4><a href="testing.html">Testing</a></h4>
+                        <p>Test your API endpoints and write automated tests</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Core Concepts -->
+        <section class="card">
+            <h2>🎯 Core Concepts</h2>
+
+            <h3>Convention over Configuration</h3>
+            <p>The framework makes smart assumptions so you can focus on building features, not configuring settings.
+            </p>
+
+            <h3>Security by Default</h3>
+            <p>Every request passes through security middleware automatically. You don't have to remember to add it.</p>
+
+            <h3>Array-Based Configuration</h3>
+            <p>Clean, readable configuration using associative arrays instead of multiple positional parameters.</p>
+
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                <pre><code class="language-php">// Instead of this: query($conn, $sql, $params, true, false, false)
+// We do this:
+RunQuery([
+    'conn' => $conn,
+    'query' => $sql,
+    'params' => $params,
+    'fetchAssoc' => true
+]);</code></pre>
+            </div>
+
+            <h3>Standardized Responses</h3>
+            <p>All API responses follow the same structure, making frontend integration predictable:</p>
+
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                <pre><code class="language-json">{
+  "status": "success",
+  "message": "User created successfully",
+  "data": {
+    "id": 123,
+    "name": "John Doe",
+    "email": "john@example.com"
+  }
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- Quick Links -->
+        <section class="card highlight">
+            <h2>🔗 Quick Links</h2>
+
+            <div class="next-steps-grid">
+                <a href="getting-started.html" class="next-step-card">
+                    <h3>🚀 Get Started</h3>
+                    <p>Set up in 60 seconds</p>
+                </a>
+
+                <a href="function-reference.html" class="next-step-card">
+                    <h3>📚 Function Reference</h3>
+                    <p>Searchable documentation</p>
+                </a>
+
+                <a href="runquery-guide.html" class="next-step-card">
+                    <h3>🔍 RunQuery Guide</h3>
+                    <p>Master database queries</p>
+                </a>
+
+                <a href="testing.html" class="next-step-card">
+                    <h3>🧪 Testing Guide</h3>
+                    <p>Test your endpoints</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- Community & Support -->
+        <section class="card">
+            <h2>💬 Community & Support</h2>
+
+            <p>Need help? Have questions? Want to contribute?</p>
+
+            <ul>
+                <li><strong>GitHub:</strong> <a href="https://github.com/yourrepo/php-light-framework"
+                        target="_blank">Star the repository</a></li>
+                <li><strong>Issues:</strong> <a href="https://github.com/yourrepo/php-light-framework/issues"
+                        target="_blank">Report bugs or request features</a></li>
+                <li><strong>Discussions:</strong> <a href="https://github.com/yourrepo/php-light-framework/discussions"
+                        target="_blank">Ask questions and share ideas</a></li>
+            </ul>
+        </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>
+        hljs.highlightAll();
+
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const code = codeBlock.textContent;
+
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = '#28a745';
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '#007bff';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+
+</html>

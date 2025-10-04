@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Migrations - PHP Light Framework</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+
+
+    <!-- Theme Toggle Script -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+    <span class="theme-icon">🌙</span>
+</button>
+
+<script>
+    // Theme Toggle Functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.querySelector('.theme-icon');
+    const htmlElement = document.documentElement;
+
+    // Check for saved theme preference or default to 'light' mode
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    htmlElement.setAttribute('data-theme', currentTheme);
+    updateThemeIcon(currentTheme);
+
+    themeToggle.addEventListener('click', function() {
+        const currentTheme = htmlElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        
+        htmlElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
+    });
+
+    function updateThemeIcon(theme) {
+        themeIcon.textContent = theme === 'light' ? '🌙' : '☀️';
+    }
+</script>
+
+
+
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h3>PHP Light Framework</h3>
+            <span class="version">v1.0.0</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">🏠 Home</a></li>
+            <li><a href="getting-started.html">🚀 Getting Started</a></li>
+            <li><a href="routing.html">🛣️ Routing</a></li>
+            <li><a href="controllers.html">🎛️ Controllers</a></li>
+            <li><a href="database.html">💾 Database</a></li>
+            <li><a href="runquery-guide.html">🔍 RunQuery Guide</a></li>
+            <li><a href="migrations.html" class="active">📋 Migrations</a></li>
+            <li><a href="validation.html">🔒 Validation & Security</a></li>
+            <li><a href="testing.html">🧪 Testing</a></li>
+            <li><a href="function-reference.html">📚 Function Reference</a></li>
+        </ul>
+    </nav>
+
+    <main class="content">
+        <header class="doc-header">
+            <div class="header-content">
+                <div class="search-container">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" id="globalSearch" placeholder="Search documentation..." />
+                    <div class="search-results" id="searchResults"></div>
+                </div>
+            </div>
+        </header>
+
+        <div class="content-inner">
+            <div class="breadcrumb">
+                <a href="index.html">Home</a> &gt; Migrations
+            </div>
+
+            <h1>📋 Database Migrations</h1>
+            <p class="intro">Manage your database schema with a simple single-file upload system. Execute SQL migrations safely with transaction support and rollback capabilities.</p>
+
+            <section class="card highlight">
+                <h2>⚡ Quick Start</h2>
+                <p>Upload and execute SQL migration file:</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-bash"># Using API endpoint
+curl -X POST http://localhost:8080/api/init/upload-sql \
+  -F "sqlFile=@schema.sql"</code></pre>
+                </div>
+
+                <div class="alert alert-success">
+                    <strong>✅ Done!</strong> Your migration will execute within a transaction and rollback automatically if any error occurs.
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>📄 Single File Migration System</h2>
+                
+                <p>The framework uses a <strong>single SQL file upload system</strong> for database migrations. This approach is simple, straightforward, and perfect for most projects.</p>
+
+                <h3>How It Works</h3>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Create SQL File</h4>
+                            <p>Write all your CREATE TABLE, ALTER TABLE statements in one .sql file</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Upload via API</h4>
+                            <p>Use the /api/init/upload-sql endpoint to upload your file</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Automatic Execution</h4>
+                            <p>Framework executes all statements within a single transaction</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Rollback on Error</h4>
+                            <p>If any statement fails, entire migration is rolled back</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>📝 Creating Migration File</h2>
+                
+                <h3>Example Migration File (schema.sql)</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-sql">-- Create users table
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(150) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('user', 'admin') DEFAULT 'user',
+    status ENUM('active', 'inactive') DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Create products table
+CREATE TABLE IF NOT EXISTS products (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(200) NOT NULL,
+    description TEXT,
+    price DECIMAL(10, 2) NOT NULL,
+    stock INT DEFAULT 0,
+    category VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create orders table
+CREATE TABLE IF NOT EXISTS orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity INT NOT NULL,
+    total_amount DECIMAL(10, 2) NOT NULL,
+    status ENUM('pending', 'completed', 'cancelled') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
+
+-- Insert default admin user
+INSERT INTO users (name, email, password, role) VALUES
+('Admin', 'admin@example.com', '$2y$10$hashedpassword', 'admin');</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>🚀 Uploading Migration</h2>
+                
+                <h3>Method 1: Using cURL</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-bash">curl -X POST http://localhost:8080/api/init/upload-sql \
+  -F "sqlFile=@/path/to/schema.sql"</code></pre>
+                </div>
+
+                <h3>Method 2: Using Postman</h3>
+                <ol>
+                    <li>Create POST request to <code>http://localhost:8080/api/init/upload-sql</code></li>
+                    <li>Go to "Body" tab</li>
+                    <li>Select "form-data"</li>
+                    <li>Key: <code>sqlFile</code>, Type: File</li>
+                    <li>Choose your .sql file and send</li>
+                </ol>
+
+                <h3>Success Response</h3>
+                <div class="code-block">
+                    <pre><code class="language-json">{
+  "status": "success",
+  "message": "SQL file executed successfully",
+  "data": {
+    "file": "schema.sql",
+    "size": "2.4 KB",
+    "statements": 4,
+    "execution_time": "0.15s"
+  }
+}</code></pre>
+                </div>
+
+                <h3>Error Response</h3>
+                <div class="code-block">
+                    <pre><code class="language-json">{
+  "status": "error",
+  "message": "Migration failed: Syntax error at line 15",
+  "data": {
+    "error": "Table 'users' already exists",
+    "line": 15,
+    "rolled_back": true
+  }
+}</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>🔒 Transaction Safety</h2>
+                
+                <p>All migrations are executed within a database transaction, ensuring data integrity:</p>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">// Framework automatically handles transactions
+try {
+    $conn->beginTransaction();
+    
+    // Execute each SQL statement
+    foreach ($statements as $statement) {
+        $conn->exec($statement);
+    }
+    
+    $conn->commit();
+    // Success response
+    
+} catch (Exception $e) {
+    $conn->rollBack();
+    // Error response with details
+}</code></pre>
+                </div>
+
+                <div class="alert alert-info">
+                    <strong>💡 Transaction Benefits:</strong> If any SQL statement fails, the entire migration is rolled back. Your database stays consistent.
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>📋 Common Migration Patterns</h2>
+
+                <h3>Creating Tables</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-sql">CREATE TABLE IF NOT EXISTS table_name (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    column1 VARCHAR(100) NOT NULL,
+    column2 TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);</code></pre>
+                </div>
+
+                <h3>Adding Indexes</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-sql">-- Add index to existing table
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_products_category ON products(category);</code></pre>
+                </div>
+
+                <h3>Adding Foreign Keys</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-sql">ALTER TABLE orders 
+ADD CONSTRAINT fk_user 
+FOREIGN KEY (user_id) REFERENCES users(id) 
+ON DELETE CASCADE;</code></pre>
+                </div>
+
+                <h3>Inserting Seed Data</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-sql">-- Insert default data
+INSERT INTO categories (name, slug) VALUES
+('Electronics', 'electronics'),
+('Clothing', 'clothing'),
+('Books', 'books');</code></pre>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>⚠️ Important Notes</h2>
+
+                <div class="alert alert-warning">
+                    <strong>File Size Limit:</strong> Default upload limit is 10MB. Adjust in php.ini if needed:
+                    <code>upload_max_filesize = 10M</code>
+                </div>
+
+                <div class="alert alert-warning">
+                    <strong>Use IF NOT EXISTS:</strong> Always use <code>CREATE TABLE IF NOT EXISTS</code> to avoid errors when re-running migrations.
+                </div>
+
+                <div class="alert alert-danger">
+                    <strong>Backup First:</strong> Always backup your database before running migrations in production.
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>💡 Best Practices</h2>
+
+                <div class="tips-grid">
+                    <div class="tip">
+                        <h4>Use IF NOT EXISTS</h4>
+                        <p>Prevents errors when tables already exist</p>
+                    </div>
+
+                    <div class="tip">
+                        <h4>Comment Your SQL</h4>
+                        <p>Add comments explaining each table and its purpose</p>
+                    </div>
+
+                    <div class="tip">
+                        <h4>Version Your Files</h4>
+                        <p>Name files: schema_v1.sql, schema_v2.sql</p>
+                    </div>
+
+                    <div class="tip">
+                        <h4>Test Locally First</h4>
+                        <p>Always test migrations on local database before production</p>
+                    </div>
+
+                    <div class="tip">
+                        <h4>Backup Before Running</h4>
+                        <p>Create database backup before executing migrations</p>
+                    </div>
+
+                    <div class="tip">
+                        <h4>Keep Files Small</h4>
+                        <p>Split very large migrations into manageable chunks</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>🔗 Next Steps</h2>
+
+                <div class="next-steps-grid">
+                    <a href="database.html" class="next-step-card">
+                        <h3>💾 Database</h3>
+                        <p>Work with database</p>
+                    </a>
+
+                    <a href="runquery-guide.html" class="next-step-card">
+                        <h3>🔍 RunQuery</h3>
+                        <p>Execute database queries</p>
+                    </a>
+
+                    <a href="testing.html" class="next-step-card">
+                        <h3>🧪 Testing</h3>
+                        <p>Test your migrations</p>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="assets/search.js"></script>
+    <script>
+        hljs.highlightAll();
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = 'Copied!';
+                button.style.background = '#10b981';
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                    button.style.background = '#2563eb';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

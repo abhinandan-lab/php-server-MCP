@@ -1,0 +1,36 @@
+youtube_creators: id (PK), channel_id, channel_handle, channel_name, submission_cities, user_name, user_email, login_jwt_token, firebase_token, profile_avatar, login_password, email_verified (TINYINT), creator_status (TINYINT), google_access_token, google_refresh_token, event_uploads, submission_states, region, total_submissions, google_token_expires_at, created_at
+
+admin_user: id (PK), username, email (UNIQUE), password, created_at
+
+challenges: id (PK), challenge_title, target_city, description, start_date, end_date, reward_points, reward_coins, difficulty_level, hashtags, location, category, feature_challenge (TINYINT), push_notifications_to_creators (TINYINT), created_by, created_at, updated_at
+
+badges: id (PK), title, label, icon, description, reward_point_required, reward_condition_required, reward_condition_required_SQL, created_by, created_at
+
+modules: id (PK), title, video_url, video_file, documentation, description, activity, status, reward_points_can_achieve, created_by, created_at, updated_at
+
+creator_badges: id (PK), creator_id (FK->youtube_creators.id), badge_id (FK->badges.id), awarded_at, reason, awarded_by, UNIQUE(creator_id, badge_id)
+
+creator_module_progress: id (PK), creator_id (FK->youtube_creators.id), module_id (FK->modules.id), status, submission, points_earned, started_at, completed_at, updated_at, UNIQUE(creator_id, module_id)
+
+creator_challenge_progress: id (PK), creator_id (FK->youtube_creators.id), challenge_id (FK->challenges.id), status, started_at, completed_at, updated_at, UNIQUE(creator_id, challenge_id)
+
+module_submissions: id (PK), creator_id (FK->youtube_creators.id), module_id (FK->modules.id), submission, points_awarded, coins_awarded, status, rejected_reason, submitted_at, reviewed_at, reviewed_by, title, thumbnail, description, channel_title, published_at, tags, location, location_desc, hashtags, city, country, state
+
+challenge_submissions: id (PK), creator_id (FK->youtube_creators.id), challenge_id (FK->challenges.id), submission_url, video_id, title, thumbnail, description, channel_title, published_at, tags, view_count, like_count, comment_count, location, location_desc, hashtags, city, country, state, points_awarded, coins_awarded, status, rejected_reason, submitted_at, reviewed_at, reviewed_by
+
+creator_stats: id (PK), creator_id (FK->youtube_creators.id, UNIQUE), total_points, total_coins, total_badges, last_updated
+
+rewards: id (PK), title, description, coin_cost, voucher_link, logo, total_available, created_by (FK->admin_user.id), created_at, updated_at
+
+reward_redemptions: id (PK), creator_id (FK->youtube_creators.id), reward_id (FK->rewards.id), coins_used, redeemed_at, status
+
+creator_activities: id (PK), creator_id (FK->youtube_creators.id), activity_type, activity_ref_id, points_earned, coins_earned, description, created_at
+
+admin_events: id (PK), start_date, end_date, hashtags, description, status (TINYINT), created_at
+
+event_uploads: id (PK), creator_id (FK->youtube_creators.id), event_id (FK->admin_events.id), submission_url, video_id (UNIQUE), title, thumbnail, description, channel_title, published_at, tags, view_count, like_count, comment_count, location, location_desc, hashtags, city, state, country, submitted_at
+
+indian_states: id (PK), state_name, region
+
+state_submissions_count: id (PK), creator_id (FK->youtube_creators.id), state_name, total_submissions, updated_at, UNIQUE(creator_id, state_name)
+

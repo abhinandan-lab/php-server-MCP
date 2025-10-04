@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Getting Started - PHP Light Framework</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+
+
+    <!-- Theme Toggle Script -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+    <span class="theme-icon">🌙</span>
+</button>
+
+<script>
+    // Theme Toggle Functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.querySelector('.theme-icon');
+    const htmlElement = document.documentElement;
+
+    // Check for saved theme preference or default to 'light' mode
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    htmlElement.setAttribute('data-theme', currentTheme);
+    updateThemeIcon(currentTheme);
+
+    themeToggle.addEventListener('click', function() {
+        const currentTheme = htmlElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        
+        htmlElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
+    });
+
+    function updateThemeIcon(theme) {
+        themeIcon.textContent = theme === 'light' ? '🌙' : '☀️';
+    }
+</script>
+
+
+
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h3>PHP Light Framework</h3>
+            <span class="version">v1.0.0</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">🏠 Home</a></li>
+            <li><a href="getting-started.html" class="active">🚀 Getting Started</a></li>
+            <li><a href="routing.html">🛣️ Routing</a></li>
+            <li><a href="controllers.html">🎛️ Controllers</a></li>
+            <li><a href="database.html">💾 Database</a></li>
+            <li><a href="runquery-guide.html">🔍 RunQuery Guide</a></li>
+            <li><a href="migrations.html">📋 Migrations</a></li>
+            <li><a href="validation.html">🔒 Validation & Security</a></li>
+            <li><a href="testing.html">🧪 Testing</a></li>
+            <li><a href="function-reference.html">📚 Function Reference</a></li>
+        </ul>
+    </nav>
+
+    <main class="content">
+        <header class="doc-header">
+            <div class="header-content">
+                <div class="search-container">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" id="globalSearch" placeholder="Search documentation..." />
+                    <div class="search-results" id="searchResults"></div>
+                </div>
+            </div>
+        </header>
+
+        <div class="content-inner">
+            <div class="breadcrumb">
+                <a href="index.html">Home</a> &gt; Getting Started
+            </div>
+
+            <h1>🚀 Getting Started</h1>
+            <p class="intro">Get your PHP Light Framework up and running in minutes with Docker. This guide walks you through the complete setup process from installation to your first API endpoint.</p>
+
+            <section class="card highlight">
+                <h2>⚡ Quick Start (60 Seconds)</h2>
+                <p>Already have Docker installed? Run these commands:</p>
+                
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-bash">git clone https://github.com/yourrepo/php-light-framework.git
+cd php-light-framework
+docker-compose up -d
+
+# Visit: http://localhost:8080/api/docs</code></pre>
+                </div>
+
+                <div class="alert alert-success">
+                    <strong>✅ Done!</strong> Your framework is now running. Visit http://localhost:8080/api/docs to see the interactive documentation.
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>📋 Prerequisites</h2>
+                <p>Before you begin, ensure you have the following installed:</p>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Software</th>
+                            <th>Version</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Docker</td>
+                            <td>20.10+</td>
+                            <td>Container runtime</td>
+                        </tr>
+                        <tr>
+                            <td>Docker Compose</td>
+                            <td>2.0+</td>
+                            <td>Multi-container orchestration</td>
+                        </tr>
+                        <tr>
+                            <td>Git</td>
+                            <td>2.0+</td>
+                            <td>Version control</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="card">
+                <h2>📦 Installation Steps</h2>
+                
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Clone Repository</h4>
+                            <p>Get the framework code from GitHub</p>
+                            <div class="code-block">
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                <pre><code class="language-bash">git clone https://github.com/yourrepo/php-light-framework.git
+cd php-light-framework</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Configure Environment</h4>
+                            <p>Create and edit your .env file</p>
+                            <div class="code-block">
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                <pre><code class="language-bash">cp .env.example .env
+nano .env</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Start Docker Containers</h4>
+                            <p>Launch all services</p>
+                            <div class="code-block">
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                <pre><code class="language-bash">docker-compose up -d</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Verify Installation</h4>
+                            <p>Check if everything is running</p>
+                            <ul>
+                                <li>API: <a href="http://localhost:8080/api/health">http://localhost:8080/api/health</a></li>
+                                <li>Docs: <a href="http://localhost:8080/api/docs">http://localhost:8080/api/docs</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>🎯 Your First API Endpoint</h2>
+                
+                <h3>Create Controller</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">// api/controllers/HelloController.php
+&lt;?php
+namespace App\Controllers;
+
+class HelloController extends BaseController
+{
+    public function sayHello()
+    {
+        $name = $_GET['name'] ?? 'World';
+        
+        $this->sendSuccess("Hello, $name!", [
+            'timestamp' => date('Y-m-d H:i:s'),
+            'message' => 'Welcome to PHP Light Framework'
+        ]);
+    }
+}</code></pre>
+                </div>
+
+                <h3>Register Route</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code class="language-php">// api/index.php
+$router->add([
+    'method' => 'GET',
+    'url' => '/hello',
+    'controller' => [App\Controllers\HelloController::class, 'sayHello'],
+    'desc' => 'Simple hello world endpoint'
+]);</code></pre>
+                </div>
+
+                <h3>Test It</h3>
+                <p>Visit: <a href="http://localhost:8080/api/hello?name=Developer">http://localhost:8080/api/hello?name=Developer</a></p>
+                
+                <div class="alert alert-success">
+                    <strong>🎉 Congratulations!</strong> You've created your first API endpoint.
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>🔧 Docker Commands</h2>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Command</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>docker-compose up -d</code></td>
+                            <td>Start all containers</td>
+                        </tr>
+                        <tr>
+                            <td><code>docker-compose down</code></td>
+                            <td>Stop all containers</td>
+                        </tr>
+                        <tr>
+                            <td><code>docker-compose logs -f</code></td>
+                            <td>View logs</td>
+                        </tr>
+                        <tr>
+                            <td><code>docker-compose restart</code></td>
+                            <td>Restart containers</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="card">
+                <h2>🚀 Next Steps</h2>
+                
+                <div class="next-steps-grid">
+                    <a href="routing.html" class="next-step-card">
+                        <h3>🛣️ Routing</h3>
+                        <p>Learn route definitions</p>
+                    </a>
+                    
+                    <a href="controllers.html" class="next-step-card">
+                        <h3>🎛️ Controllers</h3>
+                        <p>Create controllers</p>
+                    </a>
+                    
+                    <a href="database.html" class="next-step-card">
+                        <h3>💾 Database</h3>
+                        <p>Work with databases</p>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="assets/search.js"></script>
+    <script>
+        hljs.highlightAll();
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const code = codeBlock.textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = 'Copied!';
+                button.style.background = '#10b981';
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                    button.style.background = '#2563eb';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
