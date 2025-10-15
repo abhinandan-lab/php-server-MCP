@@ -1,0 +1,178 @@
+Below are compact, ASCII-style diagrams showing the best-practice flow in this framework—from router setup in index.php to a JSON response—with where to use services and helpers.
+
+----------------------------------------------------------------------------------------------------------------------------
+End-to-end request lifecycle
+
+
+Client
+  |
+  v
+/api/index.php  --(OB start, env, security, rate limit, exception handler)-->  Router('/api')
+  |                                                                       |
+  |-- set JSON header (except /api/docs) ---------------------------------|
+  |                                                                       v
+  |                                                              match method+pattern
+  |                                                              resolve Controller@action
+  |                                                              pass URL params
+  v                                                                       |
+Controller action (thin)  <-----------------------------------------------|
+  |
+  |-- BaseController bootstraps (env, Security::ensureSecure, DB conn)
+  |-- Validate input (ValidationMiddleware rules)
+  |-- Call Service (business logic)
+  |-- Return sendSuccess/sendError (sendJsonResponse)
+  v
+JSON response (consistent shape)
+
+
+
+index.php loads env, initializes security, applies security headers/CORS, rate limits, registers the global ExceptionHandler, creates Router('/api'), sets JSON header for non-docs, and dispatches.
+
+Router matches HTTP method + URL using regex from patterns (supports {id}), sorts by specificity, instantiates App\Controllers\Controller, and calls the action with URL params.
+
+BaseController ensures env is loaded, runs Security::ensureSecure, initializes the DB connection, exposes validateRequest, sendSuccess/sendError/sendValidationError using sendJsonResponse.
+
+ExceptionHandler converts exceptions (framework or PHP) into JSON, optionally logs based on LOG_ERRORS, and includes debug data when SHOW_ERRORS is true.
+
+Helpers pp/ppp print debug only when DEBUG_MODE is on; sendJsonResponse standardizes payload and content-type.
+
+----------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+Route definition and dispatch
+
+index.php
+  |
+  |-- $router->add([
+  |      method, url, controller@action,
+  |      desc, visible, tags,
+  |      params: { url, get, form, json }
+  |   ])
+  |
+  '-- $router->dispatch()
+         |
+         |-- $_SERVER[REQUEST_METHOD] + REQUEST_URI
+         |-- patternToRegex("/user/{id}")  ->  '^/user/([^/]+)$'
+         '-- call 'App\Controllers\UserController@getUser'
+
+         
+Routes are added with method/url/controller and optional params metadata; Router compiles regex and sorts by specificity.
+
+
+----------------------------------------------------------------------------------------------------------------------------
+
+Validation flow (inputs from GET, form, JSON)
+
+
+ValidationMiddleware::validateRequest(rules)
+  |
+  |-- Collect: $_GET + $_POST + (JSON if Content-Type: application/json)
+  |-- Sanitize: trim, strip null bytes, htmlspecialchars (recursive for arrays)
+  '-- Validate rules: required | email | min | max | numeric | integer | url | alpha | alphanumeric
+       |
+       '-- throw ValidationException on errors
+
+
+
+Middleware merges GET/POST/JSON, sanitizes recursively, validates against simple rules, and throws ValidationException if needed
+
+----------------------------------------------------------------------------------------------------------------------------
+
+Error handling flow
+
+ExceptionHandler::register()
+  |
+  |-- set_exception_handler / set_error_handler / shutdown_function
+  |
+  '-- On exception:
+        if BaseException -> map httpStatus + toArray() -> sendJsonResponse
+        else -> 500 system_error -> sendJsonResponse
+        (+ debug_info when SHOW_ERRORS, optional logging when LOG_ERRORS)
+
+
+Centralized handler converts all failures to JSON, with optional logging and debug fields controlled by env.
+
+----------------------------------------------------------------------------------------------------------------------------
+
+Where services and helpers fit (best practice)
+
+Controller (HTTP only)
+  |
+  |-- validateRequest([...])             <-- ValidationMiddleware[3]
+  |-- call Service->method(...)          <-- your app’s service layer (recommended)
+  |-- sendSuccess()/sendError()          <-- BaseController -> sendJsonResponse[4][2]
+
+Service (business logic)
+  |
+  |-- DB operations via PDO from BaseController (passed in)
+  |-- Use small helpers (slug, format, pp/ppp for debug)    <-- helpers[2]
+  '-- Throw exceptions for business failures                <-- handled by ExceptionHandler[6]
+
+Keep controllers thin; move business logic to services; use helpers for small, stateless utilities; let ExceptionHandler unify error output.
+
+Minimal patterns (copy-paste ready)
+
+----------------------------------------------------------------------------------------------------------------------------
+
+Route (index.php)
+
+$router->add([
+  'method' => 'POST',
+  'url' => '/user/create',
+  'controller' => 'UserController@create',
+  'desc' => 'Create user',
+  'params' => ['json' => ['email' => 'string', 'password' => 'string']]
+]);
+
+
+Routes are defined in index.php and dispatched by Router('/api')
+
+
+----------------------------------------------------------------------------------------------------------------------------
+
+Controller (thin)
+
+class UserController extends BaseController {
+  public function create() {
+    $data = $this->validateRequest([
+      'email' => 'required|email',
+      'password' => 'required|min:8'
+    ]); // uses ValidationMiddleware
+    try {
+      $user = $this->userService->create($data); // service call (recommended)
+      $this->sendSuccess('User created', $user); // sendJsonResponse
+    } catch (\Throwable $e) {
+      throw $e; // ExceptionHandler returns JSON
+    }
+  }
+}
+
+
+BaseController wires env/security/DB and exposes validateRequest and sendSuccess/sendError.
+ValidationMiddleware merges/sanitizes/validates inputs and throws on errors.
+ExceptionHandler transforms thrown errors into JSON automatically.
+sendSuccess/sendError use the global sendJsonResponse helper
+
+
+
+----------------------------------------------------------------------------------------------------------------------------
+
+Helper usage (safe debug + standard JSON)
+
+pp($data);        // prints only when DEBUG_MODE=1
+ppp($object);     // var_dump style when DEBUG_MODE=1
+sendJsonResponse(200, 'success', 'ok', ['id' => 1]);
+
+Helpers pp/ppp respect DEBUG_MODE; sendJsonResponse standardizes payload and headers.
+
+
+----------------------------------------------------------------------------------------------------------------------------
+
+Docs and content-type nuance
+
+/api/docs -> HTML (output buffer flushed)
+/api/*    -> JSON (Content-Type set globally)
+
+index.php sets JSON Content-Type for API routes and flushes output only for /api/docs.
