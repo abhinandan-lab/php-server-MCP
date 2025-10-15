@@ -221,6 +221,39 @@ $router->add([
 
 
 
+// User routes
+$router->add([
+    'method' => 'POST',
+    'url' => '/user/register',
+    'controller' => 'UserController@register',
+    'desc' => 'Register a new user',
+    'visible' => true,
+    'params' => [
+        'json' => [
+            'email' => 'string (required) – Valid email',
+            'password' => 'string (required) – Min 8 characters',
+            'name' => 'string (required) – Full name'
+        ]
+    ],
+    'group' => ['Users']
+]);
+
+$router->add([
+    'method' => 'GET',
+    'url' => '/user',
+    'controller' => 'UserController@getUser',
+    'desc' => 'Get user by ID',
+    'visible' => true,
+    'params' => [
+        'get' => ['id' => 'integer (required) – User ID']
+    ],
+    'group' => ['Users']
+]);
+
+
+
+
+
 
 
 

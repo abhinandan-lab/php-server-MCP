@@ -91,7 +91,7 @@ function interpolateQuery(PDO $conn, string $query, array $params = []): string
  * @param bool $returnSql Return SQL string (if using old style)
  * @return mixed Query results
  */
-function RunQuery(
+function RunQuery_OLD(
     $conn_or_config,
     string $query = null,
     array $parameterArray = [],
@@ -237,7 +237,7 @@ function RunQuery(
  * 
  * @return mixed Query results, success array, SQL string, or error array
  */
-function RunQueryNew(array $config)
+function RunQuery(array $config)
 {
     // Extract parameters with defaults
     $conn = $config['conn'] ?? null;
