@@ -257,7 +257,7 @@ class DocsController extends BaseController
                     --text-secondary: #6c757d;
                     --text-inverse: #ffffff;
                     --border-color: #dee2e6;
-                    --btn-primary: #007bff;
+                    --btn-primary: #004a99;
                     --btn-primary-hover: #0056b3;
                     --btn-success: #28a745;
                     --btn-warning: #ffc107;

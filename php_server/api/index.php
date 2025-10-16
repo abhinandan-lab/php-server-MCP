@@ -253,6 +253,36 @@ $router->add([
 
 
 
+// Service Tester Routes
+$router->add([
+    'method' => 'GET',
+    'url' => '/service-test',
+    'controller' => 'ServiceTesterController@index',
+    'desc' => 'Service Tester UI',
+    'visible' => true,
+    'group' => ['Testing']
+]);
+
+$router->add([
+    'method' => 'POST',
+    'url' => '/service-test/execute',
+    'controller' => 'ServiceTesterController@execute',
+    'desc' => 'Execute service test',
+    'visible' => false,
+    'group' => ['Testing']
+]);
+
+$router->add([
+    'method' => 'POST',
+    'url' => '/service-test/toggle-debug',
+    'controller' => 'ServiceTesterController@toggleDebug',
+    'desc' => 'Toggle debug mode',
+    'visible' => false,
+    'group' => ['Testing']
+]);
+
+
+
 
 
 
