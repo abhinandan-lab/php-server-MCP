@@ -233,11 +233,12 @@ class DocsController extends BaseController
         }
     }
 
+
     private function renderEnhancedApiDocs($groupedRoutes, $totalRoutes, $basePath = '')
     {
         header('Content-Type: text/html');
         $allowedEnvVars = $this->getAllowedEnvironmentVariables();
-?>
+        ?>
         <!DOCTYPE html>
         <html>
 
@@ -293,7 +294,7 @@ class DocsController extends BaseController
                 }
 
                 .container {
-                    max-width: 1400px;
+                    /* max-width: 1400px; */
                     margin: 0 auto;
                 }
 
@@ -344,10 +345,52 @@ class DocsController extends BaseController
                 .theme-toggle:hover,
                 .env-toggle:hover {
                     background: var(--btn-primary-hover);
-                    transform: translateY(-2px);
                 }
 
-                /* Search Section */
+                /* ========================================= */
+                /* IMPROVEMENT #2: Toast Notifications */
+                /* ========================================= */
+                .toast {
+                    position: fixed;
+                    bottom: 30px;
+                    right: 30px;
+                    background: #21262d;
+                    color: #e6edf3;
+                    padding: 14px 20px;
+                    border-radius: 8px;
+                    border: 1px solid #30363d;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                    z-index: 9999;
+                    opacity: 0;
+                    transform: translateY(20px);
+                    transition: all 0.3s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    min-width: 250px;
+                }
+
+                .toast.show {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+
+                .toast.success {
+                    border-color: #3fb950;
+                    background: #1a4d2e;
+                }
+
+                .toast.error {
+                    border-color: #f85149;
+                    background: #4d1a1a;
+                }
+
+                .toast.warning {
+                    border-color: #fbbf24;
+                    background: #4d3d1a;
+                }
+
+                /* Search Section - ORIGINAL STYLES */
                 .search-section {
                     background: var(--bg-secondary);
                     padding: 20px;
@@ -373,6 +416,7 @@ class DocsController extends BaseController
                     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
                 }
 
+                /* IMPROVEMENT #1: Filter buttons styles kept but will be hidden via HTML removal */
                 .search-filters {
                     display: flex;
                     gap: 10px;
@@ -397,10 +441,50 @@ class DocsController extends BaseController
                 .filter-btn.active {
                     background: var(--btn-primary);
                     color: white;
-                    transform: translateY(-2px);
                 }
 
-                /* Environment Section */
+                /* ========================================= */
+                /* IMPROVEMENT #5: Group Navigation Tabs */
+                /* ========================================= */
+                .group-nav-section {
+                    background: var(--bg-secondary);
+                    padding: 15px 20px;
+                    border-radius: 12px;
+                    margin-bottom: 20px;
+                    box-shadow: var(--shadow);
+                    display: flex;
+                    gap: 10px;
+                    flex-wrap: wrap;
+                    align-items: center;
+                }
+
+                .group-nav-section h4 {
+                    margin: 0;
+                    color: var(--text-secondary);
+                    font-size: 14px;
+                    min-width: 100%;
+                    margin-bottom: 8px;
+                }
+
+                .group-nav-btn {
+                    padding: 6px 14px;
+                    background: var(--bg-tertiary);
+                    color: var(--text-primary);
+                    border: 2px solid var(--border-color);
+                    border-radius: 6px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    font-size: 13px;
+                    font-weight: 600;
+                }
+
+                .group-nav-btn:hover {
+                    background: var(--btn-primary);
+                    color: white;
+                    border-color: var(--btn-primary);
+                }
+
+                /* Environment Section - ORIGINAL STYLES */
                 .env-section {
                     background: var(--bg-secondary);
                     padding: 20px;
@@ -446,7 +530,7 @@ class DocsController extends BaseController
                     color: var(--text-primary);
                 }
 
-                /* API Groups */
+                /* API Groups - ORIGINAL STYLES */
                 .group-section {
                     margin-bottom: 25px;
                     border-radius: 4px;
@@ -487,12 +571,11 @@ class DocsController extends BaseController
                 }
 
                 .collapsed .group-toggle {
-                    /* transform: scale(0.7); */
                     font-size: 0.8rem;
                     transform: rotate(180deg);
                 }
 
-                /* API Items */
+                /* API Items - ORIGINAL STYLES */
                 .api-item {
                     background: var(--bg-form);
                     margin: 15px 0;
@@ -506,6 +589,7 @@ class DocsController extends BaseController
                     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
                 }
 
+                /* IMPROVEMENT #3: Modified API Header for inline test button */
                 .api-header {
                     padding: 10px;
                     display: flex;
@@ -561,6 +645,26 @@ class DocsController extends BaseController
                     font-size: 14px;
                 }
 
+                /* IMPROVEMENT #3: Small inline test button */
+                .test-btn-small {
+                    padding: 4px 10px;
+                    background: #194824;
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 12px;
+                    font-weight: 600;
+                    white-space: nowrap;
+                    transition: all 0.3s ease;
+                    margin-left: 8px;
+                }
+
+                .test-btn-small:hover {
+                    background: #218838;
+                }
+
+                /* Original Test Button - Keep for backward compatibility */
                 .test-btn {
                     padding: 8px 16px;
                     background: var(--btn-success);
@@ -577,7 +681,7 @@ class DocsController extends BaseController
                     background: #218838;
                 }
 
-                /* Parameter Sections */
+                /* Parameter Sections - ORIGINAL STYLES */
                 .test-section {
                     padding: 20px;
                     background: var(--bg-tertiary);
@@ -644,11 +748,10 @@ class DocsController extends BaseController
                     margin-top: 2px;
                 }
 
-                /* Buttons */
+                /* Buttons - ORIGINAL STYLES */
                 .btn-group {
                     display: flex;
                     gap: 10px;
-                    margin: 20px 0;
                 }
 
                 .btn {
@@ -667,19 +770,18 @@ class DocsController extends BaseController
 
                 .btn-primary:hover {
                     background: var(--btn-primary-hover);
-                    transform: translateY(-2px);
                 }
 
                 .btn-secondary {
-                    background: var(--text-secondary);
+                    background: #2e2e2e;
                     color: white;
                 }
 
                 .btn-secondary:hover {
-                    background: #5a6268;
+                    background: #2e2e2e;
                 }
 
-                /* Response Section */
+                /* Response Section - ORIGINAL STYLES */
                 .response-section {
                     margin-top: 15px;
                     display: none;
@@ -734,9 +836,8 @@ class DocsController extends BaseController
                 }
 
                 .response-content {
-                    padding: 20px;
                     font-family: 'Monaco', 'Menlo', monospace;
-                    font-size: 13px;
+                    font-size: 14px;
                     line-height: 1.5;
                     color: #f8f8f2;
                     background: #1e1e1e;
@@ -745,13 +846,13 @@ class DocsController extends BaseController
                     overflow-y: auto;
                 }
 
-                /* Loading States */
+                /* Loading States - ORIGINAL */
                 .loading {
                     color: var(--btn-primary);
                     font-style: italic;
                 }
 
-                /* Animations */
+                /* Animations - ORIGINAL */
                 @keyframes fadeIn {
                     from {
                         opacity: 0;
@@ -766,10 +867,9 @@ class DocsController extends BaseController
 
                 .fade-in {
                     animation: fadeIn 0.3s ease;
-
                 }
 
-                /* Responsive */
+                /* Responsive - ORIGINAL */
                 @media (max-width: 768px) {
                     body {
                         padding: 10px;
@@ -793,12 +893,13 @@ class DocsController extends BaseController
                     }
                 }
 
-                /* Hide when searching */
+                /* Hide when searching - ORIGINAL */
                 .hidden {
                     display: none !important;
                 }
             </style>
         </head>
+
 
         <body data-theme="light">
             <div class="container">
@@ -806,24 +907,35 @@ class DocsController extends BaseController
                 <div class="header">
                     <div>
                         <h1><span>🚀</span> Enhanced API Documentation</h1>
-                        <p>Total APIs: <strong><?= $totalRoutes ?></strong> | Groups: <strong><?= count($groupedRoutes) ?></strong></p>
+                        <p>Total APIs: <strong><?= $totalRoutes ?></strong> | Groups:
+                            <strong><?= count($groupedRoutes) ?></strong>
+                        </p>
                     </div>
+                    <!-- IMPROVEMENT #4: Added Collapse All Button -->
                     <div class="header-controls">
+                        <button class="btn btn-secondary" onclick="toggleAllGroups()" id="collapseAllBtn">
+                            📁 Collapse All
+                        </button>
                         <button class="env-toggle" onclick="toggleEnvSection()">⚙️ Environment</button>
                         <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
                     </div>
                 </div>
 
-                <!-- Search Section -->
+                <!-- IMPROVEMENT #1: Search Section - NO FILTER BUTTONS -->
                 <div class="search-section">
-                    <input type="text" class="search-box" placeholder="🔍 Search APIs by method, URL, or description..." id="searchInput">
-                    <div class="search-filters">
-                        <button class="filter-btn active" data-method="all">All Methods</button>
-                        <button class="filter-btn" data-method="GET">GET</button>
-                        <button class="filter-btn" data-method="POST">POST</button>
-                        <button class="filter-btn" data-method="PUT">PUT</button>
-                        <button class="filter-btn" data-method="DELETE">DELETE</button>
-                    </div>
+                    <input type="text" class="search-box" placeholder="🔍 Search APIs by method, URL, or description..."
+                        id="searchInput">
+                    <!-- Filter buttons REMOVED as per improvement #1 -->
+                </div>
+
+                <!-- IMPROVEMENT #5: Group Navigation Tabs -->
+                <div class="group-nav-section">
+                    <h4>📑 Quick Navigation</h4>
+                    <?php foreach ($groupedRoutes as $groupName => $routes): ?>
+                        <button class="group-nav-btn" onclick="scrollToGroup('<?= $this->slugify($groupName) ?>')">
+                            <?= $this->getGroupIcon($groupName) ?>             <?= htmlspecialchars($groupName) ?>
+                        </button>
+                    <?php endforeach; ?>
                 </div>
 
                 <!-- Environment Section -->
@@ -841,10 +953,10 @@ class DocsController extends BaseController
 
                 <!-- API Groups -->
                 <?php foreach ($groupedRoutes as $groupName => $routes): ?>
-                    <div class="group-section fade-in" data-group="<?= strtolower($groupName) ?>">
+                    <div class="group-section fade-in" data-group="<?= $this->slugify($groupName) ?>">
                         <div class="group-header" onclick="toggleGroup('<?= $this->slugify($groupName) ?>')">
                             <div>
-                                <span><?= $this->getGroupIcon($groupName) ?> <?= htmlspecialchars($groupName) ?></span>
+                                <span><?= $this->getGroupIcon($groupName) ?>             <?= htmlspecialchars($groupName) ?></span>
                                 <small style="opacity: 0.8; margin-left: 10px;">(<?= count($routes) ?> endpoints)</small>
                             </div>
                             <span class="group-toggle">▲</span>
@@ -856,24 +968,27 @@ class DocsController extends BaseController
                                 $hasGetParams = !empty($route['params']['get']);
                                 $hasFormParams = !empty($route['params']['form']);
                                 $hasJsonParams = !empty($route['params']['json']);
-                            ?>
-                                <div class="api-item"
-                                    data-method="<?= $route['method'] ?>"
-                                    data-url="<?= $route['pattern'] ?>"
+                                ?>
+                                <div class="api-item" data-method="<?= $route['method'] ?>" data-url="<?= $route['pattern'] ?>"
                                     data-description="<?= htmlspecialchars($route['description']) ?>">
+
+                                    <!-- IMPROVEMENT #3: Test Button Next to Route Name -->
                                     <div class="api-header">
                                         <div class="api-info">
-                                            <div>
-                                                <span class="api-method method-<?= strtolower($route['method']) ?>"><?= $route['method'] ?></span>
+                                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                                <span
+                                                    class="api-method method-<?= strtolower($route['method']) ?>"><?= $route['method'] ?></span>
                                                 <span class="api-url"><?= htmlspecialchars($basePath . $route['pattern']) ?></span>
+                                                <button class="test-btn-small" onclick="toggleTest('<?= $globalIndex ?>')">🧪
+                                                    Test</button>
                                             </div>
                                             <div class="api-description"><?= htmlspecialchars($route['description']) ?></div>
                                         </div>
-                                        <button class="test-btn" onclick="toggleTest('<?= $globalIndex ?>')">🧪 Test API</button>
                                     </div>
 
                                     <div id="test-<?= $globalIndex ?>" class="test-section">
-                                        <form class="api-test-form" data-method="<?= $route['method'] ?>" data-url="<?= $route['pattern'] ?>" data-index="<?= $globalIndex ?>">
+                                        <form class="api-test-form" data-method="<?= $route['method'] ?>"
+                                            data-url="<?= $route['pattern'] ?>" data-index="<?= $globalIndex ?>">
 
                                             <?php if ($hasUrlParams): ?>
                                                 <div class="param-section">
@@ -882,7 +997,8 @@ class DocsController extends BaseController
                                                         <?php foreach ($route['params']['url'] as $param => $desc): ?>
                                                             <div class="param-item">
                                                                 <label><?= htmlspecialchars($param) ?></label>
-                                                                <input type="text" name="url_<?= htmlspecialchars($param) ?>" placeholder="Enter <?= htmlspecialchars($param) ?>">
+                                                                <input type="text" name="url_<?= htmlspecialchars($param) ?>"
+                                                                    placeholder="Enter <?= htmlspecialchars($param) ?>">
                                                                 <div class="param-desc"><?= htmlspecialchars($desc) ?></div>
                                                             </div>
                                                         <?php endforeach; ?>
@@ -897,7 +1013,8 @@ class DocsController extends BaseController
                                                         <?php foreach ($route['params']['get'] as $param => $desc): ?>
                                                             <div class="param-item">
                                                                 <label><?= htmlspecialchars($param) ?></label>
-                                                                <input type="text" name="get_<?= htmlspecialchars($param) ?>" placeholder="Enter <?= htmlspecialchars($param) ?>">
+                                                                <input type="text" name="get_<?= htmlspecialchars($param) ?>"
+                                                                    placeholder="Enter <?= htmlspecialchars($param) ?>">
                                                                 <div class="param-desc"><?= htmlspecialchars($desc) ?></div>
                                                             </div>
                                                         <?php endforeach; ?>
@@ -912,7 +1029,8 @@ class DocsController extends BaseController
                                                         <?php foreach ($route['params']['form'] as $param => $desc): ?>
                                                             <div class="param-item">
                                                                 <label><?= htmlspecialchars($param) ?></label>
-                                                                <input type="text" name="form_<?= htmlspecialchars($param) ?>" placeholder="Enter <?= htmlspecialchars($param) ?>">
+                                                                <input type="text" name="form_<?= htmlspecialchars($param) ?>"
+                                                                    placeholder="Enter <?= htmlspecialchars($param) ?>">
                                                                 <div class="param-desc"><?= htmlspecialchars($desc) ?></div>
                                                             </div>
                                                         <?php endforeach; ?>
@@ -938,7 +1056,8 @@ class DocsController extends BaseController
 
                                             <div class="btn-group">
                                                 <button type="submit" class="btn btn-primary">🚀 Send Request</button>
-                                                <button type="button" class="btn btn-secondary" onclick="clearResponse('<?= $globalIndex ?>')">🗑️ Clear</button>
+                                                <button type="button" class="btn btn-secondary"
+                                                    onclick="clearResponse('<?= $globalIndex ?>')">🗑️ Clear</button>
                                             </div>
                                         </form>
 
@@ -957,12 +1076,23 @@ class DocsController extends BaseController
                         </div>
                     </div>
                 <?php endforeach; ?>
+
+                <!-- IMPROVEMENT #2: Toast Container -->
+                <div id="toast" class="toast"></div>
             </div>
 
-
-
-
             <script>
+                // IMPROVEMENT #2: Toast Notification Function
+                function showToast(message, type = 'success') {
+                    const toast = document.getElementById('toast');
+                    toast.className = 'toast ' + type + ' show';
+                    toast.textContent = message;
+
+                    setTimeout(() => {
+                        toast.classList.remove('show');
+                    }, 3000);
+                }
+
                 // Theme Management
                 function toggleTheme() {
                     const body = document.body;
@@ -982,12 +1112,47 @@ class DocsController extends BaseController
 
                 // Group Management
                 function toggleGroup(groupId) {
-                    const groupSection = document.getElementById('group-' + groupId) ||
-                        document.querySelector(`[data-group="${groupId}"]`);
+                    const groupSection = document.querySelector(`[data-group="${groupId}"]`);
                     if (groupSection) {
                         groupSection.classList.toggle('collapsed');
                         const collapsed = groupSection.classList.contains('collapsed');
                         localStorage.setItem('group-' + groupId + '-collapsed', collapsed);
+                    }
+                }
+
+                // IMPROVEMENT #4: Collapse All Groups Function
+                function toggleAllGroups() {
+                    const groupSections = document.querySelectorAll('.group-section');
+                    const btn = document.getElementById('collapseAllBtn');
+                    const allCollapsed = Array.from(groupSections).every(g => g.classList.contains('collapsed'));
+
+                    groupSections.forEach(group => {
+                        if (allCollapsed) {
+                            group.classList.remove('collapsed');
+                        } else {
+                            group.classList.add('collapsed');
+                        }
+                    });
+
+                    btn.textContent = allCollapsed ? '📁 Collapse All' : '📂 Expand All';
+                }
+
+                // IMPROVEMENT #5: Scroll to Group Function
+                function scrollToGroup(groupId) {
+                    const groupSection = document.querySelector(`[data-group="${groupId}"]`);
+                    if (groupSection) {
+                        groupSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                        // Expand if collapsed
+                        if (groupSection.classList.contains('collapsed')) {
+                            groupSection.classList.remove('collapsed');
+                        }
+
+                        // Highlight effect
+                        groupSection.style.boxShadow = '0 0 20px rgba(139, 92, 246, 0.5)';
+                        setTimeout(() => {
+                            groupSection.style.boxShadow = '';
+                        }, 2000);
                     }
                 }
 
@@ -1012,7 +1177,6 @@ class DocsController extends BaseController
                     contentEl.innerHTML = '';
                 }
 
-                // Copy Response
                 function copyResponse(index) {
                     const contentEl = document.getElementById('content-' + index);
                     const text = contentEl.textContent;
@@ -1058,50 +1222,71 @@ class DocsController extends BaseController
                         const envItem = document.createElement('div');
                         envItem.className = 'env-item';
                         envItem.innerHTML = `
-                <label>${key}</label>
-                <input type="text" value="${value}" data-key="${key}" onchange="updateEnvironmentVariable('${key}', this.value)">
-            `;
+                            <label>${key}</label>
+                            <input type="text" value="${value}" data-key="${key}" onchange="updateEnvironmentVariable('${key}', this.value)">
+                        `;
                         envGrid.appendChild(envItem);
                     });
                 }
 
+                // IMPROVEMENT #2: Updated with Toast Notifications
                 function updateEnvironmentVariable(key, value) {
                     fetch('<?= $basePath ?>/env/update', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `key=${encodeURIComponent(key)}&value=${encodeURIComponent(value)}`
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                showToast(`✓ ${key} updated successfully`, 'success');
+                            } else {
+                                showToast(`✗ Failed to update ${key}`, 'error');
+                            }
+                        })
+                        .catch(error => {
+                            showToast('✗ Network error occurred', 'error');
+                        });
+                }
+
+                function saveAllEnvironmentChanges() {
+                    const inputs = document.querySelectorAll('.env-item input[data-key]');
+                    let successCount = 0;
+                    let totalCount = inputs.length;
+
+                    inputs.forEach(input => {
+                        const key = input.dataset.key;
+                        const value = input.value;
+
+                        fetch('<?= $basePath ?>/env/update', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded',
                             },
                             body: `key=${encodeURIComponent(key)}&value=${encodeURIComponent(value)}`
                         })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.status === 'success') {
-                                console.log(`Environment variable ${key} updated successfully`);
-                            } else {
-                                console.error('Error updating environment variable:', data.message);
-                            }
-                        });
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.status === 'success') {
+                                    successCount++;
+                                }
+                                if (successCount === totalCount) {
+                                    showToast('✓ All environment variables saved successfully', 'success');
+                                }
+                            });
+                    });
                 }
 
-                // Search Functionality
+                // IMPROVEMENT #1: Search WITHOUT Filter Buttons
                 function initializeSearch() {
                     const searchInput = document.getElementById('searchInput');
-                    const filterBtns = document.querySelectorAll('.filter-btn');
-
                     searchInput.addEventListener('input', performSearch);
-
-                    filterBtns.forEach(btn => {
-                        btn.addEventListener('click', () => {
-                            filterBtns.forEach(b => b.classList.remove('active'));
-                            btn.classList.add('active');
-                            performSearch();
-                        });
-                    });
                 }
 
                 function performSearch() {
                     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-                    const activeFilter = document.querySelector('.filter-btn.active').dataset.method;
                     const apiItems = document.querySelectorAll('.api-item');
                     const groupSections = document.querySelectorAll('.group-section');
 
@@ -1119,9 +1304,7 @@ class DocsController extends BaseController
                                 description.includes(searchTerm) ||
                                 method.toLowerCase().includes(searchTerm);
 
-                            const matchesFilter = activeFilter === 'all' || method === activeFilter;
-
-                            if (matchesSearch && matchesFilter) {
+                            if (matchesSearch) {
                                 item.classList.remove('hidden');
                                 hasVisibleItems = true;
                             } else {
@@ -1157,11 +1340,9 @@ class DocsController extends BaseController
                     let jsonData = null;
 
                     // Collect URL parameters
-                    const urlParams = {};
                     form.querySelectorAll('input[name^="url_"]').forEach(input => {
                         if (input.value) {
                             const paramName = input.name.replace('url_', '');
-                            urlParams[paramName] = input.value;
                             url = url.replace(`{${paramName}}`, input.value);
                         }
                     });
@@ -1219,38 +1400,31 @@ class DocsController extends BaseController
                         requestOptions.body = new URLSearchParams(formData).toString();
                     }
 
-                    // **FIXED: Send request with better error handling**
+                    // Send request
                     fetch(url, requestOptions)
                         .then(async response => {
                             const contentType = response.headers.get('content-type');
                             let data;
 
                             try {
-                                // First get the raw response text
                                 const responseText = await response.text();
 
-                                // Try to parse as JSON if content-type suggests it should be JSON
                                 if (contentType && contentType.includes('application/json')) {
                                     try {
                                         data = JSON.parse(responseText);
                                     } catch (jsonError) {
-                                        // If JSON parsing fails, show the raw response instead of error
                                         data = responseText;
                                     }
                                 } else {
-                                    // For non-JSON responses, show as-is
                                     data = responseText;
                                 }
 
                                 showResponse(index, response.ok ? 'success' : 'error', data, response.status);
-
                             } catch (fetchError) {
-                                // Only catch actual fetch/network errors
                                 showResponse(index, 'error', `Network Error: ${fetchError.message}`, null);
                             }
                         })
                         .catch(error => {
-                            // This catches network-level errors (no internet, server down, etc.)
                             showResponse(index, 'error', `Connection Error: ${error.message}`, null);
                         });
                 }
@@ -1263,7 +1437,6 @@ class DocsController extends BaseController
                     responseSection.style.display = 'block';
                     responseSection.classList.add('fade-in');
 
-                    // Set status
                     statusEl.className = `response-status status-${type}`;
                     if (type === 'loading') {
                         statusEl.textContent = 'Loading...';
@@ -1271,16 +1444,13 @@ class DocsController extends BaseController
                         statusEl.textContent = status ? `${type.toUpperCase()} ${status}` : type.toUpperCase();
                     }
 
-                    // Set content with syntax highlighting
                     if (typeof data === 'object') {
                         const jsonString = JSON.stringify(data, null, 2);
                         contentEl.innerHTML = `<pre><code class="language-json">${escapeHtml(jsonString)}</code></pre>`;
                     } else {
-                        // Show raw text/HTML responses as-is
                         contentEl.innerHTML = `<pre><code>${escapeHtml(data)}</code></pre>`;
                     }
 
-                    // Apply syntax highlighting if available
                     if (window.hljs) {
                         hljs.highlightAll();
                     }
@@ -1293,8 +1463,7 @@ class DocsController extends BaseController
                 }
 
                 // Initialize everything when page loads
-                document.addEventListener('DOMContentLoaded', function() {
-                    // Load saved theme
+                document.addEventListener('DOMContentLoaded', function () {
                     const savedTheme = localStorage.getItem('theme') || 'light';
                     const toggleBtn = document.querySelector('.theme-toggle');
 
@@ -1303,20 +1472,17 @@ class DocsController extends BaseController
                         toggleBtn.textContent = '☀️ Light Mode';
                     }
 
-                    // Load saved group states
-                    document.querySelectorAll('.group-section').forEach((group, index) => {
-                        const groupId = group.dataset.group || `group-${index}`;
+                    document.querySelectorAll('.group-section').forEach((group) => {
+                        const groupId = group.dataset.group;
                         const isCollapsed = localStorage.getItem('group-' + groupId + '-collapsed') === 'true';
                         if (isCollapsed) {
                             group.classList.add('collapsed');
                         }
                     });
 
-                    // Initialize functionality
                     initializeSearch();
                     initializeApiTesting();
 
-                    // Initialize syntax highlighting
                     if (window.hljs) {
                         hljs.highlightAll();
                     }
@@ -1326,7 +1492,8 @@ class DocsController extends BaseController
         </body>
 
         </html>
-<?php
+
+        <?php
     }
 
     private function slugify($text)
