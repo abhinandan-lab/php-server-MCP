@@ -3,29 +3,77 @@ services:
   web:
     build: ./docker/web
     volumes:
-      - ./php_server:/var/www/html/
+      - ./php_server_v2:/var/www/html/
     ports:
-      - 80:80
-  
-  db:
-    image: mysql:8.0 # Use a valid MySQL version
-    volumes:
-      - db:/var/lib/mysql/
+      - "80:80"
+    # POINT PHP TO PGBOUNCER, NOT DIRECTLY TO POSTGRES
     environment:
-      - MYSQL_ROOT_PASSWORD=abcd
-      - MYSQL_DATABASE=testdb
-      - MYSQL_USER=abh
-      - MYSQL_PASSWORD=abcd
+      DB_HOST: pgbouncer
+      DB_PORT: 6432
+      DB_NAME: testdb
+      DB_USER: abh
+      DB_PASSWORD: abcd
 
-  phpmyadmin:
-    image: phpmyadmin:5.2 # Use phpMyAdmin 5.2.x
+  postgres:
+    image: postgres:17
+    restart: always
+    environment:
+      - POSTGRES_DB=testdb
+      - POSTGRES_USER=abh
+      - POSTGRES_PASSWORD=abcd
+      - POSTGRES_HOST_AUTH_METHOD=md5
+      - POSTGRES_INITDB_ARGS=--auth=md5
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # optional: expose if you want direct access (psql, etc.)
+    ports:
+      - "5432:5432"
+
+  pgbouncer:
+    image: edoburu/pgbouncer:v1.24.1-p1
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      # Connection from PgBouncer -> Postgres
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=abh
+      - DB_PASSWORD=abcd
+      - DB_NAME=testdb
+
+      # Pool settings
+      - POOL_MODE=transaction
+      - MAX_CLIENT_CONN=200
+      - DEFAULT_POOL_SIZE=20
+
+      # Optional admin users for PgBouncer console
+      - ADMIN_USERS=abh
+
+    ports:
+      - "6432:5432" # external port 6432 -> PgBouncer's 5432
+
+  adminer:
+    image: adminer:latest
     restart: always
     ports:
-      - 8080:80
+      - "8080:8080"
     environment:
-      - PMA_HOST=db
+      # Adminer connects to PgBouncer as well
+      ADMINER_DEFAULT_SERVER: pgbouncer
+
+
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5050:80"
     depends_on:
-      - db
+      - pgbouncer
 
 volumes:
-  db:
+  pgdata:
