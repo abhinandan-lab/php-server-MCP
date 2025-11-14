@@ -1,0 +1,137 @@
+Migration :
+We need better way of migrating tables with error check and all
+
+--------------
+
+New vue js api/docs:
+Dashboard with multiple options
+
+1) api testing 
+2) services testing 
+3) repository testing
+4) curl runner 
+5) metrixs
+6) settings 
+7) workingTime
+
+In the dashboard there will be a button which will toggle debugmode, show errors, log errors
+
+
+Curl runner should show a option to copy prompt and generate the curl commands which can be directly pasted into the curl runner
+
+
+Similarly service tester, controllers tester, repository tester should have copy prompt option
+
+
+Settings: we can use this to manage other env variables and other framework settings 
+
+Database connections through env or settings
+
+
+In api testing we can use database.table.column_name in writing api routes this help us populate the real value not just  useless dummies
+
+
+This will show the Stop watch timer from howmuch time we were working 
+
+------------------------
+
+Runquery:
+There should be a class which handles connection pooling 
+
+
+
+Runquery function should automatically should applies pagination it can be off when set to false
+
+Return sqlquery should be build with parameters 
+
+We will use repository pattern in 
+
+https://www.perplexity.ai/search/can-we-make-a-better-runquery-ZSDm7J9WRNWJ03TUePvFNw
+
+
+------------
+
+Important features to implement :
+Write do controllers as I know everything in that code
+Use the docs controller html style with little variations for service testing controller 
+All helpers and services should be automatically included no need to add them
+Similarly for helpers controllers 
+Feature to add which calculated time and resource consumed during execution
+If possible movie all system folders to core folder so the folders which are required by user they only visible at the root api/*
+controllers/*
+helpers/*
+services/*
+core/*
+repository/*
+We need to add watcher which will show the state on every reload or request to notify what is happening 
+Also we can integrate live server which will refresh the html page when we do changes in php files not so important 
+We can implement mermaid diagram flow in docscontroller and servicetester to see directly logical flow of the APIs endpoint and services tester functions 
+To improve performance consider implementing op cache configuration redis memcached caching database connection pooling and response compression
+Need to add transaction handling and connection pooling and automatically fetch paginated rows
+We will create two types of middleware one will group end points  based on the router first keyword(/api/* , /api2/*) and other will group inside it routes based on authentications.   This way we can properly reuse authentication codes
+We will use pgBouncer for connection pooling
+
+
+----------
+
+Services:
+
+Now we should use services class to keep the clean code and scalable
+
+Writing all the business logic here with database queries 
+
+
+And getting request validating inputs sending response we should do in controllers 
+
+
+But managing entities updating them we should services so that by using this we can use it anywhere we want 
+
+
+When writing services keep in mind that it should be testable 
+
+-----------------
+New featurs in framework:
+Our framework also should follow the key value pair inputs in routes, helpers we can skip controller functions
+PHASE 2
+api/tables --> this should be a folder and inside it we can write as many tables list 
+The migration should be able to handle multiple file tables migration
+
+-----------------
+
+MCP tools :
+ Sql Table generotor with proper comments
+Should know or have list of available helpers
+Should be able create/edit/ routes in index.php
+Also should be able to create/adit controller functions
+Should be able to edit and update helper funcions or extend the existing 
+
+
+
+-------------
+
+
+DocsController :
+provide a link for documentations
+PHASE 2
+Need to make nice colors of docsController 
+Collapse all - toggle  button to make all section collapse
+The tags list should be declare in index.php
+group tags button lists are not available | when user clicks on this button it should take us to that group
+There should be a link where it will list all the helper functions and their descriptions and way to test them 
+Docscontroller should be able to use files in the tsting api blocks
+/docs should also show the curl command so that curl command is available at that moment 
+In /docs we can use clear and automatically fill option so the testing could be very smooth
+
+----------------
+
+Framework Best Practises :
+We have to write the documentation in a way that it encourages user to use best practises of this framework 
+When writing tables for migration write comments explaining the use and reason and the relation with other tables
+Use of pp and ppp wherever needed for debugging
+Using docsController  and its related tools
+All helper functions should use key value parameters so that extending them should not be painfull
+Always use available sanitizion and input validation framework function
+Always use sendResponse function so the code can be in uniformity
+Writing bunch of helpers for every kind of task is annoying instead use private functions related to controller 
+The helper function should be like common function can be used anywhere 
+All the helpers should be placed inside the helpers/* folder
