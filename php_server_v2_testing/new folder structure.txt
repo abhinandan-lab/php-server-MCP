@@ -1,0 +1,30 @@
+root/                    # Web server document root
+  index.html             # Static frontend entrypoint
+  assets/                # JS/CSS/images for frontend (optional)
+  api/                   # Framework root and API entrypoint
+    index.php            # Boots the framework, loads routes, dispatches
+    controllers/
+    helpers/
+    services/
+    core/
+      Router.php
+      ExceptionHandler.php
+      Config.php
+      _autoload_helpers.php
+    repository/
+    devTools/
+      controllers/
+      helpers/
+      views/
+      assets/
+    routers/
+      web.php
+      api.php
+      devTools.php
+    database/
+      migrations/
+      seeds/
+  uploads/               # User-uploaded files
+  vendor/                # Composer dependencies (if any)
+  composer.json
+  .env

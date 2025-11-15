@@ -3,7 +3,7 @@ services:
   web:
     build: ./docker/web
     volumes:
-      - ./php_server_v2:/var/www/html/
+      - ./php_server_v2_testing:/var/www/html/
     ports:
       - "80:80"
     # POINT PHP TO PGBOUNCER, NOT DIRECTLY TO POSTGRES

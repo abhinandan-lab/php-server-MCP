@@ -1,0 +1,25 @@
+{
+    "name": "your-vendor/php-light-framework",
+    "description": "A lightweight PHP API framework", 
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "App\\Controllers\\": "api/controllers/",
+            "App\\Exceptions\\": "api/exceptions/",
+            "App\\Core\\": "api/core/",
+            "App\\Middleware\\": "api/middleware/",
+            "App\\Services\\": "api/services/",
+            "App\\": "api/"
+        },
+        "files": [
+            "api/helpers/_autoload_helpers.php"
+        ]
+    },
+    "require": {
+        "php": ">=8.0",
+        "vlucas/phpdotenv": "^5.4"
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}
