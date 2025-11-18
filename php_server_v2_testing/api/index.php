@@ -1,310 +1,207 @@
 <?php
+/**
+ * Framework Bootstrap File
+ * 
+ * Entry point for the lightweight PHP framework
+ * Handles initialization, routing, and request dispatching
+ */
 
-// START OUTPUT BUFFERING FIRST - before any other code
+// ============================================
+// 1. START OUTPUT BUFFERING
+// ============================================
 ob_start();
 
-// Enable error reporting first
+// ============================================
+// 2. ERROR REPORTING CONFIGURATION
+// ============================================
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
-// Load autoloader first
-require_once __DIR__ . '/../vendor/autoload.php';
+// ============================================
+// 3. LOAD COMPOSER AUTOLOADER
+// ============================================
+if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    require_once __DIR__ . '/../vendor/autoload.php';
+} else {
+    http_response_code(500);
+    die(json_encode(['error' => 'Composer autoload not found. Run: composer install']));
+}
 
-// Load environment variables
+// ============================================
+// 4. LOAD ENVIRONMENT VARIABLES
+// ============================================
 use Dotenv\Dotenv;
-use App\Router;
-use App\Core\ExceptionHandler;
+
+try {
+    $dotenv = Dotenv::createImmutable(__DIR__ . '/..');
+    $dotenv->safeLoad();
+} catch (Exception $e) {
+    http_response_code(500);
+    die(json_encode(['error' => '.env file not found or invalid']));
+}
+
+// ============================================
+// 5. DEFINE PATHS
+// ============================================
+define('ROOT_PATH', dirname(__DIR__));
+define('API_PATH', __DIR__);
+define('CORE_PATH', API_PATH . '/core');
+define('CONTROLLERS_PATH', API_PATH . '/controllers');
+define('SERVICES_PATH', API_PATH . '/services');
+define('HELPERS_PATH', API_PATH . '/helpers');
+define('MIDDLEWARE_PATH', API_PATH . '/middleware');
+define('REPOSITORY_PATH', API_PATH . '/repository');
+define('ROUTERS_PATH', API_PATH . '/routers');
+define('UPLOADS_PATH', ROOT_PATH . '/uploads');
+define('LOGS_PATH', API_PATH . '/logs');
+
+// ============================================
+// 6. AUTO-LOAD HELPERS
+// ============================================
+if (file_exists(CORE_PATH . '/_autoload_helpers.php')) {
+    require_once CORE_PATH . '/_autoload_helpers.php';
+}
+
+// ============================================
+// 7. AUTO-LOAD ALL HELPER FILES
+// ============================================
+if (is_dir(HELPERS_PATH)) {
+    foreach (glob(HELPERS_PATH . '/*.php') as $helperFile) {
+        require_once $helperFile;
+    }
+}
+
+// ============================================
+// 8. AUTO-LOAD CORE FILES
+// ============================================
+$coreFiles = [
+    CORE_PATH . '/Config.php',
+    CORE_PATH . '/Security.php',
+    CORE_PATH . '/ExceptionHandler.php',
+    CORE_PATH . '/Router.php',
+];
+
+foreach ($coreFiles as $coreFile) {
+    if (file_exists($coreFile)) {
+        require_once $coreFile;
+    }
+}
+
+// ============================================
+// 9. NAMESPACE IMPORTS
+// ============================================
 use App\Core\Security;
+use App\Core\ExceptionHandler;
+use App\Core\Router;
 use App\Middleware\SecurityMiddleware;
 
-$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
-$dotenv->safeLoad();
+// ============================================
+// 10. INITIALIZE SECURITY
+// ============================================
+if (class_exists('App\Core\Security')) {
+    Security::initialize();
+}
 
-// Initialize security first
-Security::initialize();
+// ============================================
+// 11. APPLY SECURITY HEADERS & CORS
+// ============================================
+if (class_exists('App\Middleware\SecurityMiddleware')) {
+    SecurityMiddleware::applySecurityHeaders();
+    SecurityMiddleware::handleCORS();
+    
+    // Rate limiting: 100 requests per hour
+    SecurityMiddleware::rateLimiting(100, 3600);
+}
 
-// Apply security headers and CORS BEFORE any other output
-SecurityMiddleware::applySecurityHeaders();
-SecurityMiddleware::handleCORS();
+// ============================================
+// 12. REGISTER EXCEPTION HANDLER
+// ============================================
+if (class_exists('App\Core\ExceptionHandler')) {
+    ExceptionHandler::register();
+}
 
-// Basic rate limiting (100 requests per hour) - BEFORE router creation
-SecurityMiddleware::rateLimiting(100, 3600);
+// ============================================
+// 13. CONFIGURE ERROR REPORTING BASED ON ENV
+// ============================================
+$showErrors = !empty($_ENV['SHOW_ERRORS']) && 
+              ($_ENV['SHOW_ERRORS'] === true || 
+               $_ENV['SHOW_ERRORS'] === '1' || 
+               $_ENV['SHOW_ERRORS'] === 'true');
 
-// Register global exception handler
-ExceptionHandler::register();
+$logErrors = !empty($_ENV['LOG_ERRORS']) && 
+             ($_ENV['LOG_ERRORS'] === true || 
+              $_ENV['LOG_ERRORS'] === '1' || 
+              $_ENV['LOG_ERRORS'] === 'true');
 
-// Configure error reporting based on environment
-if (!empty($_ENV['SHOW_ERRORS']) && ($_ENV['SHOW_ERRORS'] === 'true' || $_ENV['SHOW_ERRORS'] === '1')) {
+if ($showErrors) {
     error_reporting(E_ALL);
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
-    ini_set('log_errors', '1');
-    ini_set('error_log', __DIR__ . '/php-error.log');
 } else {
     error_reporting(0);
     ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
 }
 
-// **CREATE ROUTER AFTER MIDDLEWARE**
-$router = new Router('/api');
-
-
-
-
-// SYSTEM ROUTES
-$router->add([
-    'method' => 'POST',
-    'url' => '/run_migration',
-    'controller' => 'InitController@migrateFromFile',
-    'desc' => 'Runs DB migration from uploaded SQL file',
-    'visible' => true,
-    'params' => [
-        'form' => ['sql_file' => 'file (required) – SQL file to execute']
-    ],
-    'group' => ['System']
-]);
-
-// Environment routes
-$router->add([
-    'method' => 'GET',
-    'url' => '/env/get',
-    'controller' => 'DocsController@getEnvironment',
-    'desc' => 'Get environment variables',
-    'visible' => false,
-    'group' => ['Environment']
-]);
-
-$router->add([
-    'method' => 'POST',
-    'url' => '/env/update',
-    'controller' => 'DocsController@updateEnvironment',
-    'desc' => 'Update environment variable',
-    'visible' => false,
-    'params' => [
-        'form' => [
-            'key' => 'string (required) – Environment variable key',
-            'value' => 'string (required) – Environment variable value'
-        ]
-    ],
-    'group' => ['Environment']
-]);
-
-$router->add([
-    'method' => 'POST',
-    'url' => '/env/add',
-    'controller' => 'DocsController@addEnvironment',
-    'desc' => 'Add new environment variable',
-    'visible' => false,
-    'params' => [
-        'form' => [
-            'key' => 'string (required) – Environment variable key',
-            'value' => 'string (required) – Environment variable value'
-        ]
-    ],
-    'group' => ['Environment']
-]);
-
-// Main API Routes
-$router->add([
-    'method' => 'GET',
-    'url' => '/',
-    'controller' => 'AuthController@welcome',
-    'desc' => 'API welcome message with framework info',
-    'visible' => true,
-    'group' => ['Testing']
-]);
-
-$router->add([
-    'method' => 'GET',
-    'url' => '/test',
-    'controller' => 'AuthController@test',
-    'desc' => 'Testing endpoint with debug information',
-    'visible' => true,
-    'group' => ['Testing']
-]);
-
-// Documentation route
-$router->add([
-    'method' => 'GET',
-    'url' => '/docs',
-    'controller' => 'DocsController@index',
-    'desc' => 'Interactive API documentation with testing interface',
-    'visible' => true,
-    'group' => ['Documentation']
-]);
-
-// Test routes with different parameter types
-$router->add([
-    'method' => 'GET',
-    'url' => '/test-exception',
-    'controller' => 'AuthController@testException',
-    'desc' => 'Test exception handling with different error types',
-    'visible' => true,
-    'params' => [
-        'get' => ['type' => 'string (optional) – validation|database|notfound|generic|fatal']
-    ],
-    'group' => ['Testing']
-]);
-
-$router->add([
-    'method' => 'POST',
-    'url' => '/test-validation',
-    'controller' => 'AuthController@testValidation',
-    'desc' => 'Test validation with required fields',
-    'visible' => true,
-    'params' => [
-        'form' => [
-            'email' => 'string (required) – Valid email address',
-            'password' => 'string (required) – Password (min 8 characters)',
-            'name' => 'string (required) – Full name'
-        ]
-    ],
-    'group' => ['Testing']
-]);
-
-// Example with URL parameters
-$router->add([
-    'method' => 'GET',
-    'url' => '/user/{id}',
-    'controller' => 'AuthController@getUserById',
-    'desc' => 'Get user by ID with optional status filter',
-    'visible' => true,
-    'params' => [
-        'url' => ['id' => 'integer (required) – User ID'],
-        'get' => [
-            'status' => 'string (optional) – active|inactive|pending',
-            'include_profile' => 'boolean (optional) – Include profile data'
-        ]
-    ],
-    'group' => ['Testing']
-]);
-
-// Example with JSON body
-$router->add([
-    'method' => 'POST',
-    'url' => '/user/create',
-    'controller' => 'AuthController@createUser',
-    'desc' => 'Create new user with JSON payload',
-    'visible' => true,
-    'params' => [
-        'json' => [
-            'name' => 'string (required) – Full name',
-            'email' => 'string (required) – Valid email',
-            'password' => 'string (required) – Min 8 characters',
-            'profile' => 'object (optional) – {age: number, bio: string}'
-        ]
-    ],
-    'group' => ['Testing']
-]);
-
-
-// **VALIDATION TEST ROUTE**
-$router->add([
-    'method' => 'POST',
-    'url' => '/test-validation',
-    'controller' => 'AuthController@testValidation',
-    'desc' => 'Test validation with required fields and sanitization',
-    'visible' => true,
-    'params' => [
-        'form' => [
-            'email' => 'string (required) – Valid email address',
-            'password' => 'string (required) – Password (min 8 characters)',
-            'name' => 'string (required) – Full name (min 2 characters, max 50)'
-        ]
-    ],
-    'group' => ['Testing']
-]);
-
-
-
-
-
-// User routes
-$router->add([
-    'method' => 'POST',
-    'url' => '/user/register',
-    'controller' => 'UserController@register',
-    'desc' => 'Register a new user',
-    'visible' => true,
-    'params' => [
-        'json' => [
-            'email' => 'string (required) – Valid email',
-            'password' => 'string (required) – Min 8 characters',
-            'name' => 'string (required) – Full name'
-        ]
-    ],
-    'group' => ['Users']
-]);
-
-$router->add([
-    'method' => 'GET',
-    'url' => '/user',
-    'controller' => 'UserController@getUser',
-    'desc' => 'Get user by ID',
-    'visible' => true,
-    'params' => [
-        'get' => ['id' => 'integer (required) – User ID']
-    ],
-    'group' => ['Users']
-]);
-
-
-
-
-// Service Tester Routes
-$router->add([
-    'method' => 'GET',
-    'url' => '/service-test',
-    'controller' => 'ServiceTesterController@index',
-    'desc' => 'Service Tester UI',
-    'visible' => true,
-    'group' => ['Testing']
-]);
-
-$router->add([
-    'method' => 'POST',
-    'url' => '/service-test/execute',
-    'controller' => 'ServiceTesterController@execute',
-    'desc' => 'Execute service test',
-    'visible' => false,
-    'group' => ['Testing']
-]);
-
-$router->add([
-    'method' => 'POST',
-    'url' => '/service-test/toggle-debug',
-    'controller' => 'ServiceTesterController@toggleDebug',
-    'desc' => 'Toggle debug mode',
-    'visible' => false,
-    'group' => ['Testing']
-]);
-
-
-
-
-
-
-
-
-// Set JSON content type for API responses (except docs)
-if ($_SERVER['REQUEST_URI'] !== '/api/docs') {
-    header('Content-Type: application/json');
+if ($logErrors) {
+    ini_set('log_errors', 1);
+    ini_set('error_log', LOGS_PATH . '/php-error.log');
 }
-$router->dispatch();
 
+// ============================================
+// 14. SET TIMEZONE
+// ============================================
+date_default_timezone_set($_ENV['TIMEZONE'] ?? 'UTC');
 
-// Check if this is the docs route (HTML response)
-$requestUri = $_SERVER['REQUEST_URI'] ?? '';
-$isDocsRoute = (strpos($requestUri, '/docs') !== false);
+// ============================================
+// 15. INITIALIZE ROUTER
+// ============================================
+$router = new Router();
 
-if ($isDocsRoute) {
-    // For docs page - flush output (show HTML)
-    ob_end_flush();
-} else {
-    // For API routes - clean output (discard debug text)
-    if (!headers_sent()) {
-        ob_end_clean();
+// ============================================
+// 16. LOAD ROUTE FILES
+// ============================================
+$routeFiles = [
+    ROUTERS_PATH . '/api.php',
+    ROUTERS_PATH . '/web.php',
+    ROUTERS_PATH . '/devtools.php',
+];
+
+foreach ($routeFiles as $routeFile) {
+    if (file_exists($routeFile)) {
+        require_once $routeFile;
     }
 }
+
+// ============================================
+// 17. EXECUTE PERFORMANCE TRACKING (Optional)
+// ============================================
+$startTime = microtime(true);
+$startMemory = memory_get_usage();
+
+// ============================================
+// 18. DISPATCH REQUEST
+// ============================================
+try {
+    $router->dispatch();
+} catch (Exception $e) {
+    ExceptionHandler::handle($e);
+}
+
+// ============================================
+// 19. PERFORMANCE METRICS (Development Only)
+// ============================================
+if ($showErrors) {
+    $executionTime = round((microtime(true) - $startTime) * 1000, 2);
+    $memoryUsed = round((memory_get_usage() - $startMemory) / 1024, 2);
+    
+    // Add performance headers
+    header("X-Execution-Time: {$executionTime}ms");
+    header("X-Memory-Used: {$memoryUsed}KB");
+}
+
+// ============================================
+// 20. FLUSH OUTPUT BUFFER
+// ============================================
+ob_end_flush();

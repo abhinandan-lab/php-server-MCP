@@ -1,25 +1,23 @@
 {
-    "name": "your-vendor/php-light-framework",
-    "description": "A lightweight PHP API framework", 
+    "name": "yourname/light-php-framework",
+    "description": "Lightweight PHP Framework",
     "type": "project",
+    "require": {
+        "php": ">=8.1",
+        "vlucas/phpdotenv": "^5.6"
+    },
+     "config": {
+        "optimize-autoloader": true
+    },
     "autoload": {
         "psr-4": {
-            "App\\Controllers\\": "api/controllers/",
-            "App\\Exceptions\\": "api/exceptions/",
+            "App\\": "api/",
             "App\\Core\\": "api/core/",
-            "App\\Middleware\\": "api/middleware/",
+            "App\\Core\\Exceptions\\": "api/core/Exceptions/",
+            "App\\Controllers\\": "api/controllers/",
             "App\\Services\\": "api/services/",
-            "App\\": "api/"
-        },
-        "files": [
-            "api/helpers/_autoload_helpers.php"
-        ]
-    },
-    "require": {
-        "php": ">=8.0",
-        "vlucas/phpdotenv": "^5.4"
-    },
-    "config": {
-        "optimize-autoloader": true
+            "App\\Middleware\\": "api/middleware/",
+            "App\\Repository\\": "api/repository/"
+        }
     }
 }
